@@ -1,15 +1,16 @@
 // src/interfaces/routes/apartmentRoutes.ts
-import express from 'express';
+import express,{Response,Request,NextFunction} from 'express';
 import { ApartmentController } from '../controllers/ApartmentController';
 import { ApartmentUseCases } from '../../application/usecases/apartmentUseCases';
 import { MongoApartmentRepository } from '../../infrastructure/database/MongoApartmentRepository';
+import { authMiddleware,CustomRequest } from '../../infrastructure/middlewares/authMiddleware';
 
 const router = express.Router();
 const apartmentRepository = new MongoApartmentRepository();
 const apartmentUseCases = new ApartmentUseCases(apartmentRepository);
 const apartmentController = new ApartmentController(apartmentUseCases);
 
-router.post('/', (req, res) => apartmentController.create(req, res)); 
-router.get('/', (req, res) => apartmentController.getApartments(req, res));
+router.post('/', (req:CustomRequest, res) => apartmentController.create(req, res)); 
+router.get('/',authMiddleware, (req:Request, res:Response) => apartmentController.getApartments(req,res));
 
 export default router;

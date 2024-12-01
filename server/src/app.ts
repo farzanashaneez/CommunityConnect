@@ -5,6 +5,7 @@ import cors from 'cors';
 import userRouter from "./interfaces/routes/userRoutes";
 import apartmentRoutes from './interfaces/routes/apartmentroutes';
 import morgan from 'morgan';
+import errorHandler from "./infrastructure/middlewares/errorHandlerMiddleware";
 
 conncetDb();
 dotenv.config()
@@ -16,6 +17,7 @@ app.use(morgan('combined'));
 app.use(express.urlencoded({extended:true}))
 app.use('/api/users',userRouter)
 app.use('/api/apartments', apartmentRoutes);
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT,()=>{

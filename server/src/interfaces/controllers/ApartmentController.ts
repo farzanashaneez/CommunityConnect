@@ -1,11 +1,12 @@
 // src/interfaces/controllers/ApartmentController.ts
 import { Request, Response } from 'express';
 import { ApartmentUseCases } from '../../application/usecases/apartmentUseCases';
+import { CustomRequest } from '../../infrastructure/middlewares/authMiddleware';
 
 export class ApartmentController {
   constructor(private apartmentUseCases: ApartmentUseCases) {}
 
-  async create(req: Request, res: Response): Promise<void> {
+  async create(req: CustomRequest, res: Response): Promise<void> {
     try {
       const apartment = await this.apartmentUseCases.createApartment(req.body);
       res.status(201).json({ message: 'Apartment created successfully', apartment });
@@ -14,7 +15,7 @@ export class ApartmentController {
     }
   }
 
-  async getApartments(req: Request, res: Response): Promise<void> {
+  async getApartments(req: CustomRequest, res: Response): Promise<void> {
     try {
       const apartments = await this.apartmentUseCases.getAllApartments();
       res.json(apartments);

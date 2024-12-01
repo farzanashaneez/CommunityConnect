@@ -5,6 +5,9 @@ import CustomModal from '../../components/CustomModal';
 import { useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { useAppDispatch,useAppSelector } from '../../hooks/reduxStoreHook';
+import { loggedin,loginfailure } from '../../redux-store/user/adminSlice';
+
 
 
 
@@ -14,6 +17,9 @@ const AdminLogin: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const adminState = useAppSelector((state) => state.admin);
+  const dispatch=useAppDispatch()
+
 const navigate=useNavigate();
 const validationSchema = Yup.object({
     email: Yup.string()
@@ -32,11 +38,29 @@ const formik = useFormik({
     validationSchema,
     onSubmit: async (values) => {
       try {
+        console.log("admin State",adminState)
+
         const response = await login(values.email, values.password);
-        console.log(response);
-        setSnackbarMessage('Logged in successfully!');
-        setOpenSnackbar(true);
-        navigate('/admin/dashboard');
+        // console.log(response);
+
+        // setSnackbarMessage('Logged in successfully!');
+        // dispatch(loggedin(response.data));
+
+        // console.log("admin State after dispatch",adminState)
+
+        // setOpenSnackbar(true);
+        // navigate('/admin/dashboard');
+
+        if (response.data.isAdmin) {
+          setSnackbarMessage('Logged in successfully!');
+          dispatch(loggedin(response.data));
+          setOpenSnackbar(true);
+          navigate('/admin/dashboard');
+        } else {
+          setError('Access denied. Admin rights required.');
+          setModalOpen(true);
+          dispatch(loginfailure());
+        }
       } catch (error) {
         console.error('Login failed:', error);
         setError('Login failed..!');

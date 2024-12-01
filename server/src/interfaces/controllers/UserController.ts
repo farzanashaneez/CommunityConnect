@@ -21,12 +21,12 @@ export class UserController {
   async login(req: Request, res: Response): Promise<void> {
     try {
       const { email, password } = req.body;
-      const token = await this.userUseCases.loginUser(email, password);
-      if (!token) {
+      const data = await this.userUseCases.loginUser(email, password);
+      if (!data?.token) {
         res.status(401).json({ message: 'Invalid credentials' });
         return;
       }
-      res.json({ message: 'Login successful', token });
+      res.json({ message: 'Login successful', data });
     } catch (error) {
       res.status(400).json({ message: 'Login failed', error });
     }

@@ -1,14 +1,20 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-const initialState= {
-    admin: null,
-    isLogged: false,
-  }
+interface AdminState {
+  admin: any | null; // Consider defining a more specific type for admin
+  isLogged: boolean;
+}
+
+const initialState: AdminState = {
+  admin: null,
+  isLogged: false,
+};
+
 const adminSlice = createSlice({
   name: "admin",
   initialState,
   reducers: {
-    loggedin: (state, action) => {
+    loggedin: (state, action: PayloadAction<any>) => {
       state.admin = action.payload;
       state.isLogged = true;
     },
@@ -23,5 +29,5 @@ const adminSlice = createSlice({
   },
 });
 
-export default adminSlice.reducer;
 export const { loggedin, loggedOut, loginfailure } = adminSlice.actions;
+export default adminSlice.reducer;

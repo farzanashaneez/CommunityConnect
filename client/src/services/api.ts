@@ -1,23 +1,29 @@
-import axios from 'axios';
+ import axios from 'axios';
+
+import api from "./configAxios";
+
 
 const API_URL = 'http://localhost:5000/api';
 
+
 export const register = async (userData: any) => {
-  const response = await axios.post(`${API_URL}/users/register`, userData);
+  const response = await api.post(`${API_URL}/users/register`, userData);
   return response.data;
 };
 
 export const login = async (email: string, password: string) => {
-  const response = await axios.post(`${API_URL}/users/login`, { email, password });
+  const response = await api.post(`${API_URL}/users/login`, { email, password });
   return response.data;
 };
 
 export const fetchAllApartments = async () => {
-  const response = await axios.get(`${API_URL}/apartments`);
+  const response = await api.get(`${API_URL}/apartments`);
   return response.data;
 };
 
 export const fetchAllUsers = async () => {
-  const response = await axios.get(`${API_URL}/users`);
+  const response = await api.get(`${API_URL}/users`);
   return response.data;
 };
+
+
