@@ -1,12 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface AdminState {
-  admin: any | null; // Consider defining a more specific type for admin
+  currentAdmin: any | null; // Consider defining a more specific type for admin
   isLogged: boolean;
 }
 
 const initialState: AdminState = {
-  admin: null,
+  currentAdmin: null,
   isLogged: false,
 };
 
@@ -15,15 +15,15 @@ const adminSlice = createSlice({
   initialState,
   reducers: {
     loggedin: (state, action: PayloadAction<any>) => {
-      state.admin = action.payload;
+      state.currentAdmin = action.payload;
       state.isLogged = true;
     },
     loginfailure: (state) => {
-      state.admin = null;
+      state.currentAdmin = null;
       state.isLogged = false;
     },
     loggedOut: (state) => {
-      state.admin = null;
+      state.currentAdmin = null;
       state.isLogged = false;
     },
   },

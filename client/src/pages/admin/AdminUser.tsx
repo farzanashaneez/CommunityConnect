@@ -56,7 +56,12 @@ const AdminUser: React.FC = () => {
       resetForm();
     } catch (error) {
       console.error('Error adding user:', error);
-      setSnackbarMessage('Error registering user. Please try again.');
+  let errorMessage = "Error :";
+  if (error instanceof Error) {
+    errorMessage += ` ${(error as any).response?.data.message}`;
+  }
+  setSnackbarMessage(errorMessage);
+
       setOpenSnackbar(true);
     }
     setSubmitting(false);

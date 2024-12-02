@@ -6,13 +6,17 @@ import { User } from "../../domain/entities/User";
 export class userUseCases {
   constructor(private userRepository: UserRepository) {}
 
-  async registerUser(userData: User): Promise<User> {
+  async registerUser(userData: User): Promise<{user:User,password:string}> {
     const hashedPassword = await bcrypt.hash(userData.password, 12);
-    return this.userRepository.create({
+    const createdUser=await this.userRepository.create({
       ...userData,
       password: hashedPassword,
     
     });
+    return {
+      user: createdUser,
+      password: userData.password, // Return the plain-text password
+    };
   }
 
   async loginUser(email: string, password: string): Promise<{ token: string; user: Partial<User> } | null> {

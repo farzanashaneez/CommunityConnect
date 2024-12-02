@@ -12,8 +12,8 @@ const api: AxiosInstance = axios.create({
 api.interceptors.request.use(
   (config) => {
     const state = store.getState();
-
-    const admintoken = state.admin?.admin.token;
+   // store.dispatch(loggedOut());
+    const admintoken = state.admin?.currentAdmin?.token;
     const currenttoken= state.user?.currentUser?.token;
     console.log('admin token',admintoken)
     if (admintoken) {
@@ -34,11 +34,17 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response?.status === 401) {
+      if (error.response.data.message.toLowerCase().includes('invalid token')) {
+        store.dispatch(loggedOut());
+
+       
+      }
       if (error.config.url?.startsWith('/admin')) {
         store.dispatch(loggedOut());
       } else {
         store.dispatch(signoutSuccess());
       }
+      //store.dispatch(loggedOut());
     }
     return Promise.reject(error);
   }

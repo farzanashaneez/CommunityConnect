@@ -1,42 +1,41 @@
 import React, { useEffect, useState } from 'react';
 import { TextField, Button, Container, Typography, Paper, Snackbar } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import { login } from '../../services/api'; // Adjust the import based on your structure
 import CustomModal from '../../components/CustomModal';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { useAppDispatch,useAppSelector } from '../../hooks/reduxStoreHook';
-import { loggedin,loginfailure } from '../../redux-store/user/adminSlice';
+import { useAppDispatch, useAppSelector } from '../../hooks/reduxStoreHook';
+import { signinSuccess,signinFailure,signInStart } from '../../redux-store/user/userSlice';
 
-
-
-
-const AdminLogin: React.FC = () => {
-
+const UserLogin: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const adminState = useAppSelector((state) => state.admin);
-  const dispatch=useAppDispatch()
+  const userState = useAppSelector((state) => state.user);
+  const dispatch = useAppDispatch();
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (adminState.isLogged) {
-      window.history.replaceState(null, '', '/admin/dashboard'); // Replace current state with dashboard
+    if (userState.currentUser) {
+      window.history.replaceState(null, '', '/home');
+      navigate('/home');
     }
   }, [location]);
-const navigate=useNavigate();
-const validationSchema = Yup.object({
+
+  const validationSchema = Yup.object({
     email: Yup.string()
       .email('Invalid email address')
       .required('Email is required'),
     password: Yup.string()
-      .min(6, 'Password must be at least 6 characters')
+      // .min(6, 'Password must be at least 6 characters')
       .required('Password is required'),
   });
 
-const formik = useFormik({
+  const formik = useFormik({
     initialValues: {
       email: '',
       password: '',
@@ -44,32 +43,15 @@ const formik = useFormik({
     validationSchema,
     onSubmit: async (values) => {
       try {
-        console.log("admin State",adminState)
-
+        console.log("user State", userState);
         const response = await login(values.email, values.password);
         console.log(response);
 
-        // setSnackbarMessage('Logged in successfully!');
-        // dispatch(loggedin(response.data));
-
-        // console.log("admin State after dispatch",adminState)
-
-        // setOpenSnackbar(true);
-        // navigate('/admin/dashboard');
-
-        if (response.data.user.isAdmin) {
           setSnackbarMessage('Logged in successfully!');
-          dispatch(loggedin(response.data));
+          dispatch(signinSuccess(response.data));
           setOpenSnackbar(true);
-          navigate('/admin/dashboard');
-        } else {
-          //setError('Access denied. Admin rights required.');
-          setSnackbarMessage('Access denied. Admin rights required.');
-          setOpenSnackbar(true);
-
-         // setModalOpen(true);
-          dispatch(loginfailure());
-        }
+          navigate('/home');
+      
       } catch (error) {
         console.error('Login failed:', error);
         setError('Login failed..!');
@@ -77,26 +59,41 @@ const formik = useFormik({
       }
     },
   });
+
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
+
   return (
     <Container component="main" maxWidth={false} 
-    sx={{ 
-    //   backgroundColor: 'blue', 
-      backgroundImage:"url('/src/assets/admin_background.avif')",
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      margin: 0,
-      padding: 0,
-      display: 'flex', 
-      justifyContent: 'center', 
-      alignItems: 'center', 
-      height: '100vh',
-      width: '100vw'
-    }}>
-      <Paper elevation={3} style={{ padding: '20px' }}>
-        <Typography variant="h5" align="center">Admin Login</Typography>
+     
+
+      sx={{ 
+        backgroundImage: "url('/src/assets/homeBG.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        margin: 0,
+        padding: 0,
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        width: '100%',
+        height:'100%',
+      overflowX: 'hidden'
+      }}>
+      <Paper 
+        elevation={6} 
+        sx={{
+          padding: '40px',
+          width: '100%',
+          maxWidth: '400px',
+          backgroundColor: alpha('#ffffff', 0.5),
+          backdropFilter: 'blur(10px)',
+          borderRadius: '15px',
+          boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+        }}
+      >
+       <img src={"/src/assets/Community-2.png"} alt="Logo" style={{ width: '100%', height: 'auto', marginBottom: '20px' }} />
         <form onSubmit={formik.handleSubmit} noValidate>
           <TextField
             variant="outlined"
@@ -111,6 +108,7 @@ const formik = useFormik({
             onBlur={formik.handleBlur}
             error={formik.touched.email && Boolean(formik.errors.email)}
             helperText={formik.touched.email && formik.errors.email}
+            sx={{ backgroundColor: alpha('#ffffff', 0.7), borderRadius: '4px' }}
           />
           <TextField
             variant="outlined"
@@ -126,13 +124,24 @@ const formik = useFormik({
             onBlur={formik.handleBlur}
             error={formik.touched.password && Boolean(formik.errors.password)}
             helperText={formik.touched.password && formik.errors.password}
+            sx={{ backgroundColor: alpha('#ffffff', 0.7), borderRadius: '4px' }}
           />
           <Button
             type="submit"
             fullWidth
             variant="contained"
             color="primary"
-            style={{ marginTop: '16px' }}
+            sx={{ 
+              marginTop: '24px',
+              padding: '12px',
+              fontSize: '1rem',
+              fontWeight: 'bold',
+              borderRadius: '8px',
+              backgroundColor: '#1976d2',
+              '&:hover': {
+                backgroundColor: '#115293',
+              }
+            }}
           >
             Login
           </Button>
@@ -140,30 +149,23 @@ const formik = useFormik({
       </Paper>
       <CustomModal 
         open={modalOpen} 
-        handleClose={() => setModalOpen(false)} 
-        title="Login Error" 
-        content={<div>{error}</div>} 
+        handleClose={() => setModalOpen(false)}
+        title="Login Error"
+        content={error}
+        onConfirm={() => setModalOpen(false)}
+        confirmText="Close"
+        cancelText=""
+        showConfirm={true}
+        showCancel={false}
       />
-      <CustomModal 
-  open={modalOpen} 
-  handleClose={() => setModalOpen(false)}
-  title="Login Error"
-  content={error}
-  onConfirm={() => setModalOpen(false)}
-  confirmText="close"
-  cancelText=""
-  showConfirm={true}
-  showCancel={false}
-/>
-       <Snackbar
+      <Snackbar
         open={openSnackbar}
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
         message={snackbarMessage}
       />
     </Container>
-    
   );
 };
 
-export default AdminLogin;
+export default UserLogin;

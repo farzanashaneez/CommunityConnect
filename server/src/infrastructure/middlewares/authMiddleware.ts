@@ -16,15 +16,17 @@ export interface CustomRequest extends Request {
 
 export const authMiddleware = (req: CustomRequest, res: Response, next: NextFunction):void => {
   const token = req.header('Authorization')?.replace('Bearer ', '');
-console.log("token",req.headers)
+console.log("token",req.headers,"----->",token)
   if (!token) {
     res.status(401).json({ message: 'No token provided' });
     return; 
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as CustomUser;
-    req.user = decoded
+    console.log("decoded")
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') ;
+    console.log("decoded",decoded)
+    req.user = decoded as CustomUser
     next();
   } catch (error) {
     res.status(401).json({ message: 'Invalid token' });

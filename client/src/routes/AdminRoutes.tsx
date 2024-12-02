@@ -1,6 +1,5 @@
 import React from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
-import AdminLogin from '../pages/admin/AdminLogin';
 import AdminDashboard from '../pages/admin/AdminDashboard';
 import Sidebar from '../components/Sidebar';
 import AdminUser from '../pages/admin/AdminUser';
@@ -9,6 +8,7 @@ import AdminEvents from '../pages/admin/AdminEvents';
 import AdminPosts from '../pages/admin/AdminPosts';
 import AdminAnnouncements from '../pages/admin/AdminAnnouncements';
 import AdminSettings from '../pages/admin/AdminSettings';
+
 
 const AdminRoutes: React.FC = () => {
   const location = useLocation();
@@ -25,7 +25,6 @@ const AdminRoutes: React.FC = () => {
           </header>
           <main className="p-6">
             <Routes>
-              <Route path="/login" element={<AdminLogin />} />
               <Route path='/dashboard' element={<AdminDashboard />} />
               <Route path='/users' element={<AdminUser />} />
               <Route path='/services' element={<AdminServices />} />

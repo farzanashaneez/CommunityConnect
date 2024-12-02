@@ -10,7 +10,7 @@ const apartmentRepository = new MongoApartmentRepository();
 const apartmentUseCases = new ApartmentUseCases(apartmentRepository);
 const apartmentController = new ApartmentController(apartmentUseCases);
 
-router.post('/', (req:CustomRequest, res) => apartmentController.create(req, res)); 
-router.get('/',authMiddleware, (req:Request, res:Response) => apartmentController.getApartments(req,res));
+router.post('/', (req:CustomRequest, res:Response,next:NextFunction) => apartmentController.create(req, res,next)); 
+router.get('/',authMiddleware, (req:CustomRequest, res:Response,next:NextFunction) => apartmentController.getApartments(req,res,next));
 
 export default router;
