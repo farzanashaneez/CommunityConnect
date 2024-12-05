@@ -19,12 +19,12 @@ const UserLogin: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (userState.currentUser) {
-      window.history.replaceState(null, '', '/home');
-      navigate('/home');
-    }
-  }, [location]);
+  // useEffect(() => {
+  //   if (userState.currentUser) {
+  //     window.history.replaceState(null, '', '/home');
+  //     navigate('/home');
+  //   }
+  // }, [location]);
 
   const validationSchema = Yup.object({
     email: Yup.string()

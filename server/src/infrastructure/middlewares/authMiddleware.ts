@@ -23,9 +23,9 @@ console.log("token",req.headers,"----->",token)
   }
 
   try {
-    console.log("decoded")
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') ;
     console.log("decoded",decoded)
+
     req.user = decoded as CustomUser
     next();
   } catch (error) {

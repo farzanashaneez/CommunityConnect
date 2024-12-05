@@ -1,4 +1,3 @@
- import axios from 'axios';
 
 import api from "./configAxios";
 
@@ -23,6 +22,25 @@ export const fetchAllApartments = async () => {
 
 export const fetchAllUsers = async () => {
   const response = await api.get(`${API_URL}/users`);
+  return response.data;
+};
+
+export const fetchUserDetails = async (token: string,id:string) => {
+  console.log("iid",id)
+  const response = await api.get(`${API_URL}/users/details/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
+export const addMember = async (token: string,id:string, memberData: { name: string; relation: string; profession: string }) => {
+  const response = await api.post(`${API_URL}/users/members/${id}`, memberData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return response.data;
 };
 

@@ -8,6 +8,7 @@ import AdminEvents from '../pages/admin/AdminEvents';
 import AdminPosts from '../pages/admin/AdminPosts';
 import AdminAnnouncements from '../pages/admin/AdminAnnouncements';
 import AdminSettings from '../pages/admin/AdminSettings';
+import PageNotFound from '../pages/PageNotFound';
 
 
 const AdminRoutes: React.FC = () => {
@@ -32,6 +33,8 @@ const AdminRoutes: React.FC = () => {
               <Route path='/posts' element={<AdminPosts />} />
               <Route path='/announcements' element={<AdminAnnouncements />} />
               <Route path='/settings' element={<AdminSettings />} />
+              <Route path="*" element={<PageNotFound />} />
+
               {/* Add other admin routes here */}
             </Routes>
           </main>

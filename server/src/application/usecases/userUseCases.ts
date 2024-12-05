@@ -1,21 +1,21 @@
+// backend/application/useCases/userUseCases.ts
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { UserRepository } from "../interfaces/UserRepository";
 import { User } from "../../domain/entities/User";
 
-export class userUseCases {
+export class UserUseCases {
   constructor(private userRepository: UserRepository) {}
 
-  async registerUser(userData: User): Promise<{user:User,password:string}> {
+  async registerUser(userData: User): Promise<{ user: User; password: string }> {
     const hashedPassword = await bcrypt.hash(userData.password, 12);
-    const createdUser=await this.userRepository.create({
+    const createdUser = await this.userRepository.create({
       ...userData,
       password: hashedPassword,
-    
     });
     return {
       user: createdUser,
-      password: userData.password, // Return the plain-text password
+      password: userData.password,
     };
   }
 
@@ -36,9 +36,22 @@ export class userUseCases {
         email: user.email,
         isAdmin: user.isAdmin,
       }
-    }
+    };
   }
+
   async getAllUsers(): Promise<User[]> {
     return this.userRepository.findAll();
+  }
+
+  async getUserById(userId: string): Promise<User | null> {
+    return this.userRepository.findById(userId);
+  }
+
+  async updateUser(userId: string, userData: Partial<User>): Promise<User | null> {
+    return this.userRepository.update(userId, userData);
+  }
+
+  async addMember(userId: string, memberData: { name: string; relation: string; profession: string }): Promise<User | null> {
+    return this.userRepository.addMember(userId, memberData);
   }
 }

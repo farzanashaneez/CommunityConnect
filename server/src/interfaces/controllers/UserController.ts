@@ -1,20 +1,21 @@
 import { Request, Response, NextFunction } from 'express';
-import { userUseCases } from '../../application/usecases/userUseCases';
 import { sendWelcomeEmail } from '../../infrastructure/services/emailServices';
+import { UserUseCases } from '../../application/usecases/userUseCases';
+import { error } from 'console';
 
 export class UserController {
-  constructor(private userUseCases: userUseCases) {}
+  constructor(private userUseCases: UserUseCases) {}
 
   async register(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       console.log(req.body);
-      const {user,password} = await this.userUseCases.registerUser(req.body);
-      console.log("user--->",user,"password---->",password)
-      await sendWelcomeEmail(user.email, user.firstName,password);
+      const { user, password } = await this.userUseCases.registerUser(req.body);
+      console.log("user--->", user, "password---->", password);
+      await sendWelcomeEmail(user.email, user.firstName, password);
 
       res.status(201).json({ message: 'User registered successfully', user });
     } catch (error) {
-      console.log("============",error)
+      console.log("Registration error:", error);
       next(error);
     }
   }
@@ -30,6 +31,7 @@ export class UserController {
       }
       res.json({ message: 'Login successful', data });
     } catch (error) {
+      console.log("Login error:", error);
       next(error);
     }
   }
@@ -39,6 +41,67 @@ export class UserController {
       const users = await this.userUseCases.getAllUsers();
       res.json(users);
     } catch (error) {
+      console.log("Get users error:", error);
+      next(error);
+    }
+  }
+
+  async getUserById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.params.id; 
+      const user = await this.userUseCases.getUserById(userId);
+      if (!user) {
+        const error = new Error('User not found');
+        (error as any).statusCode = 404; 
+        throw error;
+      }
+      console.log("user",user)
+      res.json(user);
+    } catch (error) {
+      console.log("Get user by ID error:", error);
+      next(error);
+    }
+  }
+
+  async updateUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.params.id; // Assuming you're passing the user ID in the URL
+      const updatedUser = await this.userUseCases.updateUser(userId, req.body);
+      if (!updatedUser) {
+        const error = new Error('User not found');
+        (error as any).statusCode = 404; // Adding a custom property for status code
+        throw error;
+      }
+      res.json({ message: 'User updated successfully', updatedUser });
+    } catch (error) {
+      console.log("Update user error:", error);
+      next(error);
+    }
+  }
+
+  async addMember(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      console.log("add member called")
+      const userId = req.params.id; 
+      const { name, relation, profession } = req.body;
+
+      if (!name || !relation || !profession) {
+        const error = new Error('All fields are required');
+        (error as any).statusCode = 404; 
+        throw error;
+      }
+
+      const updatedUser = await this.userUseCases.addMember(userId, { name, relation, profession });
+      
+      if (!updatedUser) {
+        const error = new Error('User not found');
+        (error as any).statusCode = 404; 
+        throw error;
+      }
+      const members=updatedUser?.members||[] ;
+      res.json({ message: 'Member added successfully', members});
+    } catch (error) {
+      console.log("Add member error:", error);
       next(error);
     }
   }
