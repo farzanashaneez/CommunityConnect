@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
+import { Box, Drawer, IconButton, useMediaQuery, useTheme } from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
 import AdminDashboard from '../pages/admin/AdminDashboard';
 import Sidebar from '../components/Sidebar';
 import AdminUser from '../pages/admin/AdminUser';
@@ -10,37 +12,84 @@ import AdminAnnouncements from '../pages/admin/AdminAnnouncements';
 import AdminSettings from '../pages/admin/AdminSettings';
 import PageNotFound from '../pages/PageNotFound';
 
+const drawerWidth = 240;
 
 const AdminRoutes: React.FC = () => {
   const location = useLocation();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      {location.pathname !== '/admin/login' && <Sidebar />}
-      <div className="flex-grow overflow-auto">
-        <div className={`${location.pathname !== '/admin/login' ? 'ml-64' : ''}`}>
-          <header className="bg-white shadow-sm">
-            <h1 className="text-3xl font-bold text-gray-900 p-4 text-start">
-              ADMIN DASHBOARD
-            </h1>
-          </header>
-          <main className="p-6">
-            <Routes>
-              <Route path='/dashboard' element={<AdminDashboard />} />
-              <Route path='/users' element={<AdminUser />} />
-              <Route path='/services' element={<AdminServices />} />
-              <Route path='/events' element={<AdminEvents />} />
-              <Route path='/posts' element={<AdminPosts />} />
-              <Route path='/announcements' element={<AdminAnnouncements />} />
-              <Route path='/settings' element={<AdminSettings />} />
-              <Route path="*" element={<PageNotFound />} />
+    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: theme.palette.background.default }}>
+      {/* Mobile Menu Icon */}
+      {isMobile && (
+        <IconButton
+          color="inherit"
+          aria-label="open drawer"
+          edge="start"
+          onClick={handleDrawerToggle}
+          sx={{
+            position: 'absolute',
+            top: 16,
+            left: 16,
+            zIndex: theme.zIndex.drawer + 1,
+          }}
+        >
+          <MenuIcon />
+        </IconButton>
+      )}
 
-              {/* Add other admin routes here */}
-            </Routes>
-          </main>
-        </div>
-      </div>
-    </div>
+      {/* Sidebar Drawer */}
+      <Drawer
+        variant={isMobile ? 'temporary' : 'permanent'}
+        open={isMobile ? mobileOpen : true}
+        onClose={handleDrawerToggle}
+        ModalProps={{
+          keepMounted: true, // Improves performance on mobile.
+        }}
+        sx={{
+          '& .MuiDrawer-paper': {
+            width: drawerWidth,
+            boxSizing: 'border-box',
+            backgroundColor: theme.palette.background.paper,
+            boxShadow: isMobile ? theme.shadows[5] : 'none',
+          },
+        }}
+      >
+        <Sidebar />
+      </Drawer>
+
+      {/* Main Content */}
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          width: { lg: `calc(100% - ${drawerWidth}px)`, xs: '100%' },
+          p: { xs: 2, md: 3 },
+          marginLeft: isMobile ? 0 : `${drawerWidth}px`,
+          transition: theme.transitions.create(['margin', 'width'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+          }),
+        }}
+      >
+        <Routes>
+          <Route path='/dashboard' element={<AdminDashboard />} />
+          <Route path='/users' element={<AdminUser />} />
+          <Route path='/services' element={<AdminServices />} />
+          <Route path='/events' element={<AdminEvents />} />
+          <Route path='/posts' element={<AdminPosts />} />
+          <Route path='/announcements' element={<AdminAnnouncements />} />
+          <Route path='/settings' element={<AdminSettings />} />
+          <Route path="*" element={<PageNotFound />} />
+        </Routes>
+      </Box>
+    </Box>
   );
 };
 

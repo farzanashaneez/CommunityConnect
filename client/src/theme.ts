@@ -19,8 +19,11 @@ export const theme = createTheme({
       fontWeight: 'bold', // Bold heading
     },
     button: {
-      textTransform: 'none', // Prevent uppercase transformation for buttons
+      textTransform: 'none', 
     },
+    body2:{
+         color: '#8B3A0E',
+    }
   },
   components: {
     MuiButton: {
@@ -31,7 +34,7 @@ export const theme = createTheme({
           '&:hover': {
             backgroundColor: '#1976d2', // Change to desired hover color
             color: 'white', // Text color on hover
-          },
+          }
         },
       },
     },

@@ -12,6 +12,7 @@ import {
   Divider,
 } from '@mui/material';
 import ServiceList from '../../components/ServiceList'; // Import ServiceList component
+import TextButton from '../../components/TextButton';
 
 const AdminServices: React.FC = () => {
   const [tabValue, setTabValue] = useState(0);
@@ -21,11 +22,11 @@ const AdminServices: React.FC = () => {
   };
 
   return (
-    <Box sx={{ padding: 4 }}>
-      <Typography variant="h4" sx={{ textAlign: 'center', mb: 4 }}>
+    <Box sx={{ padding: 2 }}>
+      <Typography variant="h4" sx={{ textAlign: 'center', mb: 2 }}>
         Admin Services
       </Typography>
-
+<Divider />
       <Tabs value={tabValue} onChange={handleTabChange} sx={{ mb: 4 }}>
         <Tab label="Local Services" />
         <Tab label="Residential Services" />
@@ -39,37 +40,49 @@ const AdminServices: React.FC = () => {
 
 const LocalServicesTab = () => {
   return (
-    <Box sx={{ display: 'flex' }}>
-      {/* Left Side - List of Local Service Requests */}
-      <Box sx={{ flex: 1, mr: 2 }}>
+    <Box sx={{ display: 'flex',flexDirection: { xs: 'column', md: 'row', lg: 'row' },
+    gap: 0 }}>
+      <Box sx={{ flex: 1, mr:1 }}>
         <Typography variant="h6" sx={{ mb: 2 }}>Local Service Requests</Typography>
         <Box
          sx={{
-          height: '100vh', // Fixed height for scrolling
+          height: 'auto', // Fixed height for scrolling
           overflowY: 'auto',
           border: '1px solid #ccc',
-          padding: '8px',
+          padding: '5px',
+          backgroundColor:'#ffffff',
+          mb:5
         }}
         >
           {/* Example of a service request */}
           {[...Array(5)].map((_, index) => (
-            <Card key={index} sx={{ display: 'flex', mb: 2 }}>
+            <Card key={index} sx={{ display: 'flex', mb: 2 ,alignItems: 'center',justifyContent:'space-evenly'}}>
               <CardMedia
                 component="img"
-                sx={{ width: '100px', height: '100px' }}
-                image="/path-to-image.jpg" // Replace with actual image path
+                sx={{ width: '75px', height: '75px' }}
+                image="/src/assets/logo1.png" 
                 alt="Service"
               />
               <CardContent>
-                <Typography variant="body1">Service Name (Apartment #)</Typography>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-                  <Button variant="contained" color="primary">Pending</Button>
-                  <Button variant="outlined" color="secondary">Completed</Button>
+                <Box sx={{display:'flex'}}>
+                <Typography variant="body1">Service Name</Typography>
+                <Box sx={{display:'flex',flexDirection:'column',ml:1,alignItems:'center'}}>
+                <Typography variant="body2" sx={{fontWeight:'400'}}>requested by</Typography>
+                <Typography variant="body1" sx={{fontWeight:'800'}}>F2-121</Typography>
+                </Box>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between',alignItems:'center', mt: 1 }}>
+                <Typography variant="body2">Pending </Typography>
+                <TextButton label="Done" color="secondary" />
+                <Typography variant="body2">Completed </Typography>
+
                 </Box>
               </CardContent>
             </Card>
           ))}
         </Box>
+        <Divider sx={{ display: { xs: 'block', md: 'none' }, my: 1 }} />
+
       </Box>
 
       {/* Right Side - Add New Service Form */}
