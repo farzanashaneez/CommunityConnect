@@ -6,7 +6,7 @@ import userRouter from "./interfaces/routes/userRoutes";
 import apartmentRoutes from './interfaces/routes/apartmentroutes';
 import morgan from 'morgan';
 import errorHandler from "./infrastructure/middlewares/errorHandlerMiddleware";
-import serviceRouter from "./interfaces/routes/serverRoutes";
+import serviceRoutes from "./interfaces/routes/serviceRoutes";
 
 conncetDb();
 dotenv.config()
@@ -18,7 +18,7 @@ app.use(morgan('combined'));
 app.use(express.urlencoded({extended:true}))
 app.use('/api/users',userRouter)
 app.use('/api/apartments', apartmentRoutes);
-app.use('/api/services', serviceRouter);
+app.use('/api/services', serviceRoutes);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;

@@ -9,7 +9,7 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <nav className="w-64 bg-white h-screen fixed left-0 top-0 overflow-y-auto">
+    <nav className="w-64 bg-white h-screen fixed left-0 top-0 overflow-y-auto border-r-2">
       <div className="p-5">
         <img src="/src/assets/adminlogo.png" alt="Community Connect" className="w-full mb-6" />
         <div className="flex flex-col items-center mb-6">

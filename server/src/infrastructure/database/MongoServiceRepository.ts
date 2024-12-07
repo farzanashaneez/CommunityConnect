@@ -6,7 +6,7 @@ const serviceSchema = new Schema<Service>({
   name: { type: String, required: true },
   type: { type: String, enum: ['local', 'residential'], required: true },
   price: { type: Number, required: true },
-  provider: { type: String, required: true },
+  provider: { type: String },
   description: { type: String, required: true },
   category: { type: String, required: true },
   imageUrl: { type: String },

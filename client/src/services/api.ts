@@ -44,4 +44,9 @@ export const addMember = async (token: string,id:string, memberData: { name: str
   return response.data;
 };
 
+export const createService=async(servicedata:any)=>{
+  console.log("servicedata",servicedata)
+  const response=await api.post(`${API_URL}/services/upload`,servicedata);
+  return response.data;
+}
 

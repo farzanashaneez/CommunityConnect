@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -11,12 +11,16 @@ import {
   CardContent,
   Divider,
 } from '@mui/material';
-import ServiceList from '../../components/ServiceList'; // Import ServiceList component
+import * as Yup from 'yup';
+import { useFormik } from 'formik';
+import ServiceList from '../../components/ServiceList';
 import TextButton from '../../components/TextButton';
+import ImageCropper from '../../components/ImageCropper';
+import { createService } from '../../services/api';
 
 const AdminServices: React.FC = () => {
   const [tabValue, setTabValue] = useState(0);
-  
+
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
@@ -26,12 +30,12 @@ const AdminServices: React.FC = () => {
       <Typography variant="h4" sx={{ textAlign: 'center', mb: 2 }}>
         Admin Services
       </Typography>
-<Divider />
-      <Tabs value={tabValue} onChange={handleTabChange} sx={{ mb: 4 }}>
+      <Divider />
+      <Tabs value={tabValue} onChange={handleTabChange} sx={{ mb: 2 }}>
         <Tab label="Local Services" />
         <Tab label="Residential Services" />
       </Tabs>
-
+      <Divider sx={{ my: 1 }} />
       {tabValue === 0 && <LocalServicesTab />}
       {tabValue === 1 && <ResidentialServicesTab />}
     </Box>
@@ -39,130 +43,237 @@ const AdminServices: React.FC = () => {
 };
 
 const LocalServicesTab = () => {
-  return (
-    <Box sx={{ display: 'flex',flexDirection: { xs: 'column', md: 'row', lg: 'row' },
-    gap: 0 }}>
-      <Box sx={{ flex: 1, mr:1 }}>
-        <Typography variant="h6" sx={{ mb: 2 }}>Local Service Requests</Typography>
-        <Box
-         sx={{
-          height: 'auto', // Fixed height for scrolling
-          overflowY: 'auto',
-          border: '1px solid #ccc',
-          padding: '5px',
-          backgroundColor:'#ffffff',
-          mb:5
-        }}
-        >
-          {/* Example of a service request */}
-          {[...Array(5)].map((_, index) => (
-            <Card key={index} sx={{ display: 'flex', mb: 2 ,alignItems: 'center',justifyContent:'space-evenly'}}>
-              <CardMedia
-                component="img"
-                sx={{ width: '75px', height: '75px' }}
-                image="/src/assets/logo1.png" 
-                alt="Service"
-              />
-              <CardContent>
-                <Box sx={{display:'flex'}}>
-                <Typography variant="body1">Service Name</Typography>
-                <Box sx={{display:'flex',flexDirection:'column',ml:1,alignItems:'center'}}>
-                <Typography variant="body2" sx={{fontWeight:'400'}}>requested by</Typography>
-                <Typography variant="body1" sx={{fontWeight:'800'}}>F2-121</Typography>
-                </Box>
-                </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between',alignItems:'center', mt: 1 }}>
-                <Typography variant="body2">Pending </Typography>
-                <TextButton label="Done" color="secondary" />
-                <Typography variant="body2">Completed </Typography>
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [croppedImage, setCroppedImage] = useState<string | null>(null);
+  const [isCropping, setIsCropping] = useState(false);
 
+  const formik = useFormik({
+    initialValues: {
+      serviceName: '',
+      description: '',
+      price: '',
+      image: null,
+    },
+    validationSchema: Yup.object({
+      serviceName: Yup.string().required('Service Name is required'),
+      description: Yup.string()
+        .min(10, 'Description must be at least 10 characters')
+        .required('Description is required'),
+      price: Yup.number()
+        .min(0, 'Price must be greater than or equal to 0')
+        .required('Price is required'),
+      image: Yup.mixed().required('Image is required'),
+    }),
+    onSubmit: (values) => {
+      const formData = new FormData();
+      formData.append('serviceName', values.serviceName);
+      formData.append('description', values.description);
+      formData.append('price', values.price.toString());
+      if (values.image) {
+        const fileName = `cropped-image-${Date.now()}.jpeg`; // Define a unique filename
+        const file = new File([values.image], fileName, { type: "image/jpeg" }); // Convert Blob to File
+        formData.append('image', file);
+      }
+      createService(formData);
+    },
+  });
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      formik.setFieldValue('image', file);
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (reader.result) {
+          setImageSrc(reader.result.toString());
+          setIsCropping(true);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleCropComplete = useCallback((croppedBlob: Blob) => {
+    const croppedImageURL = URL.createObjectURL(croppedBlob);
+    console.log("cropped blob",croppedBlob)
+    setCroppedImage(croppedImageURL);
+    setIsCropping(false);
+   
+
+    formik.setFieldValue('image', file);
+  }, [formik]);
+  
+  const handleCancel = () => {
+    setIsCropping(false);
+  };
+  
+
+  return (
+    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: '0', md: '16px' } }}>
+      <Box sx={{ flex: 1 }}>
+        <Typography variant="h6" sx={{ mb: 2 }}>Local Service Requests</Typography>
+        <Box sx={{ height: 'auto', overflowY: 'auto', padding: '10px', backgroundColor: '#ffffff', mb: 5, boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.3)', borderRadius: '4px' }}>
+          {[...Array(5)].map((_, index) => (
+            <Card key={index} sx={{ display: 'flex', my: 1 }}>
+              <CardMedia component="img" sx={{ width: '75px', height: '75px', ml: 1, mt: 1 }} image="/src/assets/logo1.png" alt="Service" />
+              <CardContent>
+                <Box sx={{ display: 'flex', justifyContent: "space-evenly" }}>
+                  <Typography variant="body1">Service Name</Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', ml: 1 }}>
+                    <Typography variant="body2" sx={{ fontWeight: '400' }}>requested by</Typography>
+                    <Typography variant="body1" sx={{ fontWeight: '800' }}>F2-121</Typography>
+                  </Box>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 3, ml: -9 }}>
+                  <Typography variant="body2">Pending</Typography>
+                  <TextButton label="Done" color="secondary" />
+                  <Typography variant="body2">Completed</Typography>
                 </Box>
               </CardContent>
             </Card>
           ))}
         </Box>
-        <Divider sx={{ display: { xs: 'block', md: 'none' }, my: 1 }} />
-
       </Box>
-
-      {/* Right Side - Add New Service Form */}
-      <Box sx={{ flex: 1, ml: 2 }}>
+      <Box sx={{ flex: 1 }}>
         <Typography variant="h6" sx={{ mb: 2 }}>Add New Service</Typography>
-        <TextField fullWidth label="Service Name" variant="outlined" sx={{ mb: 2 }} />
-        <TextField fullWidth label="Description" variant="outlined" multiline rows={3} sx={{ mb: 2 }} />
-        <TextField fullWidth label="Price" variant="outlined" type="number" sx={{ mb: 2 }} />
-        
-        {/* Image Upload */}
-        <input type="file" accept="image/*" style={{ marginBottom: '16px' }} />
-        
-        <Button variant="contained" color="primary">Add Service</Button>
-
-        {/* List of Services using ServiceList */}
+        <form onSubmit={formik.handleSubmit}>
+          <Box sx={{ padding: 4, textAlign: 'center' }}>
+            {!isCropping ? (
+              <>
+                {!croppedImage && (
+                  <Typography variant="h5" sx={{ marginBottom: 2 }}>
+                    Upload and Crop an Image
+                  </Typography>
+                )}
+                {croppedImage && (
+                  <Box sx={{ marginTop: 0 }}>
+                    <Typography variant="h6" sx={{ marginBottom: 2 }}>
+                      Cropped Image Preview:
+                    </Typography>
+                    <img
+                      src={croppedImage}
+                      alt="Cropped"
+                      style={{
+                        maxWidth: '30%',
+                        display: 'block',
+                        margin: '0 auto',
+                        border: '1px solid #ccc',
+                        borderRadius: '8px',
+                      }}
+                    />
+                  </Box>
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="mt-2"
+                />
+                {formik.touched.image && formik.errors.image && (
+                  <Typography color="error">{formik.errors.image as string}</Typography>
+                )}
+              </>
+            ) : (
+              <ImageCropper
+                imageSrc={imageSrc!}
+                onCropComplete={handleCropComplete}
+                onCancel={handleCancel}
+              />
+            )}
+          </Box>
+          <TextField
+            fullWidth
+            label="Service Name"
+            variant="outlined"
+            sx={{ mb: 2 }}
+            {...formik.getFieldProps('serviceName')}
+            error={formik.touched.serviceName && Boolean(formik.errors.serviceName)}
+            helperText={formik.touched.serviceName && formik.errors.serviceName}
+          />
+          <TextField
+            fullWidth
+            label="Description"
+            variant="outlined"
+            multiline
+            rows={3}
+            sx={{ mb: 2 }}
+            {...formik.getFieldProps('description')}
+            error={formik.touched.description && Boolean(formik.errors.description)}
+            helperText={formik.touched.description && formik.errors.description}
+          />
+          <TextField
+            fullWidth
+            label="Price"
+            variant="outlined"
+            type="number"
+            sx={{ mb: 2 }}
+            {...formik.getFieldProps('price')}
+            error={formik.touched.price && Boolean(formik.errors.price)}
+            helperText={formik.touched.price && formik.errors.price}
+          />
+          <Button variant="contained" color="primary" type="submit">
+            Add Service
+          </Button>
+        </form>
         <Divider sx={{ my: 3 }} />
         <Typography variant="h6">Available Services</Typography>
-        
-        {/* Use ServiceList component to display services */}
-       < Box sx={{
-            height: '100vh', // Fixed height for scrolling
-            overflowY: 'auto',
-            border: '1px solid #ccc',
-            padding: '8px',
-          }}>
-        <ServiceList  type="local" searchTerm="" /> {/* Pass appropriate searchTerm if needed */}
-
-          </Box>
+        <Box sx={{ display: 'flex', justifyContent: 'center', height: '100vh', overflowY: 'auto', border: '1px solid #ccc', padding: '8px', }}>
+          <ServiceList type="local" searchTerm="" />
+        </Box>
       </Box>
     </Box>
   );
 };
 
+
 const ResidentialServicesTab = () => {
   return (
-    <Box sx={{ display: 'flex' }}>
-      {/* Left Side - List of Residential Service Requests */}
+    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: '0', md: '16px' } }}>
       <Box sx={{ flex: 1, mr: 2 }}>
         <Typography variant="h6" sx={{ mb: 2 }}>Residential Service Requests</Typography>
-        
-        <Box
-          sx={{
-            height: '100vh', // Fixed height for scrolling
-            overflowY: 'auto',
-            border: '1px solid #ccc',
-            padding: '8px',
-          }}
-        >
-          {/* Example of a service request */}
+        <Box sx={{
+          height: '100vh',
+          overflowY: 'auto',
+          padding: '10px',
+          backgroundColor: '#ffffff',
+          mb: 5,
+          boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.3)',
+          borderRadius: '4px'
+        }}>
           {[...Array(5)].map((_, index) => (
-            <Card key={index} sx={{ display: 'flex', mb: 2 }}>
+            <Card key={index} sx={{ display: 'flex', alignItems: 'center', pl: 1 }}>
               <CardMedia
                 component="img"
-                sx={{ width: '100px', height: '100px' }}
-                image="/path-to-image.jpg" // Replace with actual image path
+                sx={{ width: '80px', height: '80px' }}
+                image="/src/assets/logo2.png"
                 alt="Service"
               />
               <CardContent>
-                <Typography variant="body1">Service Title (Apartment #)</Typography>
+                <Typography variant="body1" sx={{ fontWeight: '800' }}>Service Title</Typography>
+                <Typography variant="body1">f1-230</Typography>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-                  <Button variant="contained" color="primary">Accept</Button>
-                  <Button variant="outlined" color="secondary">Reject</Button>
+                  <TextButton label="Accept" />
+                  <TextButton label="Reject" />
                 </Box>
               </CardContent>
             </Card>
           ))}
         </Box>
       </Box>
-
-      {/* Right Side - List of Accepted Services */}
-      <Box sx={{
-            height: '100vh', // Fixed height for scrolling
-            overflowY: 'auto',
-            border: '1px solid #ccc',
-            padding: '8px',
-          }}>
-        <Typography variant="h6" sx={{ mb: 2 }}>Accepted Services</Typography>
-
-        {/* Use ServiceList component to display accepted services */}
-        <ServiceList type="residential" searchTerm="" /> {/* Pass appropriate searchTerm if needed */}
+      <Box sx={{ flex: 1 }}>
+        <Typography variant="h6" sx={{ mb: 2, fontWeight: '600' }}>Accepted Services</Typography>
+        <Box sx={{
+          flex: 1,
+          height: '100vh',
+          overflowY: 'auto',
+          padding: '10px',
+          backgroundColor: '#ffffff',
+          mb: 5,
+          boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.3)',
+          borderRadius: '4px'
+        }}>
+          <ServiceList type="residential" searchTerm="" />
+        </Box>
       </Box>
     </Box>
   );
