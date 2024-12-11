@@ -2,6 +2,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import multer from 'multer';
 import { Request, Response, NextFunction } from 'express';  // Import from 'express'
 import path from 'path';
+import fs from "fs";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -36,9 +37,15 @@ const uploadImageToCloudinary = async (req: CustomRequest, res: Response, next: 
       const result = await cloudinary.uploader.upload(req.file.path, {
         folder: 'community-connect/images', // Folder in Cloudinary to store the image
       });
-console.log("result")
-      req.imageUrl = result.secure_url;
 
+      req.imageUrl = result.secure_url;
+      fs.unlink(req.file.path, (err) => {
+        if (err) {
+          console.error('Error deleting the file:', err);
+        } else {
+          console.log('Temporary file deleted successfully');
+        }
+      });
       next();
     } catch (error) {
       // if (error instanceof cloudinary.CloudinaryError) {

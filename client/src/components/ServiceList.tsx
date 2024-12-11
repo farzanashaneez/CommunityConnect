@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Grid from '@mui/material/Grid2'; 
 import ServiceCard from './ServiceCard'; 
+import { getAllServices } from '../services/api';
+import { useCommunityContext } from '../context/communityContext';
 
 interface Service {
-  id: string;
+  _id: string;
   name: string;
   description: string;
   price: number;
@@ -13,50 +15,42 @@ interface Service {
 interface ServiceListProps {
   type: 'local' | 'residential';
   searchTerm: string;
+  update?:number;
+  isAdmin:boolean;
 }
 
-const mockServices: Service[] = [
-  // Mock data for demonstration
-  { id: '1', name: 'Plumbing', description: 'Fix leaks and pipesFix leaks and pipesFix leaks and pipesFix leaks and pipesFix leaks and pipes', price: 100, imageUrl: '/src/assets/logo1.png' },
-  { id: '2', name: 'Electrical', description: 'Electrical repairs', price: 150, imageUrl: '/src/assets/logo1.png' },
-  { id: '1', name: 'Plumbing', description: 'Fix leaks and pipes', price: 100, imageUrl: '/src/assets/logo1.png' },
-  { id: '2', name: 'Electrical', description: 'Electrical repairs', price: 150, imageUrl: '/src/assets/logo1.png' },
-  { id: '1', name: 'Plumbing', description: 'Fix leaks and pipes', price: 100, imageUrl: '/src/assets/logo1.png' },
-  { id: '2', name: 'Electrical', description: 'Electrical repairs', price: 150, imageUrl: '/src/assets/logo1.png' },
-  { id: '1', name: 'Plumbing', description: 'Fix leaks and pipes', price: 100, imageUrl: '/src/assets/logo1.png' },
-  { id: '2', name: 'Electrical', description: 'Electrical repairs', price: 150, imageUrl: '/src/assets/logo1.png' },
-];
+const ServiceList: React.FC<ServiceListProps> = ({ type, searchTerm = '',update ,isAdmin=false}) => {
+  const [serviceList, setServiceList] = useState<Service[]>([]);
+ const {completed,setCompleted}=useCommunityContext();
 
-// const ServiceList: React.FC<ServiceListProps> = ({ type, searchTerm }) => {
-//   const filteredServices = mockServices.filter(service =>
-//     service.name.toLowerCase().includes(searchTerm.toLowerCase())
-//   );
+ useEffect(()=>{
+  if (completed) {
+    console.log("community triggere.....")
+    setCompleted(false); 
+  }
+    const fetchServices = async () => {
+      try {
+        const response = await getAllServices(type);
+        console.log("searchTerm",searchTerm,type,response)
+        setServiceList(response);
+      } catch (error) {
+        console.error("Error fetching services:", error);
+      }
+    };
 
-//   return (
-//     <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 12, sm: 6, md: 4 }}>
-//       {filteredServices.map(service => (
-//         <ServiceCard key={service.id} service={service} type={type} />
-//       ))}
-//     </Grid>
-//   );
-// };
+    fetchServices();
+  }, [searchTerm,update,completed]);
 
-// export default ServiceList;
-
-const ServiceList: React.FC<ServiceListProps> = ({ type, searchTerm = '' }) => {
-    const filteredServices = mockServices.filter(service =>
-      service.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  
-    return (
-      <Grid container spacing={2}>
-        {filteredServices.map(service => (
-    <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 6, sm: 4, md: 2 }}>
-<ServiceCard service={service} type={type} />
-          </Grid>
-        ))}
-      </Grid>
-    );
-  };
+  return (
+    <Grid container spacing={2} sx={{justifyContent:'center'}}>
+      {serviceList.map(service => (
+    <Grid   container spacing={{ xs: 2, md: 3 }} columns={{ xs: 6, sm: 4, md: 2 }}>
+    <ServiceCard key={service._id} service={service} type={type} isAdmin={isAdmin}/>
+        </Grid>
+      ))}
+    </Grid>
+  );
+};
+    
   
   export default ServiceList;

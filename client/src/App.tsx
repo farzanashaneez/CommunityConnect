@@ -9,6 +9,7 @@ import UserLogin from './pages/user/UserLogin';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 import {theme} from '../src/theme'; 
+import { CommunityProvider } from './context/communityContext';
 
 const App: React.FC = () => {
   const adminState = useAppSelector((state) => state.admin);
@@ -16,8 +17,10 @@ const App: React.FC = () => {
 console.log("======",adminState)
  // const user='admin';
   return (
+    
     <ThemeProvider theme={theme}>
       <CssBaseline/>
+      <CommunityProvider>
     <Router>
     <Routes>
     <Route path="/login" element={<UserLogin />} />
@@ -27,6 +30,7 @@ console.log("======",adminState)
 
     </Routes>
   </Router>
+  </CommunityProvider>
   </ThemeProvider>
   );
 };

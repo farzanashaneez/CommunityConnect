@@ -40,8 +40,8 @@ export class MongoServiceRepository implements ServiceRepository {
     }
   }
 
-  async getAllServices(): Promise<Service[]> {
-    return ServiceModel.find().exec();
+  async getAllServices(type:string): Promise<Service[]> {
+    return ServiceModel.find({'type':type}).exec();
   }
 
   async getServicesByCategory(category: string): Promise<Service[]> {
@@ -49,6 +49,7 @@ export class MongoServiceRepository implements ServiceRepository {
   }
 
   async getServicesByType(type: 'local' | 'residential'): Promise<Service[]> {
+    console.log(type,"type")
     return ServiceModel.find({ type }).exec();
   }
 

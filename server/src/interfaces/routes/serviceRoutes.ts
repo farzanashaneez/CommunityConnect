@@ -14,10 +14,12 @@ const serviceUseCase = new ServiceUseCase(serviceRepository);
 const serviceController = new ServiceController(serviceUseCase);
 
 // Define routes
-router.post('/upload',upload.single('image'), uploadImageToCloudinary, (req, res,next) => serviceController.createService(req, res,next));
-router.get('/:id', (req, res,next) => serviceController.getServiceById(req, res,next));
-router.put('/:id', (req, res,next) => serviceController.updateService(req, res,next));
-router.delete('/:id', (req, res,next) => serviceController.deleteService(req, res,next));
-router.get('/', (req, res,next) => serviceController.getAllServices(req, res,next));
+router.post('/',upload.single('image'), uploadImageToCloudinary, (req, res,next) => serviceController.createService(req, res,next));
+//router.get('/:id', (req, res,next) => serviceController.getServiceById(req, res,next));
+router.put('/update/:id', (req, res,next) => serviceController.updateService(req, res,next));
+router.delete('/delete/:id', (req, res,next) => serviceController.deleteService(req, res,next));
+//router.get('/', (req, res,next) => serviceController.getAllServices(req, res,next));
+router.get('/type/:type', (req, res,next) => serviceController.getAllServices(req, res,next));
+
 
 export default router;

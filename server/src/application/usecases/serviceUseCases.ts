@@ -27,8 +27,8 @@ export class ServiceUseCase {
     return this.serviceRepository.deleteService(id);
   }
 
-  async getAllServices(): Promise<Service[]> {
-    return this.serviceRepository.getAllServices();
+  async getAllServices(type:string): Promise<Service[]> {
+    return this.serviceRepository.getAllServices(type);
   }
 
   async getServicesByCategory(category: string): Promise<Service[]> {

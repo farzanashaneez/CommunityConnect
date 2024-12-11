@@ -1,9 +1,28 @@
-// ServiceCard.tsx
-import React from "react";
-import { Card, CardContent, CardMedia, Typography } from "@mui/material";
+import React, { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardMedia,
+  Typography,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+} from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { deleteServiceApi, updateServiceApi } from "../services/api";
+import { useSnackbar } from "../hooks/useSnackbar";
+import CustomSnackbar from "./customSnackbar";
+import { useCommunityContext } from "../context/communityContext";
+import { Formik, Form } from "formik";
+import * as Yup from "yup";
 
 interface Service {
-  id: string;
+  _id: string;
   name: string;
   description: string;
   price: number;
@@ -12,81 +31,219 @@ interface Service {
 
 interface ServiceCardProps {
   service: Service;
-  type: "local" | "residential";
+  type?: "local" | "residential";
+  isAdmin: boolean;
 }
 
-const ServiceCard: React.FC<ServiceCardProps> = ({ service, type }) => {
-  const handleActionClick = () => {
-    if (type === "local") {
-      console.log("Request service:", service.name);
-    } else {
-      console.log("Contact provider:", service.name);
+const ServiceCard: React.FC<ServiceCardProps> = ({
+  service,
+  type,
+  isAdmin = false,
+}) => {
+  const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
+  const { deleteService, updateService } = useCommunityContext();
+
+  const [isEditDialogOpen, setEditDialogOpen] = useState(false);
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteServiceApi(id);
+      showSnackbar("Service deleted successfully", "success");
+      deleteService(id);
+    } catch (error) {
+      console.error("Error deleting service:", error);
+      showSnackbar("Failed to delete service.", "error");
     }
   };
 
+  const handleEditSubmit = async (values: Service) => {
+    try {
+      console.log('values',service)
+      const updatedService = await updateServiceApi(values._id,values)
+      updateService(updatedService); // Update context with new data
+      showSnackbar("Service updated successfully", "success");
+      setEditDialogOpen(false);
+    } catch (error) {
+      console.error("Error updating service:", error);
+      showSnackbar("Failed to update service.", "error");
+    }
+  };
+
+  const handleEdit = () => setEditDialogOpen(true);
+
   return (
-    <Card
-      sx={{
-        mb: 2,
-        p: 2,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        width: "100%", // Ensure the card takes full width
-        maxWidth: { xs: "100%", sm: "300px" }, // Responsive max width
-      }}
-    >
-      {service.imageUrl && (
-        <CardMedia
-          component="img"
-          sx={{
-            width: "150px",
-            height: "150px",
-            objectFit: "cover",
-            mb: 1, // Add some margin at the bottom
-          }}
-          image={service.imageUrl}
-          alt={service.name}
+    <>
+      <Card
+        sx={{
+          mb: 2,
+          p: 2,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          width: "100%",
+          maxWidth: { xs: "100%", sm: "300px" },
+          position: "relative",
+        }}
+      >
+        {isAdmin && (
+          <div
+            style={{
+              position: "absolute",
+              top: 8,
+              right: 8,
+              display: "flex",
+              gap: "8px",
+            }}
+          >
+            <IconButton
+              aria-label="edit"
+              size="small"
+              color="primary"
+              onClick={handleEdit}
+            >
+              <EditIcon fontSize="small" />
+            </IconButton>
+            <IconButton
+              aria-label="delete"
+              size="small"
+              color="error"
+              onClick={() => handleDelete(service._id)}
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </div>
+        )}
+
+        {service.imageUrl && (
+          <CardMedia
+            component="img"
+            sx={{
+              width: "150px",
+              height: "150px",
+              objectFit: "cover",
+              mt: 2,
+              mb: 0,
+            }}
+            image={service.imageUrl}
+            alt={service.name}
+          />
+        )}
+
+        <CardContent sx={{ width: "100%", textAlign: "center", height: "auto" }}>
+          <Typography variant="h6" sx={{ fontWeight: "bold", mb: 0 }}>
+            {service.name}
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              mb: 0,
+              width: "150px",
+              maxHeight: "60px",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              display: "-webkit-box",
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: "vertical",
+            }}
+          >
+            {service.description}
+          </Typography>
+       
+          {service.price===0? <Typography variant="body2" sx={{ fontWeight: "bold", mb: 0 }}>
+            Charge:Free
+          </Typography>: <Typography variant="body2" sx={{ fontWeight: "bold", mb: 0 }}>
+            Charge:{service.price}-aed
+          </Typography>}
+        </CardContent>
+        <CustomSnackbar
+          open={snackbar.open}
+          message={snackbar.message}
+          severity={snackbar.severity}
+          onClose={hideSnackbar}
         />
-      )}
-      <CardContent sx={{ width: "100%", textAlign: "center" }}>
-        <Typography variant="h6" sx={{ fontWeight: "bold", mb: 0 }}>
-          {service.name}
-        </Typography>
-        <Typography
-  variant="body2"
-  sx={{
-    mb: 0,
-    width: "150px",
-    height: "60px",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    display: "-webkit-box",
-    WebkitLineClamp: 3,
-    WebkitBoxOrient: "vertical"
-  }}
->
-  {service.description}
-</Typography>
-        <Typography variant="body2" sx={{ fontWeight: "bold", mb: 0 }}>
-          Price: ${service.price}
-        </Typography>
-        <a
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            handleActionClick();
-          }}
-          style={{
-            color: "#1976d2", // primary color
-            fontWeight: "bold",
-            cursor: "pointer",
-          }}
-        >
-          {type === "local" ? "Request" : "Contact"}
-        </a>
-      </CardContent>
-    </Card>
+      </Card>
+
+      {/* Edit Dialog */}
+      <Dialog open={isEditDialogOpen} onClose={() => setEditDialogOpen(false)}>
+  <DialogTitle>Edit Service</DialogTitle>
+  <Formik
+    initialValues={{
+      ...service, // Include _id in initial values
+    }}
+    validationSchema={Yup.object({
+      name: Yup.string().required("Name is required"),
+      description: Yup.string().required("Description is required"),
+      price: Yup.number()
+        .required("Price is required")
+        .min(0, "Price cannot be negative"),
+      imageUrl: Yup.string().url("Must be a valid URL"),
+    })}
+    onSubmit={(values) => handleEditSubmit(values)}
+  >
+    {({ values, errors, touched, handleChange }) => (
+      <Form>
+        <DialogContent>
+          {/* Display current image */}
+          {values.imageUrl && (
+            <CardMedia
+              component="img"
+              sx={{
+                width: "100px",
+                height: "100px",
+                objectFit: "cover",
+                margin: "0 auto 16px",
+                borderRadius: "8px",
+              }}
+              image={values.imageUrl}
+              alt="Service Image"
+            />
+          )}
+          <TextField
+            name="name"
+            label="Name"
+            fullWidth
+            value={values.name}
+            onChange={handleChange}
+            error={touched.name && Boolean(errors.name)}
+            helperText={touched.name && errors.name}
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            name="description"
+            label="Description"
+            fullWidth
+            multiline
+            value={values.description}
+            onChange={handleChange}
+            error={touched.description && Boolean(errors.description)}
+            helperText={touched.description && errors.description}
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            name="price"
+            label="Price"
+            fullWidth
+            type="number"
+            value={values.price}
+            onChange={handleChange}
+            error={touched.price && Boolean(errors.price)}
+            helperText={touched.price && errors.price}
+            sx={{ mb: 2 }}
+          />
+         
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
+          <Button type="submit" variant="contained" color="primary">
+            Save
+          </Button>
+        </DialogActions>
+      </Form>
+    )}
+  </Formik>
+</Dialog>
+
+    </>
   );
 };
 

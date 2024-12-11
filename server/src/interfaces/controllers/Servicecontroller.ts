@@ -9,33 +9,18 @@ export class ServiceController {
 
   async createService(req: CustomRequest, res: Response,next:NextFunction): Promise<void> {
     try {
-      // name: { type: String, required: true },
-      // type: { type: String, enum: ['local', 'residential'], required: true },
-      // price: { type: Number, required: true },
-      // provider: { type: String, required: true },
-      // description: { type: String, required: true },
-      // category: { type: String, required: true },
-      // imageUrl: { type: String },
-      // status: { type: String, enum: ['granted', 'pending'], required: true },
-
-      // {
-      //   serviceName: 'aaa',
-      //   description: 'aaaaaaaaaa',
-      //   price: '1',
-      //   imageUrl: 'https://res.cloudinary.com/drwaqorqu/image/upload/v1733605046/community-connect/images/n7hev3xerdposmzwlrru.jpg'
-      // }
-     // const serviceData ={...req.body,imageUrl:req.imageUrl};
+     
 
      const serviceData = {
       name:req.body.serviceName,
       type:req.body.type || 'local',
       price: Number(req.body.price),
       description:req.body.description,
-      provider:'',
+      provider:req.body.provider || '' ,
       category:req.body.category||'common',
       imageUrl: req.imageUrl || '',
     };
-      console.log(serviceData,"===========file",serviceData)
+      console.log(serviceData,"===========file",serviceData,req.body)
 
       const newService = await this.serviceUseCase.createService(serviceData);
       res.status(201).json(newService);
@@ -81,7 +66,9 @@ export class ServiceController {
 
   async getAllServices(req: Request, res: Response,next:NextFunction): Promise<void> {
     try {
-      const services = await this.serviceUseCase.getAllServices();
+      const type=req.params.type;
+      console.log("type===>",type)
+      const services = await this.serviceUseCase.getAllServices(type);
       res.json(services);
     } catch (error:any) {
       res.status(400).json({ message: 'Error fetching services', error: error?.message });
