@@ -179,17 +179,19 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
 
       {/* Details Dialog */}
       <Dialog open={isDetailsDialogOpen} onClose={handleDetailsClose}>
-        <DialogTitle>{service.name}</DialogTitle>
+        <DialogTitle sx={{fontWeight:'700',fontSize:'25px',margin:'auto'}}>{service.name}</DialogTitle>
         <DialogContent>
           {service.imageUrl && (
             <CardMedia
               component="img"
               sx={{
-                width: "100%",
+                width: "200px",
                 height: "200px",
                 objectFit: "cover",
                 borderRadius: "8px",
+                margin:'auto',
                 mb: 2,
+                
               }}
               image={service.imageUrl}
               alt={service.name}
