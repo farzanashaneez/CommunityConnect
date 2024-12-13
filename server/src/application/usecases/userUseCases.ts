@@ -54,4 +54,8 @@ export class UserUseCases {
   async addMember(userId: string, memberData: { name: string; relation: string; profession: string }): Promise<User | null> {
     return this.userRepository.addMember(userId, memberData);
   }
+
+  async deleteUser(id: string): Promise<void> {
+    return this.userRepository.deleteUser(id);
+  }
 }

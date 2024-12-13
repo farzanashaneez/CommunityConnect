@@ -146,59 +146,7 @@ const adminState=useAppSelector((state)=>state.admin)
         gap: { xs: "0", md: "16px" },
       }}
     >
-      <Box sx={{ flex: 1 }}>
-        <Typography variant="h6" sx={{ mb: 2 }}>
-          Local Service Requests
-        </Typography>
-        <Box
-          sx={{
-            height: "auto",
-            overflowY: "auto",
-            padding: "10px",
-            backgroundColor: "#ffffff",
-            mb: 5,
-            boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.3)",
-            borderRadius: "4px",
-          }}
-        >
-          {[...Array(5)].map((_, index) => (
-            <Card key={index} sx={{ display: "flex", my: 1 }}>
-              <CardMedia
-                component="img"
-                sx={{ width: "75px", height: "75px", ml: 1, mt: 1 }}
-                image="/src/assets/logo1.png"
-                alt="Service"
-              />
-              <CardContent>
-                <Box sx={{ display: "flex", justifyContent: "space-evenly" }}>
-                  <Typography variant="body1">Service Name</Typography>
-                  <Box sx={{ display: "flex", flexDirection: "column", ml: 1 }}>
-                    <Typography variant="body2" sx={{ fontWeight: "400" }}>
-                      requested by
-                    </Typography>
-                    <Typography variant="body1" sx={{ fontWeight: "800" }}>
-                      F2-121
-                    </Typography>
-                  </Box>
-                </Box>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    mt: 3,
-                    ml: -9,
-                  }}
-                >
-                  <Typography variant="body2">Pending</Typography>
-                  <TextButton label="Done" color="secondary" />
-                  <Typography variant="body2">Completed</Typography>
-                </Box>
-              </CardContent>
-            </Card>
-          ))}
-        </Box>
-      </Box>
+    
       <Box sx={{ flex: 1 }}>
         <Typography variant="h6" sx={{ mb: 2 }}>
           Add New Service
@@ -324,16 +272,19 @@ const ResidentialServicesTab = () => {
     <Box
       sx={{
         display: "flex",
-        flexDirection: { xs: "column", md: "row" },
+        // flexDirection: { xs: "column", md: "row" },
+         flexDirection:"column",
         gap: { xs: "0", md: "16px" },
       }}
     >
-      <Box sx={{ flex: 1, mr: 2 }}>
-        <Typography variant="h6" sx={{ mb: 2 }}>
-          Residential Service Requests
+      
+      <Box sx={{ flex: 1 }}>
+        <Typography variant="h6" sx={{ mb: 2, fontWeight: "600" }}>
+          Accepted Services
         </Typography>
         <Box
           sx={{
+            flex: 1,
             height: "100vh",
             overflowY: "auto",
             padding: "10px",
@@ -343,40 +294,17 @@ const ResidentialServicesTab = () => {
             borderRadius: "4px",
           }}
         >
-          {[...Array(5)].map((_, index) => (
-            <Card
-              key={index}
-              sx={{ display: "flex", alignItems: "center", pl: 1 }}
-            >
-              <CardMedia
-                component="img"
-                sx={{ width: "80px", height: "80px" }}
-                image="/src/assets/logo2.png"
-                alt="Service"
-              />
-              <CardContent>
-                <Typography variant="body1" sx={{ fontWeight: "800" }}>
-                  Service Title
-                </Typography>
-                <Typography variant="body1">f1-230</Typography>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    mt: 1,
-                  }}
-                >
-                  <TextButton label="Accept" />
-                  <TextButton label="Reject" />
-                </Box>
-              </CardContent>
-            </Card>
-          ))}
+          <ServiceList
+            type="residential"
+            searchTerm="residential"
+            update={1}
+            isAdmin={true}
+          />
         </Box>
       </Box>
       <Box sx={{ flex: 1 }}>
         <Typography variant="h6" sx={{ mb: 2, fontWeight: "600" }}>
-          Accepted Services
+          Rejected Services
         </Typography>
         <Box
           sx={{

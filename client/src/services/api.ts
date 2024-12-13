@@ -25,6 +25,12 @@ export const fetchAllUsers = async () => {
   return response.data;
 };
 
+export const deleteUser=async(id:string)=>{
+  console.log("id===>",id)
+  const response=await api.delete(`${API_URL}/users/delete/${id}`);
+  return response.data;
+}
+
 export const fetchUserDetails = async (token: string,id:string) => {
   console.log("iid",id)
   const response = await api.get(`${API_URL}/users/details/${id}`, {

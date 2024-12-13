@@ -105,4 +105,15 @@ export class UserController {
       next(error);
     }
   }
+
+  async deleteUser(req: Request, res: Response,next:NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+      await this.userUseCases.deleteUser(id);
+      res.status(204).send();
+    } catch (error:any) {
+      res.status(400).json({ message: 'Error deleting service', error: error?.message });
+    }
+  }
 }
+

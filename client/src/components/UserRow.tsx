@@ -18,11 +18,12 @@ const UserRow: React.FC<UserRowProps> = ({ imageUrl, name, apartmentNumber, onRe
         </div>
       </div>
       <button 
-        onClick={onRemove}
-        className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-      >
-        Remove
-      </button>
+  onClick={onRemove}
+  className="text-red-500 hover:underline transition-colors"
+>
+  Remove
+</button>
+
     </div>
   );
 };

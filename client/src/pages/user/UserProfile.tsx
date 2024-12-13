@@ -97,7 +97,7 @@ const id=userState.currentUser.user.id
       <Box sx={{ mt: 8, textAlign: 'center' }}>
         {/* Apartment and Members Count Box */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: -1 }}>
-          <Box sx={{ flexGrow: 1, textAlign: 'center', backgroundColor:'red' }}>
+          <Box sx={{ flexGrow: 1, textAlign: 'center' }}>
             <Typography variant="body1">Apartment Number:</Typography>
             <Typography variant="body1">{`${userDetails?.apartmentId?.buildingSection}-${userDetails?.apartmentId?.apartmentNumber}` || "N/A"}</Typography>
             <Typography variant="body1">Phone Number:</Typography>
@@ -107,7 +107,7 @@ const id=userState.currentUser.user.id
           </Box>
           
           {/* Center Box for Name */}
-          <Box sx={{ flexGrow: 1, textAlign: 'center', backgroundColor:'blue', display:'flex', flexDirection:'column', alignItems:'center' }}>
+          <Box sx={{ flexGrow: 1, textAlign: 'center',  display:'flex', flexDirection:'column', alignItems:'center' }}>
             {/* Responsive Typography */}
             <Typography variant="h6" sx={{ order: { xs: -1, md: 0 } }}>{userDetails?.firstName} {userDetails?.lastName}</Typography>
             <Typography variant="body2" color="text.secondary">

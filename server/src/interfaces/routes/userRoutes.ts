@@ -14,6 +14,7 @@ router.post('/login', (req, res, next) => userController.login(req, res, next));
 router.get('/',authMiddleware, (req, res, next) => userController.getUsers(req, res, next));
 router.post('/members/:id',authMiddleware, (req:Request, res:Response, next:NextFunction) => userController.addMember(req, res, next));
 router.get('/details/:id',authMiddleware, (req:Request, res:Response, next:NextFunction) => userController.getUserById(req, res, next));
+router.delete('/delete/:id', (req, res,next) => userController.deleteUser(req, res,next));
 
 
 export default router;

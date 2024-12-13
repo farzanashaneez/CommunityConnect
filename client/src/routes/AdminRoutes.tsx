@@ -11,6 +11,7 @@ import AdminPosts from '../pages/admin/AdminPosts';
 import AdminAnnouncements from '../pages/admin/AdminAnnouncements';
 import AdminSettings from '../pages/admin/AdminSettings';
 import PageNotFound from '../pages/PageNotFound';
+import AdminServiceRequest from '../pages/admin/AdminServiceRequest';
 
 
 const drawerWidth = 240;
@@ -87,6 +88,7 @@ const AdminRoutes: React.FC = () => {
           <Route path='/posts' element={<AdminPosts />} />
           <Route path='/announcements' element={<AdminAnnouncements />} />
           <Route path='/settings' element={<AdminSettings />} />
+          <Route path='/servicerequest' element={<AdminServiceRequest />} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </Box>

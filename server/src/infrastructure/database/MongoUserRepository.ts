@@ -64,4 +64,11 @@ export class MongoUserRepository implements UserRepository {
       { new: true }
     ).exec();
   }
+
+  async deleteUser(id: string): Promise<void> {
+    const result = await UserModel.findByIdAndDelete(id).exec();
+    if (!result) {
+      throw new Error('User not found');
+    }
+  }
 }
