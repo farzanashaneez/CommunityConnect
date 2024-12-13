@@ -3,21 +3,9 @@ import Grid from '@mui/material/Grid2';
 import ServiceCard from './ServiceCard'; 
 import { getAllServices } from '../services/api';
 import { useCommunityContext } from '../context/communityContext';
+import { Service, ServiceListProps } from './communityInterfaces';
 
-interface Service {
-  _id: string;
-  name: string;
-  description: string;
-  price: number;
-  imageUrl: string;
-}
 
-interface ServiceListProps {
-  type: 'local' | 'residential';
-  searchTerm: string;
-  update?:number;
-  isAdmin:boolean;
-}
 
 const ServiceList: React.FC<ServiceListProps> = ({ type, searchTerm = '',update ,isAdmin=false}) => {
   const [serviceList, setServiceList] = useState<Service[]>([]);

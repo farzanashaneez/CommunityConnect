@@ -3,8 +3,9 @@ import CustomSnackbar from "../components/customSnackbar";
 
 // Define the types for the context
 interface CommunityContextType {
-  deleteService: (id: string) => void;
-  updateService: (updatedService: Service) => void;
+  deleteService: (id: string,type?:string) => void;
+  updateService: (updatedService: Service,type?:string) => void;
+  addCompleted:(task:string)=>void;
   completed: boolean; // To track the completion of actions
   openSnackbar: (message: string, severity: 'success' | 'error' | 'info' | 'warning') => void;
   closeSnackbar: () => void;
@@ -42,22 +43,41 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
     setCompleted(status);
   };
 
-  const deleteService = (id: string) => {
-    // Call the API or perform logic to delete the service
+  const deleteService = (id: string,type?:string) => {
+    if(type==='event'){
+      openSnackbar("Event deleted successfully", "success");
+    }
+    else
     openSnackbar("Service deleted successfully", "success");
-    handleCompleted(true); // Set completed to true after action
+
+    handleCompleted(true); 
   };
 
-  const updateService = (updatedService: Service) => {
-    // Call the API or perform logic to update the service
-    openSnackbar("Service updated successfully", "success");
-    handleCompleted(true); // Set completed to true after action
+  const updateService = (updatedService: Service,type?:string) => {
+ if(type==='event'){
+      openSnackbar("Event updated successfully", "success");
+    }
+    else
+        openSnackbar("Service updated successfully", "success");
+
+    handleCompleted(true); 
   };
+  const addCompleted=(task:string)=>{
+    if(task==='event'){
+      openSnackbar("Event deleted successfully", "success");
+    }
+    else
+    openSnackbar("Service deleted successfully", "success");
+
+    handleCompleted(true); 
+  };
+
 
   return (
     <CommunityContext.Provider value={{ 
       deleteService, 
       updateService, 
+      addCompleted,
       openSnackbar, 
       closeSnackbar, 
       completed, 

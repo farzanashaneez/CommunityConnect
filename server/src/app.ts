@@ -7,6 +7,8 @@ import apartmentRoutes from './interfaces/routes/apartmentroutes';
 import morgan from 'morgan';
 import errorHandler from "./infrastructure/middlewares/errorHandlerMiddleware";
 import serviceRoutes from "./interfaces/routes/serviceRoutes";
+import eventRoutes from  "./interfaces/routes/eventRoutes";
+import announcementRoutes from  "./interfaces/routes/announcementRoutes";
 
 conncetDb();
 dotenv.config()
@@ -19,6 +21,9 @@ app.use(express.urlencoded({extended:true}))
 app.use('/api/users',userRouter)
 app.use('/api/apartments', apartmentRoutes);
 app.use('/api/services', serviceRoutes);
+app.use('/api/events', eventRoutes)
+app.use('/api/announcements',announcementRoutes )
+
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;

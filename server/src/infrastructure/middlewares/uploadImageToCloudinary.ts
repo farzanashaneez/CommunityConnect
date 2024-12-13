@@ -39,6 +39,7 @@ const uploadImageToCloudinary = async (req: CustomRequest, res: Response, next: 
       });
 
       req.imageUrl = result.secure_url;
+      console.log("result url",result.secure_url)
       fs.unlink(req.file.path, (err) => {
         if (err) {
           console.error('Error deleting the file:', err);

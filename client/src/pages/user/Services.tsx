@@ -84,6 +84,8 @@ console.log('currentuser',userState.currentUser.user.id)
       try {
         await createService(formData);
         showSnackbar("Service created successfully", "success");
+        setCroppedImage(null);
+        setAddDialogOpen(false);
         resetForm();
       } catch (error) {
         showSnackbar("Error creating service", "error");

@@ -69,7 +69,7 @@ export const updateServiceApi=async(id:string,serviceData:any)=>{
 }
 
 // Announcement Management
-export const createAnnouncement = async (announcementData: any) => {
+export const createAnnouncementApi = async (announcementData: any) => {
   console.log("announcementData", announcementData);
   const response = await api.post(`${API_URL}/announcements`, announcementData);
   return response.data;
@@ -80,13 +80,13 @@ export const fetchAllAnnouncements = async () => {
   return response.data;
 };
 
-export const deleteAnnouncement = async (id: string) => {
+export const deleteAnnouncementApi = async (id: string) => {
   console.log("id===>", id);
   const response = await api.delete(`${API_URL}/announcements/delete/${id}`);
   return response.data;
 };
 
-export const updateAnnouncement = async (id: string, announcementData: any) => {
+export const updateAnnouncementApi = async (id: string, announcementData: any) => {
   console.log("id===>", id);
   const response = await api.put(`${API_URL}/announcements/update/${id}`, announcementData);
   return response.data;
@@ -117,24 +117,24 @@ export const updatePost = async (id: string, postData: any) => {
 };
 
 // Event Management
-export const createEvent = async (eventData: any) => {
+export const createEventApi = async (eventData: any) => {
   console.log("eventData", eventData);
-  const response = await api.post(`${API_URL}/events`, eventData);
+  const response = await api.post(`${API_URL}/events`,eventData);
   return response.data;
 };
 
-export const fetchAllEvents = async () => {
+export const getAllEvents = async () => {
   const response = await api.get(`${API_URL}/events`);
   return response.data;
 };
 
-export const deleteEvent = async (id: string) => {
+export const deleteEventApi = async (id: string) => {
   console.log("id===>", id);
   const response = await api.delete(`${API_URL}/events/delete/${id}`);
   return response.data;
 };
 
-export const updateEvent = async (id: string, eventData: any) => {
+export const updateEventApi = async (id: string, eventData: any) => {
   console.log("id===>", id);
   const response = await api.put(`${API_URL}/events/update/${id}`, eventData);
   return response.data;

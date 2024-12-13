@@ -87,15 +87,16 @@ const adminState=useAppSelector((state)=>state.admin)
         const file = new File([values.image], fileName, { type: "image/jpeg" }); // Convert Blob to File
         formData.append("image", file);
         formData.append("provider",adminState.currentAdmin.user.id)
-        console.log('adminuser',adminState.currentAdmin.user.id)
 
       }
       try {
         await createService(formData);
         showSnackbar("Service created successfully", "success");
         resetForm();
+        setCroppedImage(null);
         setUpdateTrigger((prev) => prev + 1);
         setCompleted(true);
+
       } catch (error) {
         showSnackbar("Error creating service", "error");
       }
