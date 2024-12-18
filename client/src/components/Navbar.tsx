@@ -4,7 +4,7 @@ import { alpha, styled } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import ChatIcon from '@mui/icons-material/Chat';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const StyledLink = styled(Link)(({ theme }) => ({
   color: theme.palette.text.primary,
@@ -33,6 +33,10 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
 
 const NavBar: React.FC = () => {
   const [searchOpen, setSearchOpen] = useState(false);
+const navigate=useNavigate();
+  const handleChatClick = () => {
+    navigate('/chatroom');
+  };
 
   return (
     <StyledAppBar position="static">
@@ -81,7 +85,7 @@ const NavBar: React.FC = () => {
           <StyledIconButton>
             <NotificationsIcon />
           </StyledIconButton>
-          <StyledIconButton>
+          <StyledIconButton onClick={handleChatClick}>
             <ChatIcon />
           </StyledIconButton>
           <StyledLink to="/profile"> <Avatar 

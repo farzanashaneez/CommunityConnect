@@ -145,3 +145,32 @@ export const updateEventApi = async (id: string, eventData: any) => {
   const response = await api.put(`${API_URL}/events/update/${id}`, eventData);
   return response.data;
 };
+
+export const createChatApi = async (participants:object,type:string) => {
+  const response = await api.post(`${API_URL}/chats/${type}`, participants);
+  return response.data;
+};
+
+// Get a chat by ID
+export const getChatByIdApi = async (id: string) => {
+  const response = await api.get(`${API_URL}/chats/${id}`);
+  return response.data;
+};
+
+// Add a message to a chat
+export const sendMessageApi = async (chatId: string, message: { senderId: string, content: string ,status:string}) => {
+  const response = await api.post(`${API_URL}/chats/${chatId}/message`, message);
+  return response.data;
+};
+
+// Get all chats for a user
+export const getChatsForUserApi = async (userId: string) => {
+  const response = await api.get(`${API_URL}/chats/user/${userId}`);
+  return response.data;
+};
+
+// Delete a chat
+export const deleteChatApi = async (id: string) => {
+  const response = await api.delete(`${API_URL}/chats/${id}`);
+  return response.data;
+};

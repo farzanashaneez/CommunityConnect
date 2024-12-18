@@ -10,6 +10,10 @@ import {
   CardMedia,
   CardContent,
   Divider,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import * as Yup from "yup";
 import { useFormik } from "formik";
@@ -51,6 +55,8 @@ const LocalServicesTab = () => {
   const [isCropping, setIsCropping] = useState(false);
   const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
   const { completed, setCompleted } = useCommunityContext();
+  const [isAddDialogOpen, setAddDialogOpen] = useState(false);
+
 const adminState=useAppSelector((state)=>state.admin)
   const [updateTrigger, setUpdateTrigger] = useState(0);
   useEffect(() => {
@@ -96,7 +102,7 @@ const adminState=useAppSelector((state)=>state.admin)
         setCroppedImage(null);
         setUpdateTrigger((prev) => prev + 1);
         setCompleted(true);
-
+        setAddDialogOpen(false);
       } catch (error) {
         showSnackbar("Error creating service", "error");
       }
@@ -148,10 +154,42 @@ const adminState=useAppSelector((state)=>state.admin)
     >
     
       <Box sx={{ flex: 1 }}>
-        <Typography variant="h6" sx={{ mb: 2 }}>
-          Add New Service
-        </Typography>
-        <form onSubmit={formik.handleSubmit}>
+    <Box sx={{display:'flex', flexDirection:'row' ,justifyContent:'space-between'}}>
+    <Typography variant="h6">Available Services</Typography>
+        <Button 
+  variant="text" 
+  color="primary" 
+  onClick={() => setAddDialogOpen(true)} 
+  sx={{ mb: 2,fontSize:'18px',mr:2 }}
+>
+  + New Service
+</Button>
+    </Box>
+       
+
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            maxHeight: "100vh",
+            height: "auto",
+            overflowY: "auto",
+            border: "1px solid #ccc",
+            padding: "8px",
+          }}
+        >
+          <ServiceList
+            type="local"
+            searchTerm="local"
+            update={updateTrigger}
+            isAdmin={true}
+          />
+        </Box>
+      </Box>
+      <Dialog open={isAddDialogOpen} onClose={() => setAddDialogOpen(false)}>
+  <DialogTitle>Add New Service</DialogTitle>
+  <DialogContent>
+    <form onSubmit={formik.handleSubmit}>
           <Box sx={{ padding: 4, textAlign: "center" }}>
             {!isCropping ? (
               <>
@@ -232,31 +270,19 @@ const adminState=useAppSelector((state)=>state.admin)
             error={formik.touched.price && Boolean(formik.errors.price)}
             helperText={formik.touched.price && formik.errors.price}
           />
-          <Button variant="contained" color="primary" type="submit">
+          <Button onClick={() => setAddDialogOpen(false)}>Cancel</Button>
+    <Button type="submit" variant="contained" color="primary">
+      Add Service
+    </Button>
+          {/* <Button variant="contained" color="primary" type="submit">
             Add Service
-          </Button>
+          </Button> */}
+        
         </form>
-        <Divider sx={{ my: 3 }} />
-        <Typography variant="h6">Available Services</Typography>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            maxHeight: "100vh",
-            height: "auto",
-            overflowY: "auto",
-            border: "1px solid #ccc",
-            padding: "8px",
-          }}
-        >
-          <ServiceList
-            type="local"
-            searchTerm="local"
-            update={updateTrigger}
-            isAdmin={true}
-          />
-        </Box>
-      </Box>
+  </DialogContent>
+
+</Dialog>
+
       <CustomSnackbar
         open={snackbar.open}
         message={snackbar.message}
@@ -326,6 +352,7 @@ const ResidentialServicesTab = () => {
           />
         </Box>
       </Box>
+
     </Box>
   );
 };
