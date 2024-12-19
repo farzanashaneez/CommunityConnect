@@ -21,6 +21,7 @@ import CustomSnackbar from "./customSnackbar";
 import { useCommunityContext } from "../context/communityContext";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
+import MapComponent from "./map/GoogleMap";
 
 interface Event {
   _id: string;
@@ -28,7 +29,8 @@ interface Event {
   description: string;
   date: string;
   imageUrl: string;
-  status:string
+  status: string;
+  location: { lat: number; lng: number };
 }
 
 interface EventCardProps {
@@ -38,13 +40,13 @@ interface EventCardProps {
 const getEventStatus = (eventDate: string) => {
   const now = new Date();
   const date = new Date(eventDate);
-  
+
   if (date > now) {
-    return 'Scheduled';
+    return "Scheduled";
   } else if (date.toDateString() === now.toDateString()) {
-    return 'Ongoing';
+    return "Ongoing";
   } else {
-    return 'Completed';
+    return "Completed";
   }
 };
 
@@ -55,11 +57,17 @@ const EventCard: React.FC<EventCardProps> = ({ event, isAdmin = false }) => {
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setDetailsDialogOpen] = useState(false);
 
+  const [selectedPlaceName, setSelectedPlaceName] = useState("");
+
+  const handlePlaceSelected = (placeName: string) => {
+    setSelectedPlaceName(placeName); // Set the selected place name
+  };
+
   const handleDelete = async (id: string) => {
     try {
       await deleteEventApi(id);
       showSnackbar("Event deleted successfully", "success");
-      deleteService(id,'event');
+      deleteService(id, "event");
     } catch (error) {
       console.error("Error deleting event:", error);
       showSnackbar("Failed to delete event.", "error");
@@ -67,9 +75,11 @@ const EventCard: React.FC<EventCardProps> = ({ event, isAdmin = false }) => {
   };
 
   const handleEditSubmit = async (values: Event) => {
+    console.log("edit update");
     try {
+      console.log("values", values);
       const updatedEvent = await updateEventApi(values._id, values);
-      updateService(updatedEvent,'event');
+      updateService(updatedEvent, "event");
       showSnackbar("Event updated successfully", "success");
       setEditDialogOpen(false);
     } catch (error) {
@@ -148,7 +158,9 @@ const EventCard: React.FC<EventCardProps> = ({ event, isAdmin = false }) => {
           />
         )}
 
-        <CardContent sx={{ width: "100%", textAlign: "center", height: "auto" }}>
+        <CardContent
+          sx={{ width: "100%", textAlign: "center", height: "auto" }}
+        >
           <Typography variant="h6" sx={{ fontWeight: "bold", mb: 0 }}>
             {event.name}
           </Typography>
@@ -168,18 +180,19 @@ const EventCard: React.FC<EventCardProps> = ({ event, isAdmin = false }) => {
             {event.description}
           </Typography>
           <Typography variant="body2" sx={{ fontWeight: "bold", mb: 0 }}>
-  Date: {new Date(event.date).toLocaleString('en-US', { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric', 
-    hour: '2-digit', 
-    minute: '2-digit' 
-  })}
-</Typography>
-<Typography variant="body2" sx={{ fontWeight: "bold", mb: 0 }}>
-  Status: {getEventStatus(event.date)}
-</Typography>
+            Date:{" "}
+            {new Date(event.date).toLocaleString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </Typography>
 
+          <Typography variant="body2" sx={{ fontWeight: "bold", mb: 0 }}>
+            Status: {getEventStatus(event.date)}
+          </Typography>
         </CardContent>
         <CustomSnackbar
           open={snackbar.open}
@@ -191,7 +204,9 @@ const EventCard: React.FC<EventCardProps> = ({ event, isAdmin = false }) => {
 
       {/* Details Dialog */}
       <Dialog open={isDetailsDialogOpen} onClose={handleDetailsClose}>
-        <DialogTitle sx={{ fontWeight: "700", fontSize: "25px", margin: "auto" }}>
+        <DialogTitle
+          sx={{ fontWeight: "700", fontSize: "25px", margin: "auto" }}
+        >
           {event.name}
         </DialogTitle>
         <DialogContent>
@@ -213,13 +228,23 @@ const EventCard: React.FC<EventCardProps> = ({ event, isAdmin = false }) => {
           <Typography variant="body1" gutterBottom>
             {event.description}
           </Typography>
-          <Typography variant="body2">Date: {new Date(event.date).toLocaleString('en-US', { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric', 
-    hour: '2-digit', 
-    minute: '2-digit' 
-  })}</Typography>
+          <Typography variant="body2" sx={{my:2}}>
+            Date:{" "}
+            {new Date(event.date).toLocaleString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </Typography>
+          {/* <Typography variant="body2">Location: {selectedPlaceName}</Typography> Show selected place */}
+        <MapComponent 
+          center={{ lat: event.location.lat, lng: event.location.lng }} 
+          markers={[{ lat: event.location.lat, lng: event.location.lng }]} 
+          onPlaceSelected={handlePlaceSelected} // Pass the handler to MapComponent
+        />
+
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDetailsClose} color="primary">
@@ -234,16 +259,24 @@ const EventCard: React.FC<EventCardProps> = ({ event, isAdmin = false }) => {
         <Formik
           initialValues={{
             ...event,
+            date: event.date.split("T")[0],
+            location: event.location || { lat: null, lng: null },
           }}
           validationSchema={Yup.object({
-            name: Yup.string().required("Title is required"),
+            name: Yup.string().required("Name is required"),
             description: Yup.string().required("Description is required"),
             date: Yup.string().required("Date is required"),
             imageUrl: Yup.string().url("Must be a valid URL"),
+            location: Yup.object()
+              .shape({
+                lat: Yup.number().required("Latitude is required"),
+                lng: Yup.number().required("Longitude is required"),
+              })
+              .required("Location is required"),
           })}
           onSubmit={(values) => handleEditSubmit(values)}
         >
-          {({ values, errors, touched, handleChange }) => (
+          {({ values, errors, touched, handleChange, setFieldValue }) => (
             <Form>
               <DialogContent>
                 <TextField
@@ -279,6 +312,31 @@ const EventCard: React.FC<EventCardProps> = ({ event, isAdmin = false }) => {
                   helperText={touched.date && errors.date}
                   sx={{ mb: 2 }}
                 />
+
+                {/* Map Component */}
+                <MapComponent
+                  center={{
+                    lat: values.location.lat || 24.2232,
+                    lng: values.location.lng || 55.7229,
+                  }}
+                  markers={
+                    values.location.lat && values.location.lng
+                      ? [{ lat: values.location.lat, lng: values.location.lng }]
+                      : []
+                  }
+                  onMapClick={(e) => {
+                    const lat = e.latLng?.lat() || 0;
+                    const lng = e.latLng?.lng() || 0;
+                    setFieldValue("location", { lat, lng });
+                  }}
+                />
+
+                {/* Validation Errors for Location */}
+                {touched.location && errors.location && (
+                  <Typography color="error" variant="body2">
+                    {errors.location.lat || errors.location.lng}
+                  </Typography>
+                )}
               </DialogContent>
               <DialogActions>
                 <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
@@ -295,5 +353,3 @@ const EventCard: React.FC<EventCardProps> = ({ event, isAdmin = false }) => {
 };
 
 export default EventCard;
-
-

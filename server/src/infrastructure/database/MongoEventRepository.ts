@@ -4,11 +4,13 @@ import { EventRepository } from "../../application/interfaces/EventRepository";
 
 const eventSchema = new Schema<Event>({
   name: { type: String, required: true },
-  date: { type: Date, required: true },
-  location: { type: String, required: true },
+  date: { type: Date },
+  location: {lat:{type:Number},lng:{type:Number}} ,
   description: { type: String },
-  status: { type: String, enum: ['scheduled','ongoing', 'completed'], required: true },
+  status: { type: String, enum: ['scheduled','ongoing', 'completed']},
   imageUrl: { type: String },
+  createdAt: { type: Date, default: Date.now },
+
 });
 eventSchema.pre('save', function(next) {
   const event = this as Event;
@@ -28,6 +30,7 @@ const EventModel = mongoose.model<Event>("Event", eventSchema);
 
 export class MongoEventRepository implements EventRepository {
   async createEvent(event: Partial<Event>): Promise<Event> {
+    console.log("mongo event,",event)
     const newEvent = new EventModel(event);
     return newEvent.save();
   }

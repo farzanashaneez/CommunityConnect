@@ -106,6 +106,40 @@ export class UserController {
     }
   }
 
+  async updatName(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      console.log("updatename called")
+      const userId = req.params.id; 
+      const { firstname,lastname } = req.body;
+
+    
+      const updatedUser = await this.userUseCases.updateName(userId,{ firstname,lastname});
+      
+     
+      res.json({ message: 'Member added successfully', updatedUser});
+    } catch (error) {
+      console.log("Add member error:", error);
+      next(error);
+    }
+  }
+  async updateImage(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      console.log("updateimage called")
+      const userId = req.params.id; 
+      const { imageUrl } = req.body;
+
+    
+      const updatedUser = await this.userUseCases.updateImage(userId, imageUrl);
+      
+     
+      res.json({ message: 'Member added successfully', updatedUser});
+    } catch (error) {
+      console.log("Add member error:", error);
+      next(error);
+    }
+  }
+
+
   async deleteUser(req: Request, res: Response,next:NextFunction): Promise<void> {
     try {
       const { id } = req.params;

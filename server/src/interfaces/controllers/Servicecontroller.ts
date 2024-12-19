@@ -3,6 +3,8 @@
 import { NextFunction, Request, Response } from 'express';
 import { ServiceUseCase } from '../../application/usecases/serviceUseCases';
 import { CustomRequest } from '../../infrastructure/middlewares/uploadImageToCloudinary';
+import notificationServices from '../../application/services/notificationServices';
+import { emitNotificationUpdate } from '../../infrastructure/services/socketIOServices';
 
 export class ServiceController {
   constructor(private serviceUseCase: ServiceUseCase) {}
@@ -23,6 +25,18 @@ export class ServiceController {
       console.log(serviceData,"===========file",serviceData,req.body)
 
       const newService = await this.serviceUseCase.createService(serviceData);
+      const notificationMessage = `New service created: ${newService.name}`;
+      // await notificationServices.createNotification(notificationMessage, [], true); // Send to all users
+
+      // // Emit the notification update to all clients
+      // emitNotificationUpdate({ message: notificationMessage });
+
+      Promise.resolve().then(async () => {
+        const notificationMessage = `New service created: ${newService.name}`;
+        await notificationServices.createNotification(notificationMessage, [], true); // Send to all users
+        emitNotificationUpdate({ message: notificationMessage }); // Emit update
+      });
+
       res.status(201).json(newService);
     } catch (error:any) {
       res.status(400).json({ message: 'Error creating service', error: error?.message });

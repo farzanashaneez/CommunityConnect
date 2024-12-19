@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import CustomSnackbar from "../components/customSnackbar";
+import { socket } from "../services/socketConnection";
 
 // Define the types for the context
 interface CommunityContextType {
@@ -64,10 +65,12 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   };
   const addCompleted=(task:string)=>{
     if(task==='event'){
-      openSnackbar("Event deleted successfully", "success");
+      openSnackbar("Event added successfully", "success");
+      socket.emit("update",'event');
     }
     else
-    openSnackbar("Service deleted successfully", "success");
+    openSnackbar("Service added successfully", "success");
+    socket.emit("update",'service');
 
     handleCompleted(true); 
   };

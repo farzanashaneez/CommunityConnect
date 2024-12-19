@@ -49,6 +49,30 @@ export const addMember = async (token: string,id:string, memberData: { name: str
   });
   return response.data;
 };
+export const updateName = async (token: string,id:string,firstname:string,lastname:string) => {
+  const response = await api.post(`${API_URL}/users/updatename/${id}`, {firstname,lastname}, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+export const addProfileImage = async (token: string,id:string, data:object) => {
+  const response = await api.post(`${API_URL}/users/addprofileImage/${id}`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+export const addCoverphoto = async (token: string,id:string, data:object) => {
+  const response = await api.post(`${API_URL}/users/addcoverphoto/${id}`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
 
 export const createService=async(servicedata:any)=>{
   console.log("servicedata",servicedata)

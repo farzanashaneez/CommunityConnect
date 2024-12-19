@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import { EventUseCase } from '../../application/usecases/eventUseCase';
 import { CustomRequest } from '../../infrastructure/middlewares/uploadImageToCloudinary';
+import notificationServices from '../../application/services/notificationServices';
+import { emitNotificationUpdate } from '../../infrastructure/services/socketIOServices';
 
 export class EventController {
   constructor(private eventUseCase: EventUseCase) {}
@@ -11,13 +13,20 @@ export class EventController {
       const eventData = {
         name: req.body.name,
         date: req.body.date,
-        location: req.body.location,
+        location: JSON.parse(req.body.location),
         description: req.body.description,
         imageUrl: req.imageUrl || '',
       };
 
       const newEvent = await this.eventUseCase.createEvent(eventData);
+      Promise.resolve().then(async () => {
+      const notificationMessage = `New event created: ${newEvent.name}`;
+      await notificationServices.createNotification(notificationMessage, [], true); // Send to all users
+      emitNotificationUpdate({ message: notificationMessage });
+      })
+      
       res.status(201).json(newEvent);
+
     } catch (error: any) {
       console.log(error)
       res.status(400).json({ message: 'Error creating event', error: error?.message });
@@ -42,6 +51,7 @@ export class EventController {
     try {
       const { id } = req.params;
       const eventData = req.body;
+      console.log("event to be updated",eventData)
       const updatedEvent = await this.eventUseCase.updateEvent(id, eventData);
       res.json(updatedEvent);
     } catch (error: any) {

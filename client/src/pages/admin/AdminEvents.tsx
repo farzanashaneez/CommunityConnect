@@ -16,7 +16,7 @@ import { createEventApi } from "../../services/api";
 import { useSnackbar } from "../../hooks/useSnackbar";
 import { useCommunityContext } from "../../context/communityContext";
 import CustomSnackbar from "../../components/customSnackbar";
-
+import MapComponent from "../../components/map/GoogleMap";
 
 const AdminEvents: React.FC = () => {
   const [isAddDialogOpen, setAddDialogOpen] = useState(false);
@@ -24,7 +24,10 @@ const AdminEvents: React.FC = () => {
   const [isCropping, setIsCropping] = useState(false);
   const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
   const [imageSrc, setImageSrc] = useState<string | null>(null);
-
+  const [eventLocation, setEventLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
 
   const { addCompleted } = useCommunityContext();
 
@@ -33,23 +36,27 @@ const AdminEvents: React.FC = () => {
       title: "",
       description: "",
       date: "",
-      location: "",
+      location: { lat: 0, lng: 0 },
       imageUrl: null,
     },
     validationSchema: Yup.object({
       title: Yup.string().required("Title is required"),
       description: Yup.string().required("Description is required"),
       date: Yup.string().required("Date is required"),
-      location: Yup.string().required("Location is required"),
-      imageUrl: Yup.string()
-        .required("Image is required"),
+      location: Yup.object()
+        .shape({
+          lat: Yup.number().required("Latitude is required"),
+          lng: Yup.number().required("Longitude is required"),
+        })
+        .required("Location is required"),
+      imageUrl: Yup.string().required("Image is required"),
     }),
     onSubmit: async (values, { resetForm }) => {
       const formData = new FormData();
       formData.append("name", values.title);
       formData.append("description", values.description);
       formData.append("date", new Date(values.date).toISOString());
-            formData.append("location", values.location);
+      formData.append("location", JSON.stringify(values.location));
 
       if (values.imageUrl) {
         const fileName = `cropped-image-${Date.now()}.jpeg`; // Define a unique filename
@@ -57,18 +64,20 @@ const AdminEvents: React.FC = () => {
           type: "image/jpeg",
         });
 
-        formData.append("imageUrl",file);
+        formData.append("imageUrl", file);
       }
 
       try {
-       
         await createEventApi(formData);
+
         addCompleted("event");
         setCroppedImage(null);
         setAddDialogOpen(false);
+        //showSnackbar("Event added successfully", "success");
+
         resetForm();
       } catch (error) {
-        showSnackbar("Error creating service", "error");
+        showSnackbar("Error creating event", "error");
       }
     },
   });
@@ -89,8 +98,6 @@ const AdminEvents: React.FC = () => {
 
   const handleCropComplete = useCallback(
     (croppedBlob: Blob) => {
-
-
       const croppedImageURL = URL.createObjectURL(croppedBlob);
       console.log("cropped blob", croppedBlob);
       setCroppedImage(croppedImageURL);
@@ -138,11 +145,11 @@ const AdminEvents: React.FC = () => {
         </Box>
       </Box>
       <CustomSnackbar
-          open={snackbar.open}
-          message={snackbar.message}
-          severity={snackbar.severity}
-          onClose={hideSnackbar}
-        />
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        onClose={hideSnackbar}
+      />
       <Dialog open={isAddDialogOpen} onClose={() => setAddDialogOpen(false)}>
         <DialogTitle>Add New Event</DialogTitle>
         <form onSubmit={formik.handleSubmit}>
@@ -178,14 +185,24 @@ const AdminEvents: React.FC = () => {
             helperText={formik.touched.date && formik.errors.date}
             sx={{ mb: 2 }}
           />
-          <TextField
-            label="Location"
-            fullWidth
-            {...formik.getFieldProps("location")}
-            error={formik.touched.location && Boolean(formik.errors.location)}
-            helperText={formik.touched.location && formik.errors.location}
-            sx={{ mb: 2 }}
+          <MapComponent
+            center={{ lat: 24.2232, lng: 55.7229 }}
+            markers={eventLocation ? [eventLocation] : []}
+            onMapClick={(e) => {
+              if (e.latLng) {
+                const lat = e.latLng.lat();
+                const lng = e.latLng.lng();
+                setEventLocation({ lat, lng });
+                formik.setFieldValue("location", { lat, lng });
+              }
+            }}
           />
+          {formik.touched.location && formik.errors.location && (
+  <Typography color="error">
+    {String(formik.errors.location)}
+  </Typography>
+)}
+
           <Box sx={{ padding: 4, textAlign: "center" }}>
             {!isCropping ? (
               <>

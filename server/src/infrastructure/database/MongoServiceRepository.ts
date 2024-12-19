@@ -11,6 +11,8 @@ const serviceSchema = new Schema<Service>({
   category: { type: String, required: true },
   imageUrl: { type: String },
   status: { type: String, enum: ['granted', 'pending'], required: true },
+  createdAt: { type: Date, default: Date.now },
+
 });
 
 const ServiceModel = mongoose.model<Service>("Service", serviceSchema);

@@ -12,7 +12,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@react-google-maps/api": "^2.20.3",
     "@types/express": "^5.0.0",
+    "@types/google-maps": "^3.2.6",
     "@types/mongoose": "^5.11.96",
     "@types/node": "^22.9.1",
     "bcryptjs": "^2.4.3",

@@ -8,4 +8,5 @@ export interface Service {
     category: string;
     imageUrl: string;
     status: 'granted' | 'pending';
+    createdAt: Date; 
   }

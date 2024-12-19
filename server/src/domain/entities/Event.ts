@@ -3,7 +3,7 @@ export interface Event {
     name: string;
     description: string; 
     date: Date; 
-    location: string; 
+    location: {lat:number;lng:number}; 
     imageUrl:string
     status: 'scheduled'|'ongoing' | 'completed'; 
     createdAt: Date; 

@@ -11,6 +11,7 @@ import eventRoutes from  "./interfaces/routes/eventRoutes";
 import announcementRoutes from  "./interfaces/routes/announcementRoutes";
 import chatRoutes from "./interfaces/routes/chatRoutes";
 import { initializeSocket } from "./infrastructure/services/socketIOServices";
+import notificationRoutes from './interfaces/routes/notificationRoutes';
 import http from "http";
 import { Server as SocketIOServer, Socket } from "socket.io";
 
@@ -58,6 +59,8 @@ app.use('/api/services', serviceRoutes);
 app.use('/api/events', eventRoutes)
 app.use('/api/announcements',announcementRoutes )
 app.use('/api/chats', chatRoutes);
+app.use('/api/notifications', notificationRoutes);
+
 app.use(errorHandler);
 
 

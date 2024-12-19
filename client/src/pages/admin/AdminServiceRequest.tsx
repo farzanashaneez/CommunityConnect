@@ -9,6 +9,7 @@ import {
   CardContent,
   Divider,
   Grid,
+  Button,
 } from "@mui/material";
 import TextButton from "../../components/TextButton";
 import { useSnackbar } from "../../hooks/useSnackbar";
@@ -128,6 +129,14 @@ const LocalServicesTab = () => {
 };
 
 const ResidentialServicesTab = () => {
+  const [status, setStatus] = useState(Array(5).fill(null)); // Track the status of each service request
+
+  const handleStatusChange = (index:number, newStatus:string) => {
+    const updatedStatus = [...status];
+    updatedStatus[index] = newStatus;
+    setStatus(updatedStatus);
+  };
+
   return (
     <Box
       sx={{
@@ -160,6 +169,7 @@ const ResidentialServicesTab = () => {
                     alignItems: "center",
                     pl: 1,
                     height: "100%",
+                    backgroundColor: status[index] === 'Granted' ? 'lightgreen' : status[index] === 'Rejected' ? 'lightcoral' : 'white', // Change background based on status
                   }}
                 >
                   <CardMedia
@@ -180,8 +190,30 @@ const ResidentialServicesTab = () => {
                         mt: 1,
                       }}
                     >
-                      <TextButton label="Accept" />
-                      <TextButton label="Reject" />
+                      <Button
+                        onClick={() => handleStatusChange(index, 'Granted')}
+                        sx={{
+                          textTransform: "none",
+                          color: "green",
+                          border: "none",
+                          background: "none",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Accept
+                      </Button>
+                      <Button
+                        onClick={() => handleStatusChange(index, 'Rejected')}
+                        sx={{
+                          textTransform: "none",
+                          color: "red",
+                          border: "none",
+                          background: "none",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Reject
+                      </Button>
                     </Box>
                   </CardContent>
                 </Card>
@@ -193,5 +225,6 @@ const ResidentialServicesTab = () => {
     </Box>
   );
 };
+
 
 export default AdminServiceRequest;

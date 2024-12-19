@@ -8,6 +8,7 @@ const userSchema = new Schema<User>({
   email: { type: String, required: true, unique: true },
   mobileNumber: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now },
   apartmentId: {
     type: Schema.Types.ObjectId,
     ref: "Apartment",
@@ -64,7 +65,33 @@ export class MongoUserRepository implements UserRepository {
       { new: true }
     ).exec();
   }
-
+  
+  async updateName(
+    userId: string,
+    fullName: { firstname: string; lastname: string }
+  ): Promise<User | null> {
+    const objectId = new mongoose.Types.ObjectId(userId);
+  
+    return UserModel.findByIdAndUpdate(
+      objectId,
+      { $set: { firstName: fullName.firstname, lastName: fullName.lastname } },
+      { new: true } // Return the updated document
+    ).exec();
+  }
+  
+  async updateImage(
+    userId: string,
+    imageUrl: string
+  ): Promise<User | null> {
+    const objectId = new mongoose.Types.ObjectId(userId);
+  
+    return UserModel.findByIdAndUpdate(
+      objectId,
+      { $set: { imageUrl: imageUrl } },
+      { new: true } // Return the updated document
+    ).exec();
+  }
+  
   async deleteUser(id: string): Promise<void> {
     const result = await UserModel.findByIdAndDelete(id).exec();
     if (!result) {

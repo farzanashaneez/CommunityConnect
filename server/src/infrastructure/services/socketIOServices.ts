@@ -1,44 +1,3 @@
-// import { Server as SocketIOServer, Socket } from "socket.io";
-// import http from "http";
-
-// let io: SocketIOServer;
-
-// export const initializeSocket = (server: http.Server) => {
-//  io = new SocketIOServer(server, {
-//     cors: {
-//       origin: "http://localhost:5173", // Replace with your frontend URL
-//       methods: ["GET", "POST"],
-//       credentials: true
-//     },
-//     path: "/socket.io"
-//   });
-
-//   console.log("Socket.IO initialized");
-
-//   io.on("connection", (socket: Socket) => {
-//     console.log(`User connected: ${socket.id}`);
-
-//     // Example: Listening for a message event
-//     socket.on("sendMessage", (data) => {
-//       console.log("Message received:", data);
-
-//       // Broadcast the message to all clients
-//       io.emit("receiveMessage", data);
-//     });
-
-//     // Example: Disconnect event
-//     socket.on("disconnect", () => {
-//       console.log(`User disconnected: ${socket.id}`);
-//     });
-//   });
-// };
-
-// export const getIO = () => {
-//   if (!io) {
-//     throw new Error("Socket.IO not initialized!");
-//   }
-//   return io;
-// };
 
 
 import { Server as SocketIOServer, Socket } from "socket.io";
@@ -79,6 +38,15 @@ export const initializeSocket = (server: any) => {
       sendMessageToChat(chatId, content);
     });
   
+    socket.on("update",(data)=>{
+      if(data==='event'){
+        io.emit("reload", data); // Notify all clients about the new/updated notification
+      }
+      else if(data==='service'){
+        io.emit("reload", data); // Notify all clients about the new/updated notification
+
+      }
+    })
 
     // When a user leaves a chat
     socket.on("leaveChat", (chatId: string) => {
@@ -110,4 +78,8 @@ export const sendMessageToChat = (chatId: string, message: string) => {
       io.to(socketId).emit("newMessage", message); // Send the message to each socketId in the chat
     });
   }
+};
+
+export const emitNotificationUpdate = (notificationData:object) => {
+  io.emit("notificationUpdate", notificationData); // Notify all clients about the new/updated notification
 };
