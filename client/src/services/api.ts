@@ -85,7 +85,16 @@ export const getAllServices=async(type:string)=>{
   const response=await api.get(`${API_URL}/services/type/${type}`);
   return response.data;
 }
-
+export const getAllRequestedServices=async(status:string)=>{
+  console.log("type===>",status)
+  const response=await api.get(`${API_URL}/services/getallservicerequest/${status}`);
+  return response.data;
+}
+export const getFilteredServices=async(status:string,type:string)=>{
+  console.log("status===>",status)
+  const response=await api.get(`${API_URL}/services/${type}/status/${status}`);
+  return response.data;
+}
 export const deleteServiceApi=async(id:string)=>{
   console.log("id===>",id)
   const response=await api.delete(`${API_URL}/services/delete/${id}`);
@@ -95,6 +104,26 @@ export const deleteServiceApi=async(id:string)=>{
 export const updateServiceApi=async(id:string,serviceData:any)=>{
   console.log("id===>",id)
   const response=await api.put(`${API_URL}/services/update/${id}`,serviceData);
+  return response.data;
+}
+export const grantServiceApi=async(id:string)=>{
+  console.log("id===>",id)
+  const response=await api.put(`${API_URL}/services/grantorreject/grantservice/${id}`);
+  return response.data;
+}
+export const rejectServiceApi=async(id:string)=>{
+  console.log("id===>",id)
+  const response=await api.put(`${API_URL}/services/grantorreject/rejectservice/${id}`);
+  return response.data;
+}
+export const requestService=async(id:string,reqObj:object)=>{
+  console.log("id===>req Object",id,reqObj)
+  const response=await api.post(`${API_URL}/services/requestservice/${id}`,reqObj);
+  return response.data;
+}
+export const markAsCompleted=async(id:string)=>{
+  console.log("id===>req Object",id)
+  const response=await api.put(`${API_URL}/services/markservicecompleted/${id}`);
   return response.data;
 }
 

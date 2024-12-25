@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
-
 import {
   Box,
   Typography,
@@ -62,15 +61,11 @@ const ChatArea: React.FC<ChatAreaProps> = ({
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState<string>("");
-  const [isTyping, setIsTyping] = useState<boolean>(false);
-  const [typingUsers, setTypingUsers] = useState<string[]>([]);
 
   const userState = useAppSelector((state) => state.user);
   const id = userState.currentUser.user.id;
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
 
   // Connect to socket and fetch messages when selectedChat changes
   useEffect(() => {
@@ -85,19 +80,9 @@ const ChatArea: React.FC<ChatAreaProps> = ({
 
     });
 
-    socket.on("userTyping", ({ userId, isTyping }) => {
-      setTypingUsers((prevUsers) => {
-        if (isTyping && !prevUsers.includes(userId) && userId!==id) {
-          return [...prevUsers, userId];
-        } else if (!isTyping) {
-          return prevUsers.filter((u) => u !== userId);
-        }
-        return prevUsers;
-      });
-    });
-        return () => {
+    // Cleanup on unmount
+    return () => {
       socket.off("newMessage");
-      socket.off("userTyping");
       socket.emit("leaveChat", selectedChat?._id);
     };
   }, [selectedChat]);
@@ -126,8 +111,9 @@ const ChatArea: React.FC<ChatAreaProps> = ({
       status: "sending",
     };
 
+    // Add the temporary message to the state
     setMessages((prevMessages) => [...prevMessages, tempMessage]);
-    setInputMessage("");
+    setInputMessage(""); // Clear the input field
 
     try {
       const response = await sendMessageApi(selectedChat._id, {
@@ -156,25 +142,6 @@ const ChatArea: React.FC<ChatAreaProps> = ({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
   
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputMessage(e.target.value);
-
-    if (!isTyping) {
-      setIsTyping(true);
-      socket.emit("typing", { chatId: selectedChat._id, userId: id, isTyping: true });
-    }
-
-    // Clear existing timeout
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-    }
-
-    // Set new timeout
-    typingTimeoutRef.current = setTimeout(() => {
-      setIsTyping(false);
-      socket.emit("typing", { chatId: selectedChat._id, userId: id, isTyping: false });
-    }, 2000); // Stop typing after 2 seconds of inactivity
-  };
   return (
     <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
       {/* Header Section */}
@@ -269,16 +236,6 @@ const ChatArea: React.FC<ChatAreaProps> = ({
   <div ref={messagesEndRef} />
 </Box>
 
-      {/* Typing Indicator */}
-      {typingUsers.length > 0 && (
-        <Typography variant="caption" sx={{ p: 1, fontStyle: 'italic' }}>
-          {typingUsers.map(userId => {
-            const user = selectedChat.participants.find(p => p._id === userId);
-            return user?.firstName || `User ${userId}`;
-          }).join(', ')} {typingUsers.length === 1 ? 'is' : 'are'} typing...
-        </Typography>
-      )}
-
       {/* Message Input Section */}
       <Paper sx={{ p: 2, display: "flex", alignItems: "flex-end" }}>
         <TextField
@@ -286,7 +243,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
           variant="outlined"
           placeholder="Type a message"
           value={inputMessage}
-          onChange={handleInputChange}
+          onChange={(e) => setInputMessage(e.target.value)}
           onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
           multiline
           maxRows={4}

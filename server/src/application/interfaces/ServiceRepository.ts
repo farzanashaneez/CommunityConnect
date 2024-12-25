@@ -1,12 +1,16 @@
-import { Service } from "../../domain/entities/Service";
+import { Service,ServiceRequest } from "../../domain/entities/Service";
 
 export interface ServiceRepository {
   createService(service: Partial<Service>): Promise<Service>;
   getServiceById(id: string): Promise<Service | null>;
   updateService(id: string, serviceData: Partial<Service>): Promise<Service>;
+  grantservice(id: string, update: string): Promise<Service>;
+  markservicecompleted(id: string, mark: string): Promise<ServiceRequest>;
+  requestLocalService(servieRequest:ServiceRequest): Promise<ServiceRequest>;
   deleteService(id: string): Promise<void>;
   getAllServices(type:string): Promise<Service[]>;
+  getAllRequestedServices(status:string): Promise<ServiceRequest[]>;
   getServicesByCategory(category: string): Promise<Service[]>;
   getServicesByType(type: 'local' | 'residential'): Promise<Service[]>;
-  getServicesByStatus(status: 'granted' | 'pending'): Promise<Service[]>;
+  getServicesByStatus(status:string,type:string): Promise<Service[]>;
 }

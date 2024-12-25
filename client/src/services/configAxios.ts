@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import { store } from '../redux-store/store'; // Adjust this path as needed
 import { loggedOut } from '../redux-store/user/adminSlice'; // Adjust import path
-import { signoutSuccess } from '../redux-store/user/userSlice'; // Adjust import path
+import { signoutSuccess,signinSuccess } from '../redux-store/user/userSlice'; // Adjust import path
 
 const API_URL = 'http://localhost:5000/api';
 
@@ -33,18 +33,27 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response?.status === 401) {
-      if (error.response.data.message.toLowerCase().includes('invalid token')) {
-        store.dispatch(loggedOut());
+    if (error.response?.status === 401 && error.response.data.message.toLowerCase().includes('invalid token')) {
+      const state = store.getState();
+      const refreshToken = state.user?.currentUser?.refreshToken;
 
-       
-      }
-      if (error.config.url?.startsWith('/admin')) {
-        store.dispatch(loggedOut());
+      if (refreshToken) {
+        try {
+          const response = await axios.post(`${API_URL}/refresh-token`, { refreshToken });
+          const newAccessToken = response.data.accessToken;
+
+          // Update the token in Redux using the signinSuccess action
+          store.dispatch(signinSuccess({ ...state.user.currentUser, token: newAccessToken }));
+
+          // Retry the original request with the new token
+          error.config.headers['Authorization'] = `Bearer ${newAccessToken}`;
+          return axios(error.config);
+        } catch (refreshError) {
+          store.dispatch(loggedOut());
+        }
       } else {
         store.dispatch(signoutSuccess());
       }
-      //store.dispatch(loggedOut());
     }
     return Promise.reject(error);
   }

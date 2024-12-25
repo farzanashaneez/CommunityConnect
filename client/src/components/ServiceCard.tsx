@@ -14,12 +14,14 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { deleteServiceApi, updateServiceApi } from "../services/api";
+import { deleteServiceApi, requestService, updateServiceApi } from "../services/api";
 import { useSnackbar } from "../hooks/useSnackbar";
 import CustomSnackbar from "./customSnackbar";
 import { useCommunityContext } from "../context/communityContext";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
+import ConfirmationDialog from "./ConfirmationDialogue";
+import { useAppSelector } from "../hooks/reduxStoreHook";
 
 interface Service {
   _id: string;
@@ -45,6 +47,42 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
 
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setDetailsDialogOpen] = useState(false);
+
+  const [open, setOpen] = useState(false);
+
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+  const [confirmData, setConfirmData] = useState<object | null>(null);
+
+
+  const userState = useAppSelector((state) => state.user);
+  const {requestServiceAlert}=useCommunityContext();
+  const handleOpenDialog = (id: string, data: object) => {
+    console.log("open section ",data,userState)
+    setConfirmId(id);
+    setConfirmData(data);
+    setOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpen(false);
+    setConfirmId(null); // Reset ID
+    setConfirmData(null); // Reset data
+  };
+
+  const handleConfirm = () => {
+    try{
+      if (confirmId && confirmData) {
+        requestService(confirmId, confirmData); // Pass id and data to requestService
+      }
+      handleCloseDialog();
+      requestServiceAlert('service',false)
+
+    }
+    catch(err){
+      requestServiceAlert('service',true)
+    }
+    
+  };
 
   const handleDelete = async (id: string) => {
     try {
@@ -139,7 +177,9 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
           />
         )}
 
-        <CardContent sx={{ width: "100%", textAlign: "center", height: "auto" }}>
+        <CardContent
+          sx={{ width: "100%", textAlign: "center", height: "auto" }}
+        >
           <Typography variant="h6" sx={{ fontWeight: "bold", mb: 0 }}>
             {service.name}
           </Typography>
@@ -168,6 +208,25 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
               Charge: {service.price}-aed
             </Typography>
           )}
+          {type==='local' ? (
+            <Button
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent triggering card click
+                handleOpenDialog(service._id, { userId: userState?.currentUser.user.id }); 
+              }}
+            >
+              request
+            </Button>
+          ) : (
+            <Button
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent triggering card click
+                handleDetailsOpen();
+              }}
+            >
+              contact
+            </Button>
+          )}
         </CardContent>
         <CustomSnackbar
           open={snackbar.open}
@@ -179,7 +238,11 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
 
       {/* Details Dialog */}
       <Dialog open={isDetailsDialogOpen} onClose={handleDetailsClose}>
-        <DialogTitle sx={{fontWeight:'700',fontSize:'25px',margin:'auto'}}>{service.name}</DialogTitle>
+        <DialogTitle
+          sx={{ fontWeight: "700", fontSize: "25px", margin: "auto" }}
+        >
+          {service.name}
+        </DialogTitle>
         <DialogContent>
           {service.imageUrl && (
             <CardMedia
@@ -189,9 +252,8 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
                 height: "200px",
                 objectFit: "cover",
                 borderRadius: "8px",
-                margin:'auto',
+                margin: "auto",
                 mb: 2,
-                
               }}
               image={service.imageUrl}
               alt={service.name}
@@ -201,7 +263,9 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
             {service.description}
           </Typography>
           <Typography variant="body2">
-            {service.price === 0 ? "Charge: Free" : `Charge: ${service.price}-aed`}
+            {service.price === 0
+              ? "Charge: Free"
+              : `Charge: ${service.price}-aed`}
           </Typography>
         </DialogContent>
         <DialogActions>
@@ -274,6 +338,15 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
           )}
         </Formik>
       </Dialog>
+      <ConfirmationDialog
+        open={open}
+        onClose={handleCloseDialog}
+        onConfirm={handleConfirm}
+        title="Confirm Request"
+        message="Are you sure you want to send this request?"
+        confirmText="Yes"
+        cancelText="No"
+      />
     </>
   );
 };

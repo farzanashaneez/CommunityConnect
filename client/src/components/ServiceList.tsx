@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import Grid from '@mui/material/Grid2'; 
 import ServiceCard from './ServiceCard'; 
-import { getAllServices } from '../services/api';
+import { getAllServices, getFilteredServices } from '../services/api';
 import { useCommunityContext } from '../context/communityContext';
 import { Service, ServiceListProps } from './communityInterfaces';
 
 
 
-const ServiceList: React.FC<ServiceListProps> = ({ type, searchTerm = '',update ,isAdmin=false}) => {
+const ServiceList: React.FC<ServiceListProps> = ({ type, searchTerm = '', status='granted',update ,isAdmin=false}) => {
   const [serviceList, setServiceList] = useState<Service[]>([]);
  const {completed,setCompleted}=useCommunityContext();
 
@@ -25,8 +25,18 @@ const ServiceList: React.FC<ServiceListProps> = ({ type, searchTerm = '',update 
         console.error("Error fetching services:", error);
       }
     };
+    const fetchResidenceServices = async (status:string) => {
+      try {
+        const response = await getFilteredServices(status,type);
+        console.log("searchTerm",searchTerm,type,response)
+        setServiceList(response);
+      } catch (error) {
+        console.error("Error fetching services:", error);
+      }
+    };
 
-    fetchServices();
+    type==='local'?fetchServices():fetchResidenceServices(status)
+
   }, [searchTerm,update,completed]);
 
   return (

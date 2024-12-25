@@ -4,6 +4,8 @@ import { Server as SocketIOServer, Socket } from "socket.io";
 
 let io: SocketIOServer;
 const chatSocketMap = new Map<string, Set<string>>(); // chatId -> Set of socketIds
+const userSocketMap = new Map<string, string>(); // userId -> socketId
+
 
 export const initializeSocket = (server: any) => {
   io = new SocketIOServer(server, {
@@ -54,6 +56,11 @@ export const initializeSocket = (server: any) => {
       console.log(`Socket ${socket.id} left chat ${chatId}`);
     });
 
+    socket.on("typing", ({ chatId, userId, isTyping }) => {
+      console.log(`User ${userId} is ${isTyping ? 'typing' : 'not typing'} in chat ${chatId}`);
+      sendTypingStatusToChat(chatId, userId, isTyping);
+    });
+
     // Handling user disconnection
     socket.on("disconnect", () => {
       console.log(`Socket disconnected: ${socket.id}`);
@@ -80,6 +87,22 @@ export const sendMessageToChat = (chatId: string, message: string) => {
   }
 };
 
+export const sendTypingStatusToChat = (chatId: string, userId: string, isTyping: boolean) => {
+  const socketIds = chatSocketMap.get(chatId);
+  console.log("userId",chatSocketMap)
+
+  if (socketIds) {
+    socketIds.forEach(socketId => {
+      if (socketId !== userSocketMap.get(userId)) { // Don't send typing status to the user who is typing
+        io.to(socketId).emit("userTyping", { userId, isTyping });
+      }
+    });
+  }
+};
+
 export const emitNotificationUpdate = (notificationData:object) => {
   io.emit("notificationUpdate", notificationData); // Notify all clients about the new/updated notification
+};
+export const emitNotificationUpdatetoId = (requesterId:string,notificationData:object) => {
+  io.to(requesterId).emit("notificationUpdate", notificationData); // Notify all clients about the new/updated notification
 };

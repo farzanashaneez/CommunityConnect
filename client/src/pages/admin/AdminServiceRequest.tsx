@@ -15,7 +15,15 @@ import TextButton from "../../components/TextButton";
 import { useSnackbar } from "../../hooks/useSnackbar";
 import CustomSnackbar from "../../components/customSnackbar";
 import { useCommunityContext } from "../../context/communityContext";
-import { useAppSelector } from "../../hooks/reduxStoreHook";
+import {
+  getAllRequestedServices,
+  getFilteredServices,
+  grantServiceApi,
+  markAsCompleted,
+  rejectServiceApi,
+} from "../../services/api";
+import { Service } from "../../interfaces/communityInterfaces";
+import ConfirmationDialog from "../../components/ConfirmationDialogue";
 
 const AdminServiceRequest: React.FC = () => {
   const [tabValue, setTabValue] = useState(0);
@@ -41,16 +49,36 @@ const AdminServiceRequest: React.FC = () => {
 };
 
 const LocalServicesTab = () => {
-  const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
+  // const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
   const { completed, setCompleted } = useCommunityContext();
-  const adminState = useAppSelector((state) => state.admin);
+  const [serviceRequstArray, setServiceRequstArray] = useState<Service[]>([]);
+
+  const [serviceRequstCompletedArray, setServiceRequstCompletedArray] =
+    useState<Service[]>([]);
 
   useEffect(() => {
-    if (completed) {
-      console.log("community triggered.....");
-      setCompleted(false);
-    }
-  }, [completed, setCompleted]);
+    const fetchService = async () => {
+      try {
+        const response = await getAllRequestedServices("pending");
+        setServiceRequstArray(response);
+        console.log("response", response, serviceRequstArray);
+      } catch (err) {
+        console.error("Error fetching services:", err);
+      }
+    };
+    const fetchCompletedService = async () => {
+      try {
+        const response = await getAllRequestedServices("completed");
+        setServiceRequstCompletedArray(response);
+        console.log("response", response, serviceRequstArray);
+      } catch (err) {
+        console.error("Error fetching services:", err);
+      }
+    };
+    fetchService();
+    fetchCompletedService();
+    setCompleted(false);
+  }, [completed]);
 
   return (
     <Box
@@ -76,39 +104,52 @@ const LocalServicesTab = () => {
           }}
         >
           <Grid container spacing={2}>
-            {[...Array(5)].map((_, index) => (
+            {serviceRequstArray.map((item: any, index) => (
               <Grid item xs={12} sm={6} md={4} key={index}>
                 <Card sx={{ display: "flex", height: "100%" }}>
                   <CardMedia
                     component="img"
                     sx={{ width: "75px", height: "75px", ml: 1, mt: 1 }}
-                    image="/src/assets/logo1.png"
+                    image={item.serviceId.imageUrl}
                     alt="Service"
                   />
                   <CardContent>
-                    <Box sx={{ display: "flex", justifyContent: "space-evenly" }}>
-                      <Typography variant="body1">Service Name</Typography>
-                      <Box sx={{ display: "flex", flexDirection: "column", ml: 1 }}>
+                    <Box
+                      sx={{ display: "flex", justifyContent: "space-evenly" }}
+                    >
+                      <Typography variant="body1">
+                        {item.serviceId.name}
+                      </Typography>
+                      <Box
+                        sx={{ display: "flex", flexDirection: "column", ml: 1 }}
+                      >
                         <Typography variant="body2" sx={{ fontWeight: "400" }}>
                           requested by
                         </Typography>
                         <Typography variant="body1" sx={{ fontWeight: "800" }}>
-                          F2-121
+                          {item.requestId.apartmentId.buildingSection +
+                            -+item.requestId.apartmentId.apartmentNumber ||
+                            "NA"}
                         </Typography>
                       </Box>
                     </Box>
                     <Box
                       sx={{
                         display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
+                        justifyContent: "end",
+                        alignItems: "end",
                         mt: 3,
                         ml: -9,
                       }}
                     >
-                      <Typography variant="body2">Pending</Typography>
-                      <TextButton label="Done" color="secondary" />
-                      <Typography variant="body2">Completed</Typography>
+                      <TextButton
+                        label="mark as done"
+                        color="secondary"
+                        onClick={() => {
+                          markAsCompleted(item._id);
+                          setCompleted(true)
+                        }}
+                      />
                     </Box>
                   </CardContent>
                 </Card>
@@ -117,41 +158,13 @@ const LocalServicesTab = () => {
           </Grid>
         </Box>
       </Box>
-
-      <CustomSnackbar
-        open={snackbar.open}
-        message={snackbar.message}
-        severity={snackbar.severity}
-        onClose={hideSnackbar}
-      />
-    </Box>
-  );
-};
-
-const ResidentialServicesTab = () => {
-  const [status, setStatus] = useState(Array(5).fill(null)); // Track the status of each service request
-
-  const handleStatusChange = (index:number, newStatus:string) => {
-    const updatedStatus = [...status];
-    updatedStatus[index] = newStatus;
-    setStatus(updatedStatus);
-  };
-
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: { xs: "column", md: "row" },
-        gap: { xs: "0", md: "16px" },
-      }}
-    >
-      <Box sx={{ flex: 1, mr: 2 }}>
+      <Box sx={{ flex: 1 }}>
         <Typography variant="h6" sx={{ mb: 2 }}>
-          Residential Service Requests
+          Completed ServiceRequests
         </Typography>
         <Box
           sx={{
-            height: "100vh",
+            height: "auto",
             overflowY: "auto",
             padding: "10px",
             backgroundColor: "#ffffff",
@@ -161,59 +174,47 @@ const ResidentialServicesTab = () => {
           }}
         >
           <Grid container spacing={2}>
-            {[...Array(5)].map((_, index) => (
+            {serviceRequstCompletedArray.map((item: any, index) => (
               <Grid item xs={12} sm={6} md={4} key={index}>
-                <Card
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    pl: 1,
-                    height: "100%",
-                    backgroundColor: status[index] === 'Granted' ? 'lightgreen' : status[index] === 'Rejected' ? 'lightcoral' : 'white', // Change background based on status
-                  }}
-                >
+                <Card sx={{ display: "flex", height: "100%" }}>
                   <CardMedia
                     component="img"
-                    sx={{ width: "80px", height: "80px" }}
-                    image="/src/assets/logo2.png"
+                    sx={{ width: "75px", height: "75px", ml: 1, mt: 1 }}
+                    image={item.serviceId.imageUrl}
                     alt="Service"
                   />
                   <CardContent>
-                    <Typography variant="body1" sx={{ fontWeight: "800" }}>
-                      Service Title
-                    </Typography>
-                    <Typography variant="body1">f1-230</Typography>
+                    <Box
+                      sx={{ display: "flex", justifyContent: "space-evenly" }}
+                    >
+                      <Typography variant="body1">
+                        {item.serviceId.name}
+                      </Typography>
+                      <Box
+                        sx={{ display: "flex", flexDirection: "column", ml: 1 }}
+                      >
+                        <Typography variant="body2" sx={{ fontWeight: "400" }}>
+                          requested by
+                        </Typography>
+                        <Typography variant="body1" sx={{ fontWeight: "800" }}>
+                          {item.requestId.apartmentId.buildingSection +
+                            -+item.requestId.apartmentId.apartmentNumber ||
+                            "NA"}
+                        </Typography>
+                      </Box>
+                    </Box>
                     <Box
                       sx={{
                         display: "flex",
-                        justifyContent: "space-between",
-                        mt: 1,
+                        justifyContent: "center",
+                        alignItems: "end",
+                        mt: 3,
+                        ml: -9,
                       }}
                     >
-                      <Button
-                        onClick={() => handleStatusChange(index, 'Granted')}
-                        sx={{
-                          textTransform: "none",
-                          color: "green",
-                          border: "none",
-                          background: "none",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        Accept
-                      </Button>
-                      <Button
-                        onClick={() => handleStatusChange(index, 'Rejected')}
-                        sx={{
-                          textTransform: "none",
-                          color: "red",
-                          border: "none",
-                          background: "none",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        Reject
-                      </Button>
+                       <Typography variant="body2" sx={{ fontWeight: "400",color:'red' }}>
+                          completed
+                        </Typography>
                     </Box>
                   </CardContent>
                 </Card>
@@ -222,9 +223,152 @@ const ResidentialServicesTab = () => {
           </Grid>
         </Box>
       </Box>
+      {/* <CustomSnackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        onClose={hideSnackbar}
+      /> */}
     </Box>
   );
 };
 
+const ResidentialServicesTab = () => {
+  const [serviceArray, setServiceArray] = useState<Service[]>([]);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedServiceId, setSelectedServiceId] = useState<string | null>(
+    null
+  );
+  const [actionType, setActionType] = useState<"accept" | "reject" | null>(
+    null
+  );
+
+  useEffect(() => {
+    const fetchService = async () => {
+      try {
+        const response = await getFilteredServices("pending", "residential");
+        setServiceArray(response);
+      } catch (err) {
+        console.error("Error fetching services:", err);
+      }
+    };
+    fetchService();
+  }, []);
+
+  const handleDialogOpen = (serviceId: string, type: "accept" | "reject") => {
+    setSelectedServiceId(serviceId);
+    setActionType(type);
+    setDialogOpen(true);
+  };
+
+  const handleDialogClose = () => {
+    setDialogOpen(false);
+    setSelectedServiceId(null);
+    setActionType(null);
+  };
+
+  const handleConfirmAction = async () => {
+    if (selectedServiceId && actionType) {
+      try {
+        if (actionType === "accept") {
+          await grantServiceApi(selectedServiceId);
+          console.log(`Service ${selectedServiceId} accepted`);
+        } else {
+          await rejectServiceApi(selectedServiceId);
+          console.log(`Service ${selectedServiceId} rejected`);
+        }
+        setServiceArray(
+          serviceArray.filter((service) => service._id !== selectedServiceId)
+        );
+      } catch (err) {
+        console.error(`Error processing action: ${err}`);
+      } finally {
+        handleDialogClose();
+      }
+    }
+  };
+
+  return (
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      <Typography variant="h6">Residential Service Requests</Typography>
+      <Box
+        sx={{
+          height: "100vh",
+          overflowY: "auto",
+          padding: 2,
+          backgroundColor: "#fff",
+          boxShadow: 1,
+          borderRadius: 1,
+        }}
+      >
+        <Grid container spacing={2}>
+          {serviceArray.map((service, index) => (
+            <Grid item xs={12} sm={6} md={4} key={index}>
+              <Card sx={{ display: "flex", alignItems: "center", pl: 1 }}>
+                <CardMedia
+                  component="img"
+                  sx={{ width: 80, height: 80 }}
+                  image={service.imageUrl}
+                  alt="Service"
+                />
+                <CardContent>
+                  <Typography variant="body1" sx={{ fontWeight: "800" }}>
+                    {service.name}
+                  </Typography>
+                  <Typography variant="body1">
+                    {service.provider?.apartmentId?.buildingSection ?? "N/A"} -{" "}
+                    {service.provider?.apartmentId?.apartmentNumber ?? "N/A"}
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      mt: 1,
+                    }}
+                  >
+                    <Button
+                      onClick={() =>
+                        handleDialogOpen(service._id || "", "accept")
+                      }
+                      sx={{
+                        textTransform: "none",
+                        color: "green",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Accept
+                    </Button>
+                    <Button
+                      onClick={() =>
+                        handleDialogOpen(service._id || "", "reject")
+                      }
+                      sx={{
+                        textTransform: "none",
+                        color: "red",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Reject
+                    </Button>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
+
+      <ConfirmationDialog
+        open={dialogOpen}
+        onClose={handleDialogClose}
+        onConfirm={handleConfirmAction}
+        title={actionType === "accept" ? "Accept Service" : "Reject Service"}
+        message={`Are you sure you want to ${actionType} this service request?`}
+        confirmText={actionType === "accept" ? "Accept" : "Reject"}
+        cancelText="Cancel"
+      />
+    </Box>
+  );
+};
 
 export default AdminServiceRequest;

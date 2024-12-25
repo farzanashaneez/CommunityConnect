@@ -21,9 +21,9 @@ export const theme = createTheme({
     button: {
       textTransform: 'none', 
     },
-    body2:{
-         color: '#8B3A0E',
-    }
+    body2: {
+      color: '#8B3A0E',
+    },
   },
   components: {
     MuiButton: {
@@ -32,9 +32,9 @@ export const theme = createTheme({
           borderRadius: '20px', // Rounded corners for all buttons
           padding: '10px 20px', // Padding for buttons
           '&:hover': {
-            backgroundColor: '#1976d2', // Change to desired hover color
-            color: 'white', // Text color on hover
-          }
+            backgroundColor: 'transparent', // Keep the background transparent
+            color: '#1976d2', // Change text color on hover
+          },
         },
       },
     },

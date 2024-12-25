@@ -1,12 +1,14 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import CustomSnackbar from "../components/customSnackbar";
 import { socket } from "../services/socketConnection";
+import { ServiceRequest } from "../interfaces/communityInterfaces";
 
 // Define the types for the context
 interface CommunityContextType {
   deleteService: (id: string,type?:string) => void;
   updateService: (updatedService: Service,type?:string) => void;
   addCompleted:(task:string)=>void;
+  requestServiceAlert:(type?:string,isFailed?:boolean)=>void;
   completed: boolean; // To track the completion of actions
   openSnackbar: (message: string, severity: 'success' | 'error' | 'info' | 'warning') => void;
   closeSnackbar: () => void;
@@ -74,7 +76,18 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
 
     handleCompleted(true); 
   };
-
+  const requestServiceAlert = (type?:string,isFailed?:boolean) => {
+    if(type==='service' && !isFailed){
+         openSnackbar("service requested successfully", "success");
+       }
+       else if(isFailed){
+        openSnackbar("something went wrong", "error");
+       }
+       else
+           openSnackbar("...check context ..!", "success");
+   
+       handleCompleted(true); 
+     };
 
   return (
     <CommunityContext.Provider value={{ 
@@ -83,6 +96,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
       addCompleted,
       openSnackbar, 
       closeSnackbar, 
+      requestServiceAlert,
       completed, 
       setCompleted: handleCompleted 
     }}>

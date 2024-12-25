@@ -24,7 +24,7 @@ export class UserUseCases {
   async loginUser(
     email: string,
     password: string
-  ): Promise<{ token: string; user: Partial<User> } | null> {
+  ): Promise<{ token: string; refreshToken:string; user: Partial<User> } | null> {
     const user = await this.userRepository.findByEmail(email);
     if (!user || !(await bcrypt.compare(password, user.password))) {
       return null;
@@ -39,11 +39,12 @@ export class UserUseCases {
     );
     const refreshToken = jwt.sign(
       { id: user.id },
-      process.env.JWT_REFRESH_SECRET || 'refresh-secret',
-      { expiresIn: '7d' } // Refresh token expiration
-    );
+      process.env.REFRESH_TOKEN_SECRET || "refreshsecret",
+      { expiresIn: "7d" } );
+
     return {
       token,
+      refreshToken,
       user: {
         id: user.id,
         email: user.email,
