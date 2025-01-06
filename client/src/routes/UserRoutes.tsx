@@ -9,6 +9,7 @@ import Chatroom from '../pages/user/Chatroom';
 import Events from '../pages/user/Events';
 import Announcements from '../pages/user/Announcements';
 import Services from '../pages/user/Services';
+import ProfilePage from '../pages/user/ProfilePage';
 
 const UserRoutes: React.FC = () => {
     const location = useLocation();
@@ -45,6 +46,8 @@ const UserRoutes: React.FC = () => {
                     <Route path="/events" element={<Events />} />
                     <Route path="/chatroom" element={<Chatroom />} />
                     <Route path="/profile" element={<UserProfile />} />
+                    <Route path="/user/details/:id" element={<ProfilePage />} />
+
                 </Routes>
             </Box>
         </Box>

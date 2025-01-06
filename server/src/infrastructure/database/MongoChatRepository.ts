@@ -80,7 +80,7 @@ export class MongoChatRepository implements ChatRepository {
   
   }
 
-  async getChatsForUser(userId: string): Promise<Chat[]> {
+  async getChatsForUser(userId: string,query:string): Promise<Chat[]> {
     return ChatModel.find({ participants: { $elemMatch: { $eq: userId } } })
     .populate({
       path: 'participants',

@@ -105,18 +105,24 @@ const id=userState.currentUser.user.id;
 
   useEffect(() => {
     fetchChats();
+    fetchChatsGroup();
     fetchUsers();
   }, []);
 
-  // useEffect(() => {
-  //   if (selectedChat) {
-  //     fetchMessages(selectedChat._id);
-  //   }
-  // }, [selectedChat]);
+ 
 
   const fetchChats = async () => {
     try {
-      const response = await getChatsForUserApi(id)
+      const response = await getChatsForUserApi(id,'personal')
+      console.log("chat response",response)
+      setChats(Array.isArray(response) ? response : []);
+    } catch (error) {
+      console.error('Error fetching chats:', error);
+    }
+  };
+  const fetchChatsGroup = async () => {
+    try {
+      const response = await getChatsForUserApi(id,'group')
       console.log("chat response",response)
       setChats(Array.isArray(response) ? response : []);
     } catch (error) {

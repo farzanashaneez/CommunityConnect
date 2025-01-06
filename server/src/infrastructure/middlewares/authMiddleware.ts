@@ -1,5 +1,6 @@
 import jwt, { JwtPayload, Secret }  from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
+import UserService from '../../application/services/UserService';
 
 
 interface CustomUser {
@@ -23,12 +24,14 @@ console.log("token",req.headers,"----->",token)
   }
 
   try {
+   
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') ;
-    console.log("decoded",decoded)
+    console.log("decoded======================>>>>>>>>>>>>.",decoded)
 
     req.user = decoded as CustomUser
     next();
   } catch (error) {
+    console.log("error",error)
     res.status(401).json({ message: 'Invalid token' });
   }
 };

@@ -31,13 +31,15 @@ export const deleteUser=async(id:string)=>{
   return response.data;
 }
 
-export const fetchUserDetails = async (token: string,id:string) => {
+export const fetchUserDetails = async (id:string) => {
   console.log("iid",id)
-  const response = await api.get(`${API_URL}/users/details/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await api.get(`${API_URL}/users/details/${id}`
+  // , {
+  //   headers: {
+  //     Authorization: `Bearer ${token}`,
+  //   },
+  // }
+  );
   return response.data;
 };
 
@@ -151,29 +153,29 @@ export const updateAnnouncementApi = async (id: string, announcementData: any) =
   return response.data;
 };
 
-// Post Management
-export const createPost = async (postData: any) => {
-  console.log("postData", postData);
-  const response = await api.post(`${API_URL}/posts`, postData);
-  return response.data;
-};
+// // Post Management
+// export const createPost = async (postData: any) => {
+//   console.log("postData", postData);
+//   const response = await api.post(`${API_URL}/posts`, postData);
+//   return response.data;
+// };
 
-export const fetchAllPosts = async () => {
-  const response = await api.get(`${API_URL}/posts`);
-  return response.data;
-};
+// export const fetchAllPosts = async () => {
+//   const response = await api.get(`${API_URL}/posts`);
+//   return response.data;
+// };
 
-export const deletePost = async (id: string) => {
-  console.log("id===>", id);
-  const response = await api.delete(`${API_URL}/posts/delete/${id}`);
-  return response.data;
-};
+// export const deletePost = async (id: string) => {
+//   console.log("id===>", id);
+//   const response = await api.delete(`${API_URL}/posts/delete/${id}`);
+//   return response.data;
+// };
 
-export const updatePost = async (id: string, postData: any) => {
-  console.log("id===>", id);
-  const response = await api.put(`${API_URL}/posts/update/${id}`, postData);
-  return response.data;
-};
+// export const updatePost = async (id: string, postData: any) => {
+//   console.log("id===>", id);
+//   const response = await api.put(`${API_URL}/posts/update/${id}`, postData);
+//   return response.data;
+// };
 
 // Event Management
 export const createEventApi = async (eventData: any) => {
@@ -217,13 +219,61 @@ export const sendMessageApi = async (chatId: string, message: { senderId: string
 };
 
 // Get all chats for a user
-export const getChatsForUserApi = async (userId: string) => {
-  const response = await api.get(`${API_URL}/chats/user/${userId}`);
+export const getChatsForUserApi = async (userId: string,query:string) => {
+  const response = await api.get(`${API_URL}/chats/user/${userId}/${query}`);
   return response.data;
 };
 
 // Delete a chat
 export const deleteChatApi = async (id: string) => {
   const response = await api.delete(`${API_URL}/chats/${id}`);
+  return response.data;
+};
+
+//post management
+export const createPost = async (postData: any) => {
+  console.log("post data",postData)
+
+  const response = await api.post(`${API_URL}/posts`, postData);
+  return response.data;
+};
+
+export const fetchAllPosts = async () => {
+  const response = await api.get(`${API_URL}/posts`);
+  return response.data;
+};
+
+export const getPostById = async (id: string) => {
+  const response = await api.get(`${API_URL}/posts/${id}`);
+  return response.data;
+};
+
+export const updatePost = async (id: string, postData: any) => {
+  const response = await api.put(`${API_URL}/posts/${id}`, postData);
+  return response.data;
+};
+
+export const deletePost = async (id: string) => {
+  const response = await api.delete(`${API_URL}/posts/${id}`);
+  return response.data;
+};
+
+export const likePost = async (id: string) => {
+  const response = await api.post(`${API_URL}/posts/${id}/like`);
+  return response.data;
+};
+
+export const addComment = async (id: string, commentData: any) => {
+  const response = await api.post(`${API_URL}/posts/${id}/comment`, commentData);
+  return response.data;
+};
+
+export const getPostsByTag = async (tag: string) => {
+  const response = await api.get(`${API_URL}/posts/tag/${tag}`);
+  return response.data;
+};
+
+export const shareComment = async (postId: string, commentId: string) => {
+  const response = await api.post(`${API_URL}/posts/${postId}/comment/${commentId}/share`);
   return response.data;
 };

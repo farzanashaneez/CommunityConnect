@@ -64,6 +64,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
   const [inputMessage, setInputMessage] = useState<string>("");
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
+  const [onlineUsers,setOnlineUsers]= useState<string[]>([]);
 
   const userState = useAppSelector((state) => state.user);
   const id = userState.currentUser.user.id;
@@ -71,7 +72,9 @@ const ChatArea: React.FC<ChatAreaProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-
+useEffect(()=>{
+  socket.emit("userConnected", {userId: id})
+},[])
   // Connect to socket and fetch messages when selectedChat changes
   useEffect(() => {
     if (selectedChat) {
@@ -95,12 +98,17 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         return prevUsers;
       });
     });
+    socket.on("onlineStatusUpdate", (onlineStatus) => {
+      setOnlineUsers(onlineStatus)
+      console.log('Online users ',onlineUsers)
+    });
         return () => {
       socket.off("newMessage");
       socket.off("userTyping");
+      socket.off("onlineStatusUpdate");
       socket.emit("leaveChat", selectedChat?._id);
     };
-  }, [selectedChat]);
+  }, [selectedChat,onlineUsers]);
   useEffect(() => {
     scrollToBottom();
   }, [messages,selectedChat]);
@@ -214,6 +222,16 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                   selectedChat?.participants[1]?.apartmentId?.apartmentNumber || ""
                 }`}
           </Typography>
+         
+          {!selectedChat?.isgroup && (
+  <Typography 
+    variant="caption" 
+    color={onlineUsers.some(user => user.userId === selectedChat?.participants[0]?._id) ? "green" : "gray"}
+  >
+    {onlineUsers.some(user => user.userId === selectedChat?.participants[0]?._id) ? "Online" : "Offline"}
+  </Typography>
+)}
+    
         </Box>
 
         {isTablet && selectedChat && (

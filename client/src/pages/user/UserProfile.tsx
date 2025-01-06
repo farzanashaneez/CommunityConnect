@@ -62,7 +62,7 @@ const UserProfile: React.FC = () => {
   const fetchUserDetailsData = async () => {
     try {
       if (!token) throw new Error('No token found');
-      const data = await fetchUserDetails(token, id);
+      const data = await fetchUserDetails(id);
       console.log(data);
       setUserDetails(data);
       setFirstName(data?.firstName || '');

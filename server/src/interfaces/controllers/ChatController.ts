@@ -22,10 +22,8 @@ export class ChatController {
   async getChatById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
-      console.log("chat ====>",id)
 
       const chat = await this.chatUseCase.getChatById(id);
-      console.log("chat ====>",chat)
       if (chat) {
         res.json(chat);
       } else {
@@ -53,11 +51,9 @@ export class ChatController {
 
   async getChatsForUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { userId } = req.params;
-      console.log("chat ====>",userId)
+      const { userId,query } = req.params;
 
-      const chats = await this.chatUseCase.getChatsForUser(userId);
-      console.log("chat ====>",chats)
+      const chats = await this.chatUseCase.getChatsForUser(userId,query);
 
       res.json(chats);
     } catch (error: any) {

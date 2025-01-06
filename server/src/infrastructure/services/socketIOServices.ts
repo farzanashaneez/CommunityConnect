@@ -5,6 +5,7 @@ import { Server as SocketIOServer, Socket } from "socket.io";
 let io: SocketIOServer;
 const chatSocketMap = new Map<string, Set<string>>(); // chatId -> Set of socketIds
 const userSocketMap = new Map<string, string>(); // userId -> socketId
+const onlineUsers = new Map<string, boolean>(); // userId -> online status
 
 
 export const initializeSocket = (server: any) => {
@@ -19,7 +20,6 @@ export const initializeSocket = (server: any) => {
   console.log("Socket.IO initialized");
 
   io.on("connection", (socket: Socket) => {
-    console.log(`Socket connected: ${socket.id}`);
 
     socket.on("joinChat", (chatId: string) => {
       // Add the socketId to the set of socketIds for the chatId
@@ -27,11 +27,9 @@ export const initializeSocket = (server: any) => {
         chatSocketMap.set(chatId, new Set());
       }
       chatSocketMap.get(chatId)?.add(socket.id);
-      console.log(`Socket ${socket.id} joined chat ${chatId}`);
     });
 
     socket.on("sendMessage", (data) => {
-      console.log("Message received:", data);
   
       // Assume `data` contains chatId and the message
       const { chatId, content } = data;
@@ -53,7 +51,6 @@ export const initializeSocket = (server: any) => {
     // When a user leaves a chat
     socket.on("leaveChat", (chatId: string) => {
       chatSocketMap.get(chatId)?.delete(socket.id);
-      console.log(`Socket ${socket.id} left chat ${chatId}`);
     });
 
     socket.on("typing", ({ chatId, userId, isTyping }) => {
@@ -61,15 +58,34 @@ export const initializeSocket = (server: any) => {
       sendTypingStatusToChat(chatId, userId, isTyping);
     });
 
+    socket.on("userConnected", (userId: string) => {
+      onlineUsers.set(userId, true);
+      userSocketMap.set(userId, socket.id);
+      broadcastOnlineStatus();
+    });
+
     // Handling user disconnection
     socket.on("disconnect", () => {
-      console.log(`Socket disconnected: ${socket.id}`);
       // Remove socketId from all chat rooms it was part of
       for (let [chatId, socketIds] of chatSocketMap) {
         socketIds.delete(socket.id);
       }
+      for (let [userId, socketId] of userSocketMap) {
+        if (socketId === socket.id) {
+          onlineUsers.set(userId, false);
+          userSocketMap.delete(userId);
+          io.emit("userStatusChanged", { userId, isOnline: false });
+          break;
+        }
+      }
     });
   });
+};
+const broadcastOnlineStatus = () => {
+  const onlineStatus = Array.from(onlineUsers.entries())
+    .filter(([_, status]) => status)
+    .map(([userId, _]) => userId);
+  io.emit("onlineStatusUpdate", onlineStatus);
 };
 
 export const getIO = () => {

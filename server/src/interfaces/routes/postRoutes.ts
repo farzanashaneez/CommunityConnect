@@ -1,22 +1,35 @@
-// // src/infrastructure/web/routes/postRoutes.ts
+// src/infrastructure/web/routes/postRoutes.ts
 
-// import express from 'express';
-// import { MongoPostRepository } from '../../infrastructure/database/MongoPostRepository';
-// import { PostUseCase } from '../../application/usecases/postUseCases';
-// import { PostController } from '../controllers/PostController';
+import express,{Response,Request,NextFunction} from 'express';
+import { MongoPostRepository } from '../../infrastructure/database/MongoPostRepository';
+import { PostUseCase } from '../../application/usecases/postUseCase';
+import { PostController } from '../controllers/PostController';
+import { CustomRequestWithImageArray,upload, uploadImageArrayToCloudinary } from '../../infrastructure/middlewares/uploadImageToCloudinary';
 
-// const router = express.Router();
+const router = express.Router();
 
-// // Initialize dependencies
-// const postRepository = new MongoPostRepository();
-// const postUseCase = new PostUseCase(postRepository);
-// const postController = new PostController(postUseCase);
+// Initialize dependencies
+const postRepository = new MongoPostRepository();
+const postUseCase = new PostUseCase(postRepository);
+const postController = new PostController(postUseCase);
 
-// // Define routes
-// router.post('/', (req, res, next) => postController.createPost(req, res, next));
-// router.get('/:id', (req, res, next) => postController.getPostById(req, res, next));
-// router.put('/update/:id', (req, res, next) => postController.updatePost(req, res, next));
-// router.delete('/delete/:id', (req, res, next) => postController.deletePost(req, res, next));
-// router.get('/', (req, res, next) => postController.getAllPosts(req, res, next));
+// Define routes
+router.post('/',(req, res, next) => {
+    upload.array('images', 5)(req, res, err => {
+      if (err) {
+        console.error('Multer error:', err);
+        return res.status(400).send({ error: 'File upload failed' });
+      }
+      next();
+    });
+  }, uploadImageArrayToCloudinary, (req:CustomRequestWithImageArray, res:Response, next:NextFunction) => postController.createPost(req, res, next));
+router.get('/', (req:Request, res:Response,next:NextFunction) => postController.getAllPosts(req, res, next));
+router.get('/:id', (req:Request, res:Response,next:NextFunction) => postController.getPostById(req, res, next));
+router.put('/:id', (req:Request, res:Response,next:NextFunction) => postController.updatePost(req, res, next));
+router.delete('/:id', (req:Request, res:Response,next:NextFunction) => postController.deletePost(req, res, next));
+router.get('/tag/:tag', (req:Request, res:Response,next:NextFunction) => postController.getPostsByTag(req, res, next));
+router.post('/:id/like', (req:Request, res:Response,next:NextFunction) => postController.addLike(req, res, next));
+router.post('/:id/comment', (req:Request, res:Response,next:NextFunction) => postController.addComment(req, res, next));
+router.post('/:postId/comment/:commentId/share', (req:Request, res:Response,next:NextFunction) => postController.sharePost(req, res, next));
 
-// export default router;
+export default router;

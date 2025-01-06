@@ -76,6 +76,17 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
 
     handleCompleted(true); 
   };
+
+  const addedPost = (success:boolean) => {
+    if(success){
+         openSnackbar("New Post added successfully", "success");
+       }
+       else
+           openSnackbar("Error creating a new post", "error");
+   
+       handleCompleted(true); 
+     };
+
   const requestServiceAlert = (type?:string,isFailed?:boolean) => {
     if(type==='service' && !isFailed){
          openSnackbar("service requested successfully", "success");

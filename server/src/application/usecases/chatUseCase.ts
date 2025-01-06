@@ -23,8 +23,8 @@ export class ChatUseCase {
     return this.chatRepository.addMessage(chatId, message);
   }
 
-  async getChatsForUser(userId: string): Promise<Chat[]> {
-    return this.chatRepository.getChatsForUser(userId);
+  async getChatsForUser(userId: string,query:string): Promise<Chat[]> {
+    return this.chatRepository.getChatsForUser(userId,query);
   }
 
   async deleteChat(id: string): Promise<void> {

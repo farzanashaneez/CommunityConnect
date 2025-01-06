@@ -1,10 +1,20 @@
+
 export interface Post {
-    _id: string; // Unique identifier
-    title: string; // Title of the post
-    content: string; // Body content of the post
-    tags: string[]; // Array of tags for categorization
-    author: string; // Author's name or ID
-    createdAt: Date; // Timestamp of creation
-    updatedAt: Date; // Timestamp of the last update
-  }
-  
+  _id: string;
+  title: string;
+  content: string;
+  tags: string[];
+  author: string;
+  createdAt: Date;
+  updatedAt: Date;
+  likes: number;
+  comments: Comment[];
+  images: string[];
+}
+
+export interface Comment {
+  _id: string;
+  content: string;
+  author: string;
+  createdAt: Date;
+}
