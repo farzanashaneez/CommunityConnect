@@ -5,6 +5,7 @@ import { TextField, Button, Paper, IconButton } from '@mui/material';
 import { Photo, Send, Clear } from '@mui/icons-material';
 import { createPost } from '../../services/api';
 import { useAppSelector } from '../../hooks/reduxStoreHook';
+import { useCommunityContext } from '../../context/communityContext';
 
 const PostSchema = Yup.object().shape({
   content: Yup.string().required('Post content is required'),
@@ -13,6 +14,7 @@ const PostSchema = Yup.object().shape({
 
 export default function NewPostBox() {
   const userState=useAppSelector(state=>state.user)
+  const {addedPost}=useCommunityContext();
   return (
     <Paper elevation={3} className="p-4">
       <Formik
@@ -29,9 +31,12 @@ export default function NewPostBox() {
             console.log('form data',formData,values.images)
           
             await createPost(formData);
+            addedPost(true);
             resetForm();
           } catch (error) {
             console.error('Error creating post:', error);
+            addedPost(false);
+
           }
           setSubmitting(false);
         }}
@@ -96,21 +101,23 @@ export default function NewPostBox() {
                 <Button
                   component="span"
                   startIcon={<Photo />}
-                  variant="outlined"
+                  variant="text"
                   disabled={values.images.length >= 5}
                 >
                   Add Photo ({values.images.length}/5)
                 </Button>
+                
               </label>
               <Button
                 type="submit"
                 startIcon={<Send />}
-                variant="contained"
+                variant="text"
                 disabled={isSubmitting || (!values.content.trim() && values.images.length === 0)}
               >
                 Post
               </Button>
             </div>
+
             
             {errors.images && <div className="text-red-500 mt-2">{errors.images}</div>}
           </Form>

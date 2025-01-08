@@ -150,20 +150,7 @@ const id=userState.currentUser.user.id;
   };
 
 
-  const handleSendMessage = async () => {
-    if (inputMessage.trim() !== '' && selectedChat) {
-      try {
-        const response = await axios.post(`/api/chats/${selectedChat._id}/message`, {
-          senderId: userId,
-          content: inputMessage
-        });
-        setMessages(response.data.messages);
-        setInputMessage('');
-      } catch (error) {
-        console.error('Error sending message:', error);
-      }
-    }
-  };
+ 
   const handleSubmit =async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
   try{

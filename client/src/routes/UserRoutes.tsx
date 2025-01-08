@@ -10,6 +10,7 @@ import Events from '../pages/user/Events';
 import Announcements from '../pages/user/Announcements';
 import Services from '../pages/user/Services';
 import ProfilePage from '../pages/user/ProfilePage';
+import PostDetails from '../pages/user/PostDetails';
 
 const UserRoutes: React.FC = () => {
     const location = useLocation();
@@ -47,7 +48,7 @@ const UserRoutes: React.FC = () => {
                     <Route path="/chatroom" element={<Chatroom />} />
                     <Route path="/profile" element={<UserProfile />} />
                     <Route path="/user/details/:id" element={<ProfilePage />} />
-
+                    <Route path='/posts/:postid' element={<PostDetails/>}/>
                 </Routes>
             </Box>
         </Box>

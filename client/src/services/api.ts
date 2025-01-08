@@ -243,6 +243,14 @@ export const fetchAllPosts = async () => {
   return response.data;
 };
 
+export const sharePost=async (postid:string,userid:string,toUsers:string[])=>{
+  const frontend=import.meta.env.VITE_FRONTEND_URL;
+  const url = `Check out this post: <a href="${frontend}/posts/${postid}" target="_blank">${frontend}/posts/${postid}</a>`;
+  const response = await api.post(`${API_URL}/posts/share-post/${postid}`,{userid,toUsers,url});
+  return response.data;
+
+}
+
 export const getPostById = async (id: string) => {
   const response = await api.get(`${API_URL}/posts/${id}`);
   return response.data;
@@ -258,9 +266,12 @@ export const deletePost = async (id: string) => {
   return response.data;
 };
 
-export const likePost = async (id: string) => {
-  const response = await api.post(`${API_URL}/posts/${id}/like`);
+export const likePost = async (id: string,userid:string) => {
+  console.log("user======>",userid)
+
+  const response = await api.post(`${API_URL}/posts/${id}/like`,{userid});
   return response.data;
+
 };
 
 export const addComment = async (id: string, commentData: any) => {

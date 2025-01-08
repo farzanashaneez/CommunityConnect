@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
+import parse from 'html-react-parser';
 
 import {
   Box,
@@ -64,7 +65,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
   const [inputMessage, setInputMessage] = useState<string>("");
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
-  const [onlineUsers,setOnlineUsers]= useState<string[]>([]);
+  const [onlineUsers,setOnlineUsers]= useState<{userId:string}[]>([]);
 
   const userState = useAppSelector((state) => state.user);
   const id = userState.currentUser.user.id;
@@ -271,7 +272,14 @@ useEffect(()=>{
   </Typography>
 )}
       
-        <Typography variant="body1">{message.content}</Typography>
+        <Typography variant="body1" sx={{
+  '& a': {
+    color: '#1976d2',
+    '&:hover': {
+      color: '#1565c0',
+    }
+  }
+}}>{parse(message.content)}</Typography>
         {/* Message Status Icons */}
         {message.senderId === id && (
           <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 0.5 }}>

@@ -7,9 +7,11 @@ export interface Post {
   author: string;
   createdAt: Date;
   updatedAt: Date;
-  likes: number;
+  likes: [string];
   comments: Comment[];
   images: string[];
+  shareCount:number;
+  sharedBy:string[]
 }
 
 export interface Comment {

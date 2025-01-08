@@ -8,7 +8,9 @@ interface CommunityContextType {
   deleteService: (id: string,type?:string) => void;
   updateService: (updatedService: Service,type?:string) => void;
   addCompleted:(task:string)=>void;
+  addedPost:(success:boolean)=>void;
   requestServiceAlert:(type?:string,isFailed?:boolean)=>void;
+  deletePostAlert:(success:boolean)=>void;
   completed: boolean; // To track the completion of actions
   openSnackbar: (message: string, severity: 'success' | 'error' | 'info' | 'warning') => void;
   closeSnackbar: () => void;
@@ -99,7 +101,16 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
    
        handleCompleted(true); 
      };
-
+     const deletePostAlert = (success:boolean) => {
+      if(success){
+           openSnackbar("you deleted a post", "success");
+         }
+         else
+             openSnackbar("Error deleteing a post", "error");
+     
+         handleCompleted(true); 
+       };
+  
   return (
     <CommunityContext.Provider value={{ 
       deleteService, 
@@ -107,7 +118,9 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
       addCompleted,
       openSnackbar, 
       closeSnackbar, 
+      addedPost,
       requestServiceAlert,
+      deletePostAlert,
       completed, 
       setCompleted: handleCompleted 
     }}>

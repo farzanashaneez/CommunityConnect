@@ -19,12 +19,12 @@ api.interceptors.request.use(
     const admintoken = state.admin?.currentAdmin?.token;
     const currenttoken= state.user?.currentUser?.token;
     console.log('admin token',admintoken)
-    if (admintoken) {
-      config.headers['Authorization'] = `Bearer ${admintoken}`;
-    }
-    // if (config.url?.startsWith('/admin') && admintoken) {
+    // if (admintoken) {
     //   config.headers['Authorization'] = `Bearer ${admintoken}`;
     // }
+    if (config.url?.startsWith('/admin') && admintoken) {
+      config.headers['Authorization'] = `Bearer ${admintoken}`;
+    }
      else if (currenttoken) {
       config.headers['Authorization'] = `Bearer ${currenttoken}`;
     }

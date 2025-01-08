@@ -75,7 +75,7 @@ export class PostController {
 
   async addLike(req: Request, res: Response,next: NextFunction) {
     try {
-      const post = await this.postUseCase.addLike(req.params.id);
+      const post = await this.postUseCase.addLike(req.params.id,req.body.userid);
       res.json(post);
     } catch (error) {
       res.status(500).json({ error: 'Failed to add like' });
@@ -93,7 +93,7 @@ export class PostController {
 
   async sharePost(req: Request, res: Response,next: NextFunction) {
     try {
-      await this.postUseCase.sharePost(req.params.postId, req.body.userid,req.body.sharedusers);
+      await this.postUseCase.sharePost(req.params.postid, req.body.userid,req.body.toUsers,req.body.url);
       res.status(200).json({ message: 'Post shared successfully' });
     } catch (error) {
       res.status(500).json({ error: 'Failed to share Post' });

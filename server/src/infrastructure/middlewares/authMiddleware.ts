@@ -24,7 +24,8 @@ console.log("token",req.headers,"----->",token)
   }
 
   try {
-   
+    console.log("before======================>>>>>>>>>>>>.",token)
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') ;
     console.log("decoded======================>>>>>>>>>>>>.",decoded)
 

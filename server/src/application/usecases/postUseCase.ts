@@ -28,15 +28,15 @@ export class PostUseCase {
       return this.postRepository.getPostsByTag(tag);
     }
   
-    async addLike(id: string): Promise<Post> {
-      return this.postRepository.addLike(id);
+    async addLike(id: string,user:string): Promise<Post> {
+      return this.postRepository.addLike(id,user);
     }
   
     async addComment(id: string, comment: Partial<Comment>): Promise<Post> {
       return this.postRepository.addComment(id, comment);
     }
   
-    async sharePost(postId: string,sharedby:string,sharedto:string[]): Promise<void> {
-      return this.postRepository.sharePost(postId, sharedby,sharedto);
+    async sharePost(postId: string,sharedby:string,sharedto:string[], shareMessage:string): Promise<Post> {
+      return this.postRepository.sharePost(postId, sharedby,sharedto,shareMessage);
     }
   }

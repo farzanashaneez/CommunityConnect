@@ -30,6 +30,6 @@ router.delete('/:id', (req:Request, res:Response,next:NextFunction) => postContr
 router.get('/tag/:tag', (req:Request, res:Response,next:NextFunction) => postController.getPostsByTag(req, res, next));
 router.post('/:id/like', (req:Request, res:Response,next:NextFunction) => postController.addLike(req, res, next));
 router.post('/:id/comment', (req:Request, res:Response,next:NextFunction) => postController.addComment(req, res, next));
-router.post('/:postId/comment/:commentId/share', (req:Request, res:Response,next:NextFunction) => postController.sharePost(req, res, next));
+router.post('/share-post/:postid', (req:Request, res:Response,next:NextFunction) => postController.sharePost(req, res, next));
 
 export default router;

@@ -17,11 +17,17 @@ export default function PostList() {
 
     loadPosts();
   }, []);
-
+  const handlePostUpdate = (updatedPost: PostProps['post']) => {
+    setPosts(currentPosts => 
+      currentPosts.map(post => 
+        post._id === updatedPost._id ? updatedPost : post
+      )
+    );
+  };
   return (
     <div className="space-y-4">
       {posts.map((post) => (
-        <Post key={post._id} post={post} />
+        <Post key={post._id} post={post} onPostUpdate={handlePostUpdate} />
       ))}
     </div>
   );
