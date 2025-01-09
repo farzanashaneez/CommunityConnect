@@ -288,3 +288,8 @@ export const shareComment = async (postId: string, commentId: string) => {
   const response = await api.post(`${API_URL}/posts/${postId}/comment/${commentId}/share`);
   return response.data;
 };
+
+export const getDashboardData=async()=>{
+  const response = await api.get(`${API_URL}/getDashboardData`);
+  return response.data;
+}

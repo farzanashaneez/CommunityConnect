@@ -37,7 +37,7 @@ interface EventCardProps {
   event: Event;
   isAdmin: boolean;
 }
-const getEventStatus = (eventDate: string) => {
+export const getEventStatus = (eventDate: string) => {
   const now = new Date();
   const date = new Date(eventDate);
 
@@ -159,7 +159,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, isAdmin = false }) => {
         )}
 
         <CardContent
-          sx={{ width: "100%", textAlign: "center", height: "auto" }}
+          sx={{ width: "100%", textAlign: "center", height: "auto",display:'flex',flexDirection:'column',alignItems:'center' }}
         >
           <Typography variant="h6" sx={{ fontWeight: "bold", mb: 0 }}>
             {event.name}
@@ -168,13 +168,14 @@ const EventCard: React.FC<EventCardProps> = ({ event, isAdmin = false }) => {
             variant="body2"
             sx={{
               mb: 0,
-              width: "150px",
+              width: "80%",
               maxHeight: "60px",
               overflow: "hidden",
               textOverflow: "ellipsis",
               display: "-webkit-box",
               WebkitLineClamp: 3,
               WebkitBoxOrient: "vertical",
+              textAlign:'center'
             }}
           >
             {event.description}
@@ -204,6 +205,8 @@ const EventCard: React.FC<EventCardProps> = ({ event, isAdmin = false }) => {
 
       {/* Details Dialog */}
       <Dialog open={isDetailsDialogOpen} onClose={handleDetailsClose}>
+        
+      
         <DialogTitle
           sx={{ fontWeight: "700", fontSize: "25px", margin: "auto" }}
         >
@@ -214,7 +217,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, isAdmin = false }) => {
             <CardMedia
               component="img"
               sx={{
-                width: "200px",
+                width: "auto",
                 height: "200px",
                 objectFit: "cover",
                 borderRadius: "8px",

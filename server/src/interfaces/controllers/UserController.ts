@@ -8,14 +8,11 @@ export class UserController {
 
   async register(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      console.log(req.body);
       const { user, password } = await this.userUseCases.registerUser(req.body);
-      console.log("user--->", user, "password---->", password);
       await sendWelcomeEmail(user.email, user.firstName, password);
 
       res.status(201).json({ message: 'User registered successfully', user });
     } catch (error) {
-      console.log("Registration error:", error);
       next(error);
     }
   }
@@ -55,7 +52,6 @@ export class UserController {
         (error as any).statusCode = 404; 
         throw error;
       }
-      console.log("user",user)
       res.json(user);
     } catch (error) {
       console.log("Get user by ID error:", error);
@@ -74,7 +70,6 @@ export class UserController {
       }
       res.json({ message: 'User updated successfully', updatedUser });
     } catch (error) {
-      console.log("Update user error:", error);
       next(error);
     }
   }
@@ -108,7 +103,6 @@ export class UserController {
 
   async updatName(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      console.log("updatename called")
       const userId = req.params.id; 
       const { firstname,lastname } = req.body;
 
@@ -118,13 +112,11 @@ export class UserController {
      
       res.json({ message: 'Member added successfully', updatedUser});
     } catch (error) {
-      console.log("Add member error:", error);
       next(error);
     }
   }
   async updateImage(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      console.log("updateimage called")
       const userId = req.params.id; 
       const { imageUrl } = req.body;
 
@@ -134,7 +126,6 @@ export class UserController {
      
       res.json({ message: 'Member added successfully', updatedUser});
     } catch (error) {
-      console.log("Add member error:", error);
       next(error);
     }
   }

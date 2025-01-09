@@ -14,7 +14,7 @@ import chatRoutes from "./interfaces/routes/chatRoutes";
 import postRoutes from "./interfaces/routes/postRoutes";
 import notificationRoutes from './interfaces/routes/notificationRoutes';
 import refreshRoutes from './interfaces/routes/refreshtokenroutes';
-
+import dashboardRoute  from './interfaces/routes/dashboardRoutes';
 import http from "http";
 // import { Server as SocketIOServer, Socket } from "socket.io";
 
@@ -40,6 +40,8 @@ app.use('/api/chats', chatRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/refresh-token',refreshRoutes)
 app.use('/api/posts', postRoutes);
+app.use('/api/getDashboardData', dashboardRoute);
+
 
 app.use(errorHandler);
 

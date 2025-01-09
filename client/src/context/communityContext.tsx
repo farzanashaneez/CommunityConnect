@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, ReactNode } from "react";
 import CustomSnackbar from "../components/customSnackbar";
 import { socket } from "../services/socketConnection";
 import { ServiceRequest } from "../interfaces/communityInterfaces";
+import { PostProps } from "../components/postComponents/Post";
 
 // Define the types for the context
 interface CommunityContextType {
@@ -14,7 +15,9 @@ interface CommunityContextType {
   completed: boolean; // To track the completion of actions
   openSnackbar: (message: string, severity: 'success' | 'error' | 'info' | 'warning') => void;
   closeSnackbar: () => void;
-  setCompleted: (status: boolean) => void; // Method to update completed status
+  setCompleted: (status: boolean) => void; 
+  mediaPosts: PostProps['post'][];
+  updateMediaPosts: (posts: PostProps['post'][]) => void;
 }
 
 interface Service {
@@ -31,7 +34,12 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error' | 'info' | 'warning'>('info');
-  const [completed, setCompleted] = useState(false); // Track if the operation is completed
+  const [completed, setCompleted] = useState(false); 
+  const [mediaPosts, setMediaPosts] = useState<PostProps['post'][]>([]);
+
+  const updateMediaPosts = (posts: PostProps['post'][]) => {
+    setMediaPosts(posts.slice(0, 6));
+  };
 
   const openSnackbar = (message: string, severity: 'success' | 'error' | 'info' | 'warning') => {
     setSnackbarMessage(message);
@@ -122,7 +130,9 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
       requestServiceAlert,
       deletePostAlert,
       completed, 
-      setCompleted: handleCompleted 
+      setCompleted: handleCompleted ,
+      mediaPosts,
+      updateMediaPosts
     }}>
       {children}
       <CustomSnackbar

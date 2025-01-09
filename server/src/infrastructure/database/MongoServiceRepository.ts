@@ -125,4 +125,30 @@ console.log("mongo result of service request",rawRequests)
     )
     .exec();
   }
+  async findRecent(count: number): Promise<Service[]> {
+    return ServiceModel.find()
+      .sort({ createdAt: -1 })
+      .limit(count)
+      .exec();
+  }
+  async findRecentRequestedServices(count:number): Promise<ServiceRequest[]> {
+    const requests = await ServiceRequestModel.find({ status:'pending' })
+    .populate({
+      path: 'serviceId',
+      select: 'imageUrl name',
+    })
+    .populate({
+      path: 'requestId',
+      populate: {
+        path: 'apartmentId',
+        select: 'apartmentNumber buildingSection',
+      },
+    })
+    .sort({requestedDate:-1})
+    .limit(10)
+    .exec();
+
+  return requests;
+  }
+  
 }

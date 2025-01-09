@@ -180,7 +180,7 @@ export function Post({ post, onPostUpdate }: PostProps) {
         </div>
         <div className="flex justify-between border-t border-b py-2 mb-4">
          
-          {post.likes.includes(userState.currentUser.user.id) ? (
+          {post.likes.includes(userState?.currentUser?.user?.id) ? (
              <Button startIcon={<ThumbUp />} color="warning" onClick={handleLike}>
              Liked
            </Button>
@@ -199,13 +199,13 @@ export function Post({ post, onPostUpdate }: PostProps) {
 
         <div className="space-y-4 mb-4 min-h-1 max-h-44  overflow-auto ">
           {post.comments.map((comment) => (
-            <div key={comment._id} className="flex items-start items-center">
+            <div key={comment._id} className="flex items-start ">
               <Avatar
                 src={comment.author.imageUrl}
                 alt="Commenter"
                 className="mr-2"
               />
-              <div className="flex-grow bg-gray-100 rounded-lg p-2 max-w-screen-md">
+              <div className="flex-grow bg-gray-100 rounded-lg p-2 max-w-screen-sm">
                 <div className="flex justify-between items-center mb-1">
                   <Typography variant="subtitle2">
                     {comment.author.fullName || comment.author.email}
@@ -222,7 +222,7 @@ export function Post({ post, onPostUpdate }: PostProps) {
 
         <div className="flex items-center">
           <Avatar
-            src={userState.currentUser.user.imageUrl}
+            src={userState?.currentUser?.user?.imageUrl}
             alt="Your profile"
             className="mr-2"
           />

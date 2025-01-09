@@ -13,9 +13,16 @@ const Home: React.FC = () => {
         <div className="md:w-1/3">
           <LeftSidebar />
         </div>
-        <div className="md:w-2/3">
-          <PostList />
-        </div>
+        <div
+            className="md:w-2/3 py-1 overflow-y-auto "
+            style={{
+              height: "calc(100vh + 700px)",
+              overflowY: "scroll",
+              
+            }}
+          >
+            <PostList />
+          </div>
       </div>
     </div>
     </Box>

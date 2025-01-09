@@ -12,17 +12,17 @@ const api: AxiosInstance = axios.create({
 api.interceptors.request.use(
   (config) => {
     const state = store.getState();
-   // store.dispatch(loggedOut());
 
 
    
     const admintoken = state.admin?.currentAdmin?.token;
     const currenttoken= state.user?.currentUser?.token;
-    console.log('admin token',admintoken)
+    console.log('admin token',admintoken,config.url)
     // if (admintoken) {
     //   config.headers['Authorization'] = `Bearer ${admintoken}`;
+    //config.url?.startsWith('/admin') 
     // }
-    if (config.url?.startsWith('/admin') && admintoken) {
+    if (window.location.pathname.startsWith('/admin') && admintoken) {
       config.headers['Authorization'] = `Bearer ${admintoken}`;
     }
      else if (currenttoken) {

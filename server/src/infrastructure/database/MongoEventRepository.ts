@@ -61,4 +61,11 @@ export class MongoEventRepository implements EventRepository {
   async getEventsByStatus(status: 'scheduled' | 'completed'): Promise<Event[]> {
     return EventModel.find({ status }).exec();
   }
+  async findRecent(count: number): Promise<Event[]> {
+    return EventModel.find()
+      .sort({ createdAt: -1 })
+      .limit(count)
+      .exec();
+  }
+  
 }

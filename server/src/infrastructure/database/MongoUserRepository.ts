@@ -1,6 +1,7 @@
 import mongoose, { Model, Schema } from "mongoose";
 import { User } from "../../domain/entities/User";
 import { UserRepository } from "../../application/interfaces/UserRepository";
+import ApartmentService from "../../application/services/ApartmentService";
 
 const userSchema = new Schema<User>({
   firstName: { type: String },
@@ -29,9 +30,35 @@ const userSchema = new Schema<User>({
 const UserModel = mongoose.model<User>("User", userSchema);
 
 export class MongoUserRepository implements UserRepository {
+  private apartmentService = new ApartmentService();
+
   async create(user: User): Promise<User> {
-    const newUser = new UserModel(user);
-    return newUser.save();
+    // const newUser = new UserModel(user);
+    
+    // return newUser.save();
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      // Step 1: Create the user
+      const newUser = new UserModel(user);
+      const savedUser = await newUser.save({ session });
+
+      // Step 2: Mark the apartment as filled
+      if (user.apartmentId) {
+        await this.apartmentService.markFilled(user.apartmentId.toString(), true);
+      }
+
+      await session.commitTransaction();
+      session.endSession();
+
+      return savedUser;
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
+  
   }
 
   async findByEmail(email: string): Promise<User | null> {
@@ -98,4 +125,25 @@ export class MongoUserRepository implements UserRepository {
       throw new Error('User not found');
     }
   }
+  async getUserCount():Promise<number>{
+    const [totalUsers, aggregateResult] = await Promise.all([
+      UserModel.countDocuments().exec(),
+      UserModel.aggregate([
+        { $unwind: "$members" },
+        { $group: { _id: null, totalMembers: { $sum: 1 } } }
+      ]).exec()
+    ]);
+  
+    const totalMembers = aggregateResult[0]?.totalMembers || 0;
+  
+    return  totalUsers+totalMembers   }
+
+  async findRecent(count: number): Promise<User[]> {
+    return UserModel.find()
+    .populate("apartmentId")
+      .sort({ createdAt: -1 })
+      .limit(count)
+      .exec();
+  }
+  
 }

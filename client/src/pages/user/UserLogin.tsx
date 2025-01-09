@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState } from 'react';
 import { TextField, Button, Container, Typography, Paper, Snackbar } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import { login } from '../../services/api'; // Adjust the import based on your structure
@@ -7,7 +7,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useAppDispatch, useAppSelector } from '../../hooks/reduxStoreHook';
-import { signinSuccess,signinFailure,signInStart } from '../../redux-store/user/userSlice';
+import { signinSuccess } from '../../redux-store/user/userSlice';
 
 const UserLogin: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
@@ -19,12 +19,12 @@ const UserLogin: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   if (userState.currentUser) {
-  //     window.history.replaceState(null, '', '/home');
-  //     navigate('/home');
-  //   }
-  // }, [location]);
+  useEffect(() => {
+    if (userState.currentUser) {
+      window.history.replaceState(null, '', '/home');
+      navigate('/home');
+    }
+  }, [location]);
 
   const validationSchema = Yup.object({
     email: Yup.string()

@@ -20,13 +20,14 @@ const AdminLogin: React.FC = () => {
   const adminState = useAppSelector((state) => state.admin);
   const dispatch=useAppDispatch()
   const location = useLocation();
+  const navigate=useNavigate();
 
   useEffect(() => {
-    if (adminState.isLogged) {
-      window.history.replaceState(null, '', '/admin/dashboard'); // Replace current state with dashboard
-    }
+    if (adminState.currentAdmin) {
+      window.history.replaceState(null, '', '/admin/dashboard'); 
+      navigate('/admin/dashboard')
+     }
   }, [location]);
-const navigate=useNavigate();
 const validationSchema = Yup.object({
     email: Yup.string()
       .email('Invalid email address')

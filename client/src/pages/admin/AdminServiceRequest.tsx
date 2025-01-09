@@ -24,6 +24,7 @@ import {
 } from "../../services/api";
 import { Service } from "../../interfaces/communityInterfaces";
 import ConfirmationDialog from "../../components/ConfirmationDialogue";
+import { Height } from "@mui/icons-material";
 
 const AdminServiceRequest: React.FC = () => {
   const [tabValue, setTabValue] = useState(0);
@@ -101,61 +102,87 @@ const LocalServicesTab = () => {
             mb: 5,
             boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.3)",
             borderRadius: "4px",
+            maxHeight:'100vh'
           }}
         >
-          <Grid container spacing={2}>
+           {serviceRequstArray.length>0?(<Grid container spacing={2}>
             {serviceRequstArray.map((item: any, index) => (
-              <Grid item xs={12} sm={6} md={4} key={index}>
-                <Card sx={{ display: "flex", height: "100%" }}>
+              <Grid item xs={12} sm={6} md={6} lg={12} xl={6} key={index}>
+                <Card
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    bgcolor: "#E5E4E2",
+                    height: { md: "80px" },
+                  }}
+                >
                   <CardMedia
                     component="img"
-                    sx={{ width: "75px", height: "75px", ml: 1, mt: 1 }}
+                    sx={{
+                      width: { xs: "60px", sm: "60px", md: "30px" },
+                      height: { xs: "60px", sm: "60px", md: "30px" },
+                      borderRadius: "5%",
+                      objectFit: "cover",
+                    }}
                     image={item.serviceId.imageUrl}
                     alt="Service"
                   />
-                  <CardContent>
-                    <Box
-                      sx={{ display: "flex", justifyContent: "space-evenly" }}
-                    >
-                      <Typography variant="body1">
-                        {item.serviceId.name}
-                      </Typography>
-                      <Box
-                        sx={{ display: "flex", flexDirection: "column", ml: 1 }}
-                      >
-                        <Typography variant="body2" sx={{ fontWeight: "400" }}>
-                          requested by
-                        </Typography>
-                        <Typography variant="body1" sx={{ fontWeight: "800" }}>
-                          {item.requestId.apartmentId.buildingSection +
-                            -+item.requestId.apartmentId.apartmentNumber ||
-                            "NA"}
-                        </Typography>
-                      </Box>
-                    </Box>
+                  <CardContent
+                    sx={{
+                      flex: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                      width: "100%",
+                    }}
+                  >
                     <Box
                       sx={{
                         display: "flex",
-                        justifyContent: "end",
-                        alignItems: "end",
-                        mt: 3,
-                        ml: -9,
+                        justifyContent: "between",
+                        flexDirection: "column",
                       }}
                     >
-                      <TextButton
-                        label="mark as done"
-                        color="secondary"
-                        onClick={() => {
-                          markAsCompleted(item._id);
-                          setCompleted(true)
-                        }}
-                      />
+                      <Typography variant="body2" noWrap>
+                        {item.serviceId.name}
+                      </Typography>
+                      <Typography variant="caption" sx={{ fontWeight: "400" }}>
+                        Requested by
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontWeight: "600" }}>
+                        {item.requestId.apartmentId.buildingSection}-
+                        {item.requestId.apartmentId.apartmentNumber || "NA"}
+                      </Typography>
                     </Box>
                   </CardContent>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "end",
+                      alignItems: "center",
+                    }}
+                  >
+                    <TextButton
+                      label="mark as done"
+                      color="secondary"
+                      onClick={() => {
+                        markAsCompleted(item._id);
+                        setCompleted(true);
+                      }}
+                    />
+                  </Box>
                 </Card>
               </Grid>
             ))}
-          </Grid>
+          </Grid>):(
+            <Box >
+              <Typography>
+                No recent request found
+              </Typography>
+            </Box>
+
+          )}
         </Box>
       </Box>
       <Box sx={{ flex: 1 }}>
@@ -171,21 +198,49 @@ const LocalServicesTab = () => {
             mb: 5,
             boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.3)",
             borderRadius: "4px",
+            maxHeight:'100vh'
+
           }}
         >
-          <Grid container spacing={2}>
+        <Grid container spacing={2}>
             {serviceRequstCompletedArray.map((item: any, index) => (
-              <Grid item xs={12} sm={6} md={4} key={index}>
-                <Card sx={{ display: "flex", height: "100%" }}>
+              <Grid item xs={12} sm={6} md={6} lg={12} xl={6} key={index}>
+                <Card
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    bgcolor: "#E5E4E2",
+                    height: { md: "60px" },
+                    paddingLeft: "5px",
+                  }}
+                >
                   <CardMedia
                     component="img"
-                    sx={{ width: "75px", height: "75px", ml: 1, mt: 1 }}
+                    sx={{
+                      width: { xs: "60px", sm: "60px", md: "30px" },
+                      height: { xs: "60px", sm: "60px", md: "30px" },
+                      borderRadius: "5%",
+                      objectFit: "cover",
+                    }}
                     image={item.serviceId.imageUrl}
                     alt="Service"
                   />
-                  <CardContent>
+                  <CardContent
+                    sx={{
+                      flex: 2,
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                      width: "100%",
+                    }}
+                  >
                     <Box
-                      sx={{ display: "flex", justifyContent: "space-evenly" }}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-evenly",
+                        alignItems: "center",
+                      }}
                     >
                       <Typography variant="body1">
                         {item.serviceId.name}
@@ -203,24 +258,13 @@ const LocalServicesTab = () => {
                         </Typography>
                       </Box>
                     </Box>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "end",
-                        mt: 3,
-                        ml: -9,
-                      }}
-                    >
-                       <Typography variant="body2" sx={{ fontWeight: "400",color:'red' }}>
-                          completed
-                        </Typography>
-                    </Box>
                   </CardContent>
                 </Card>
               </Grid>
             ))}
           </Grid>
+
+          
         </Box>
       </Box>
       {/* <CustomSnackbar

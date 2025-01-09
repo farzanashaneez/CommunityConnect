@@ -187,4 +187,11 @@ export class MongoPostRepository implements PostRepository {
       throw error; // Re-throw the error to be handled by the route handler
     }
   }
+  async findRecent(count: number): Promise<Post[]> {
+    return PostModel.find()
+      .sort({ createdAt: -1 })
+      .limit(count)
+      .exec();
+  }
+  
 }

@@ -7,21 +7,18 @@ export class ApartmentController {
   constructor(private apartmentUseCases: ApartmentUseCases) {}
 
   async create(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
-    console.log("====================================")
     try {
      
       const apartment = await this.apartmentUseCases.createApartment(req.body);
       res.status(201).json({ message: 'Apartment created successfully', apartment });
     } catch (error) {
-      console.log("====================================",error)
       next(error); // Pass the error to the error handler middleware
     }
   }
 
   async getApartments(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      console.log("====================================")
-
+console.log("get apartments0000000///////")
       const apartments = await this.apartmentUseCases.getAllApartments();
       res.json(apartments);
     } catch (error) {

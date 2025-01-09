@@ -6,6 +6,6 @@ export interface User{
     lastName:string;
     imageUrl:string;
     phoneNumber: string;
-    apartmentNumber: string;
+    apartmentId: any;
     isAdmin: boolean;
 }

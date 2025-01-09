@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import { Box, Drawer, IconButton, useMediaQuery, useTheme } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import AdminDashboard from '../pages/admin/AdminDashboard';
 import Sidebar from '../components/Sidebar';
 import AdminUser from '../pages/admin/AdminUser';
 import AdminServices from '../pages/admin/AdminServices';
@@ -12,12 +11,12 @@ import AdminAnnouncements from '../pages/admin/AdminAnnouncements';
 import AdminSettings from '../pages/admin/AdminSettings';
 import PageNotFound from '../pages/PageNotFound';
 import AdminServiceRequest from '../pages/admin/AdminServiceRequest';
+import Dashboard from '../pages/admin/Dashboard';
 
 
 const drawerWidth = 240;
 
 const AdminRoutes: React.FC = () => {
-  const location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -81,7 +80,7 @@ const AdminRoutes: React.FC = () => {
         }}
       >
         <Routes>
-          <Route path='/dashboard' element={<AdminDashboard />} />
+          <Route path='/dashboard' element={<Dashboard />} />
           <Route path='/users' element={<AdminUser />} />
           <Route path='/services' element={<AdminServices />} />
           <Route path='/events' element={<AdminEvents />} />

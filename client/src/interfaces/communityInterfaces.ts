@@ -11,7 +11,7 @@ export interface Service{
     createdAt: Date; 
 }
 export interface ServiceRequest{
-    id?:string;
+    _id?:string;
     requestId:any;
     serviceId:any;
     requestedDate:Date;

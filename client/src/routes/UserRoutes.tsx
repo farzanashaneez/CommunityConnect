@@ -11,6 +11,7 @@ import Announcements from '../pages/user/Announcements';
 import Services from '../pages/user/Services';
 import ProfilePage from '../pages/user/ProfilePage';
 import PostDetails from '../pages/user/PostDetails';
+import AllMediaPage from '../pages/user/AllMediaPage';
 
 const UserRoutes: React.FC = () => {
     const location = useLocation();
@@ -49,6 +50,8 @@ const UserRoutes: React.FC = () => {
                     <Route path="/profile" element={<UserProfile />} />
                     <Route path="/user/details/:id" element={<ProfilePage />} />
                     <Route path='/posts/:postid' element={<PostDetails/>}/>
+                    <Route path='/all-media' element={<AllMediaPage/>}/>
+
                 </Routes>
             </Box>
         </Box>
