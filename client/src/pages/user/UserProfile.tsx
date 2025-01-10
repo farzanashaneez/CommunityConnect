@@ -1,11 +1,15 @@
 // src/pages/UserProfile.tsx
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Button, IconButton, Avatar, Modal, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Grid, Grid2 } from '@mui/material';
+import { Box, Typography, Button, IconButton, Avatar, Modal, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Grid, Grid2, Divider, Card } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import { fetchUserDetails, addMember, updateName, addProfileImage } from '../../services/api';
 import { useAppSelector } from '../../hooks/reduxStoreHook';
 import ImageCropper from '../../components/ImageCropper';
 import { Formik } from 'formik';
+import PostList from '../../components/postComponents/PostList';
+import ServiceList from '../../components/ServiceList';
+import UserServices from '../../components/home/userServices';
+import { Bold } from 'lucide-react';
 
 const UserProfile: React.FC = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -39,16 +43,19 @@ const UserProfile: React.FC = () => {
   const handleCropComplete = async (croppedBlob: Blob) => {
     const croppedUrl = URL.createObjectURL(croppedBlob);
     setCroppedImage(croppedUrl);
-    setOpenCropper(false);
 
     // Update the cropped image in the database
     const formData = new FormData();
     formData.append("image", croppedBlob);
 
     try {
-      await addProfileImage('','',formData); // Replace with your API call
+      await addProfileImage(id,formData,); 
+      setOpenCropper(false);
+      setSelectedImage(null);
       alert("Image updated successfully!");
     } catch (error) {
+      setOpenCropper(false);
+      setSelectedImage(null);
       console.error("Error updating image:", error);
       alert("Failed to update the image.");
     }
@@ -113,75 +120,101 @@ const UserProfile: React.FC = () => {
     <Box sx={{ width: '100%', margin: 'auto', mt: 0, padding: '5px' }}>
       {/* Cover Photo Section */}
       <Box 
-        sx={{
-          position: 'relative',
-          height: '45vh',
-          backgroundImage: 'url("/src/assets/homeBG.jpg")', // Replace with your cover photo URL
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        {/* Edit Cover Photo Button */}
-        <IconButton 
-          sx={{
-            position: 'absolute',
-            top: 10,
-            right: 10,
-            backgroundColor: 'white',
-            '&:hover': {
-              backgroundColor: '#f0f0f0',
-            }
-          }}
-        >
-          <EditIcon />
-        </IconButton>
+  sx={{
+    position: 'relative',
+    height: '45vh',
+    backgroundImage: 'url("/src/assets/homeBG.jpg")',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+  }}
+>
+  <IconButton 
+    sx={{
+      position: 'absolute',
+      top: 10,
+      right: 10,
+      backgroundColor: 'white',
+      '&:hover': {
+        backgroundColor: '#f0f0f0',
+      }
+    }}
+  >
+    <EditIcon />
+  </IconButton>
 
-        {/* Profile Image */}
-        <Avatar 
-          alt={userDetails?.firstName || "User Name"} 
-          src={userDetails?.imageUrl || "/path/to/default/profile-image.jpg"} // Replace with your profile image URL
-          sx={{
-            width: 150,
-            height: 150,
-            position: 'absolute',
-            bottom: -50,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            border: '4px solid white', // Optional border
-          }} 
-        />
-        <Button variant="contained" color="primary" onClick={handleAddClick}>
-            Add Image
-          </Button>
-      </Box>
+  <Box sx={{  width: 150, height: 150, position: 'absolute', bottom: -50, left: '50%', transform: 'translateX(-50%)' }}>
+    <Avatar 
+      alt={userDetails?.firstName || "User Name"} 
+      src={userDetails?.imageUrl || "/path/to/default/profile-image.jpg"}
+      sx={{
+        width: '100%',
+        height: '100%',
+        border: '4px solid white',
+      }} 
+    />
+    <Button 
+      variant="text" 
+      color="primary" 
+      onClick={handleAddClick}
+      sx={{
+        position: 'absolute',
+        bottom: 0,
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 1,
+        width:'100%'
+      }}
+    >
+      Add Image
+    </Button>
+  </Box>
+</Box>
+
 
       {/* User Details */}
       <Box sx={{ mt: 8, textAlign: 'center' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: -1 }}>
-          <Box sx={{ flexGrow: 1, textAlign: 'center' }}>
-            <Typography variant="body1">Apartment Number:</Typography>
-            <Typography variant="body1">{`${userDetails?.apartmentId?.buildingSection}-${userDetails?.apartmentId?.apartmentNumber}` || "N/A"}</Typography>
-            <Typography variant="body1">Phone Number:</Typography>
-            <Typography variant="body1">{userDetails?.mobileNumber || "N/A"}</Typography>
-            <Typography variant="body1">Email:</Typography>
-            <Typography variant="body1">{userDetails?.email || "N/A"}</Typography>
+          <Box sx={{ flex:1,flexGrow: 1, textAlign: 'center' }}>
+            <Typography variant="subtitle2">Apartment Number:</Typography>
+            <Typography variant="body1" sx={{fontWeight:'bold'}}>{`${userDetails?.apartmentId?.buildingSection}-${userDetails?.apartmentId?.apartmentNumber}` || "N/A"}</Typography>
+            <Typography variant="subtitle2">Phone Number:</Typography>
+            <Typography variant="body1" sx={{fontWeight:'bold'}}>{userDetails?.mobileNumber || "N/A"}</Typography>
+            <Typography variant="subtitle2">Email:</Typography>
+            <Typography variant="body1" sx={{fontWeight:'bold',fontSize:{xs:'14px',sm:'14px'}}}>{userDetails?.email || "N/A"}</Typography>
           </Box>
 
-          <Box sx={{ flexGrow: 1, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Box sx={{ flex:1,flexGrow: 1, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Typography variant="h6" sx={{ order: { xs: -1, md: 0 } }}>{userDetails?.firstName} {userDetails?.lastName}</Typography>
             <Button onClick={handleOpenNameModal} variant="text" color="primary">
               Edit Name
             </Button>
+            <Button 
+          variant="contained" 
+          color="primary" 
+          sx={{  }}
+          onClick={handleOpen}
+        >
+          Add Member
+        </Button>
           </Box>
 
-          <Box sx={{ flexGrow: 1, textAlign: 'center' }}>
-            <Typography variant="body1">Members Count:</Typography>
-            <Typography variant="body1">{Array.isArray(userDetails?.members) ? userDetails.members.length : "0"}</Typography>
-            <Typography variant="body1">Education/Job:</Typography>
-            {Array.isArray(userDetails?.members) && userDetails.members.length > 0 ? (
+          <Box sx={{flex:1, flexGrow: 1, textAlign: 'center',alignItems:'center' }}>
+            <Typography variant="subtitle2">Members Count:</Typography>
+            <Typography variant="h6">{Array.isArray(userDetails?.members) ? userDetails.members.length : "0"}</Typography>
+              <Divider sx={{width:'75%',my:1}}/>        
+      {Array.isArray(userDetails?.members) && userDetails.members.length > 0 ? (
               userDetails.members.map((member: any) => (
-                <Typography key={member.name} variant="body2">
-                  {member.name}: {member.profession}
+                <Typography key={member.name} variant="body2" sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'center', 
+                  alignItems: 'center' 
+                }}>
+                  <span style={{ minWidth: '60px', textAlign: 'right', marginRight: '8px' }}>
+                    {member.name}:
+                  </span>
+                  <span style={{ fontWeight: 'bold' }}>
+                    {member.profession}
+                  </span>
                 </Typography>
               ))
             ) : (
@@ -190,15 +223,27 @@ const UserProfile: React.FC = () => {
           </Box>
         </Box>
 
-        <Button 
-          variant="contained" 
-          color="primary" 
-          sx={{ mt: 2 }}
-          onClick={handleOpen}
-        >
-          Add Member
-        </Button>
+
+       
       </Box>
+
+      <Divider sx={{width:'95%',m:'auto',my:1,mb:3}}/>   
+
+      <Box sx={{ width: '90%',margin:'auto',marginBottom:'15px' }}>
+      <Grid container spacing={2} direction={{ xs: 'column-reverse', md: 'row' }}>
+  <Grid item xs={12} sm={9}>
+    <Typography variant="h5" fontWeight='bold' gutterBottom>My Posts</Typography>
+    <PostList isUser={true}/>
+  </Grid>
+  <Grid item xs={12} sm={2} >
+    <Typography variant="h5" fontWeight='bold' gutterBottom>My Services</Typography>
+    <UserServices userId={id}/>
+  </Grid>
+</Grid>
+
+    </Box>
+  
+   
 
       {/* Modal for Adding Member */}
       <Modal

@@ -12,8 +12,6 @@ import {
   Button,
 } from "@mui/material";
 import TextButton from "../../components/TextButton";
-import { useSnackbar } from "../../hooks/useSnackbar";
-import CustomSnackbar from "../../components/customSnackbar";
 import { useCommunityContext } from "../../context/communityContext";
 import {
   getAllRequestedServices,
@@ -24,7 +22,6 @@ import {
 } from "../../services/api";
 import { Service } from "../../interfaces/communityInterfaces";
 import ConfirmationDialog from "../../components/ConfirmationDialogue";
-import { Height } from "@mui/icons-material";
 
 const AdminServiceRequest: React.FC = () => {
   const [tabValue, setTabValue] = useState(0);

@@ -24,8 +24,8 @@ export class PostUseCase {
       return this.postRepository.getAllPosts();
     }
   
-    async getPostsByTag(tag: string): Promise<Post[]> {
-      return this.postRepository.getPostsByTag(tag);
+    async getPostsByUser(userId: string): Promise<Post[]> {
+      return this.postRepository.getPostsByUser(userId);
     }
   
     async addLike(id: string,user:string): Promise<Post> {

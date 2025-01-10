@@ -22,13 +22,23 @@ export class MongoNotificationRepository implements NotificationRepository {
     return newNotification.save();
   }
 
-  async getNotificationById(id: string): Promise<Notification | null> {
-    return NotificationModel.findById(id).exec();
+  async getNotificationByFilter(id: string): Promise<Notification[] | null> {
+    return NotificationModel.find({
+      $or: [
+        { userIds: id }, 
+        { broadcast: true } 
+      ]
+    }).exec();
   }
 
   async updateNotification(id: string, notificationData: Partial<Notification>): Promise<Notification> {
-    const updatedNotification = await NotificationModel.findByIdAndUpdate(id, notificationData, { new: true }).exec();
-    if (!updatedNotification) {
+    const {seenBy}=notificationData;
+    const updatedNotification = await NotificationModel.findByIdAndUpdate(
+      id,
+      { $addToSet: { seenBy: seenBy } }, 
+      { new: true } 
+    ).exec();
+        if (!updatedNotification) {
       throw new Error('Notification not found');
     }
     return updatedNotification;

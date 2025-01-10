@@ -9,6 +9,8 @@ export interface ServiceRepository {
   requestLocalService(servieRequest:ServiceRequest): Promise<ServiceRequest>;
   deleteService(id: string): Promise<void>;
   getAllServices(type:string): Promise<Service[]>;
+  getAllServicesOfUser(type:string): Promise<Service[]>;
+
   getAllRequestedServices(status:string): Promise<ServiceRequest[]>;
   getServicesByCategory(category: string): Promise<Service[]>;
   getServicesByType(type: 'local' | 'residential'): Promise<Service[]>;

@@ -64,9 +64,9 @@ export class PostController {
     }
   }
 
-  async getPostsByTag(req: Request, res: Response, next: NextFunction) {
+  async getPostsByUser(req: Request, res: Response, next: NextFunction) {
     try {
-      const posts = await this.postUseCase.getPostsByTag(req.params.tag);
+      const posts = await this.postUseCase.getPostsByUser(req.params.userid);
       res.json(posts);
     } catch (error) {
       res.status(500).json({ error: 'Failed to get posts by tag' });

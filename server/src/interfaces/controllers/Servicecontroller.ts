@@ -182,6 +182,23 @@ async getAllServiceRequst(
   }
 }
 
+async getAllServicesOfUser(
+  req: Request,
+  res: Response,
+  next: NextFunction
+):Promise<void> {
+  try {
+    const userId = req.params.userId;
+
+    const requestedServices = await this.serviceUseCase.getAllServicesOfUser(userId);
+    res.json(requestedServices);
+  } catch (error: any) {
+    res
+      .status(400)
+      .json({ message: "Error fetching services", error: error?.message });
+  }
+}
+
   async deleteService(
     req: Request,
     res: Response,

@@ -20,6 +20,7 @@ router.put('/update/:id', (req, res,next) => serviceController.updateService(req
 router.delete('/delete/:id', (req, res,next) => serviceController.deleteService(req, res,next));
 router.get('/:type/status/:status', (req, res,next) => serviceController.getServicesByStatus(req, res,next));
 router.get('/type/:type', (req, res,next) => serviceController.getAllServices(req, res,next));
+router.get('/user/:userId', (req, res,next) => serviceController.getAllServicesOfUser(req, res,next));
 
 router.put('/grantorreject/:action/:id', (req, res,next) => serviceController.grantService(req, res,next));
 

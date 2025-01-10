@@ -51,9 +51,6 @@ const uploadImageToCloudinary = async (req: CustomRequest, res: Response, next: 
       });
       next();
     } catch (error) {
-      // if (error instanceof cloudinary.CloudinaryError) {
-      //   return next(new CustomError('Cloudinary upload failed', 500, error));
-      // }
       next(error);
     }
   } else {

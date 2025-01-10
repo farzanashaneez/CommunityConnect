@@ -1,19 +1,29 @@
-import React, { useEffect, useState } from 'react';
-import { Container, Typography, ImageList, ImageListItem, Dialog, useMediaQuery, IconButton } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { fetchAllPosts, deletePost } from '../../services/api';
-import { PostProps, Post } from '../../components/postComponents/Post';
-import { useCommunityContext } from '../../context/communityContext';
-import ConfirmationDialog from '../../components/ConfirmationDialogue';
+import React, { useEffect, useState } from "react";
+import {
+  Container,
+  Typography,
+  ImageList,
+  ImageListItem,
+  Dialog,
+  useMediaQuery,
+  IconButton,
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { fetchAllPosts, deletePost } from "../../services/api";
+import { PostProps, Post } from "../../components/postComponents/Post";
+import { useCommunityContext } from "../../context/communityContext";
+import ConfirmationDialog from "../../components/ConfirmationDialogue";
 
 const AdminPosts: React.FC = () => {
-  const [posts, setPosts] = useState<PostProps['post'][]>([]);
-  const [selectedPost, setSelectedPost] = useState<PostProps['post'] | null>(null);
-  const isSmallScreen = useMediaQuery('(max-width:600px)');
-  const isMediumScreen = useMediaQuery('(max-width:960px)');
-  const isLargeScreen = useMediaQuery('(max-width:1280px)');
+  const [posts, setPosts] = useState<PostProps["post"][]>([]);
+  const [selectedPost, setSelectedPost] = useState<PostProps["post"] | null>(
+    null
+  );
+  const isSmallScreen = useMediaQuery("(max-width:600px)");
+  const isMediumScreen = useMediaQuery("(max-width:960px)");
+  const isLargeScreen = useMediaQuery("(max-width:1280px)");
   const { deletePostAlert } = useCommunityContext();
-  const [open,setOpen]=useState(false);
+  const [open, setOpen] = useState(false);
 
   const cols = isSmallScreen ? 2 : isMediumScreen ? 3 : isLargeScreen ? 4 : 5;
   const [postToDelete, setPostToDelete] = useState<string | null>(null);
@@ -24,13 +34,13 @@ const AdminPosts: React.FC = () => {
         const fetchedPosts = await fetchAllPosts();
         setPosts(fetchedPosts);
       } catch (error) {
-        console.error('Error fetching posts:', error);
+        console.error("Error fetching posts:", error);
       }
     };
     loadPosts();
   }, []);
 
-  const handlePostClick = (post: PostProps['post']) => {
+  const handlePostClick = (post: PostProps["post"]) => {
     setSelectedPost(post);
   };
 
@@ -44,10 +54,10 @@ const AdminPosts: React.FC = () => {
     if (postToDelete) {
       try {
         await deletePost(postToDelete);
-        setPosts(posts.filter(post => post._id !== postToDelete));
+        setPosts(posts.filter((post) => post._id !== postToDelete));
         deletePostAlert(true);
       } catch (error) {
-        console.error('Error deleting post:', error);
+        console.error("Error deleting post:", error);
         deletePostAlert(false);
       }
     }
@@ -62,36 +72,60 @@ const AdminPosts: React.FC = () => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
-      <Typography variant="h4" gutterBottom>Posts</Typography>
+      <Typography variant="h4" gutterBottom>
+        Posts
+      </Typography>
       <ImageList cols={cols} gap={16}>
-        {posts.filter(post => post.images.length > 0).map((post) => (
-          <ImageListItem key={post._id} onClick={() => handlePostClick(post)} sx={{ position: 'relative' }}>
-            <img
-              src={post.images[0]}
-              alt={`Post by ${post.author.firstName}`}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
+        {posts.map((post) => (
+          <ImageListItem
+            key={post._id}
+            onClick={() => handlePostClick(post)}
+            sx={{ position: "relative" }}
+          >
+            {post.images && post.images.length > 0 ? (
+              <img
+                src={post.images[0]}
+                alt={`Post by ${post?.author?.firstName || "removed user"}`}
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+            ) : (
+              <Typography
+                variant="body2"
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  bgcolor: "rgba(0,0,0,0.1)",
+                  color: "gray",
+                  fontSize: "1rem",
+                }}
+              >
+               {post.content}
+              </Typography>
+            )}
             <Typography
               variant="caption"
               sx={{
-                position: 'absolute',
+                position: "absolute",
                 bottom: 0,
                 left: 0,
                 right: 0,
-                bgcolor: 'rgba(0,0,0,0.5)',
-                color: 'white',
-                p: 1
+                bgcolor: "rgba(0,0,0,0.5)",
+                color: "white",
+                p: 1,
               }}
             >
-              Posted by {post.author.firstName}
+              Posted by {post?.author?.firstName || "removed user"}
             </Typography>
             <IconButton
               sx={{
-                position: 'absolute',
+                position: "absolute",
                 top: 8,
                 right: 8,
-                bgcolor: 'rgba(255,255,255,0.7)',
-                '&:hover': { bgcolor: 'rgba(255,255,255,0.9)' }
+                bgcolor: "rgba(255,255,255,0.7)",
+                "&:hover": { bgcolor: "rgba(255,255,255,0.9)" },
               }}
               onClick={(e) => handleDeleteClick(post._id, e)}
             >
@@ -100,7 +134,12 @@ const AdminPosts: React.FC = () => {
           </ImageListItem>
         ))}
       </ImageList>
-      <Dialog open={!!selectedPost} onClose={() => setSelectedPost(null)} maxWidth="md" fullWidth>
+      <Dialog
+        open={!!selectedPost}
+        onClose={() => setSelectedPost(null)}
+        maxWidth="md"
+        fullWidth
+      >
         {selectedPost && <Post post={selectedPost} />}
       </Dialog>
       <ConfirmationDialog

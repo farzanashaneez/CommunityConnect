@@ -24,16 +24,7 @@ export class MongoApartmentRepository implements ApartmentRepository {
     return ApartmentModel.countDocuments().exec();
   }
   async markFilled(id:string,doFill:boolean){
-    await ApartmentModel.updateMany({}, [
-      {
-        $set: {
-          isfilled: { $cond: [{ $eq: ["$isfilled", 0] },false,true] }
-        }
-      }
-    ]);
-    
-
-    console.log("befro @@@@@@@",id,doFill)
+   
     const aprtmnt=await ApartmentModel.findByIdAndUpdate(id, { isfilled:doFill }, { new: true });
     console.log("updated apartment",aprtmnt)
   }

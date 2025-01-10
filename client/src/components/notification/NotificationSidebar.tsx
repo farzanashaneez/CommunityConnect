@@ -1,40 +1,38 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
-import { Drawer, List, ListItem, ListItemText, Badge, IconButton } from '@mui/material';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import { alpha, styled } from '@mui/material/styles';
-import { socket } from '../../services/socketConnection';
+import { Drawer, List, ListItem, ListItemButton, ListItemText } from "@mui/material";
+import { alpha, styled } from "@mui/material/styles";
+import { socket } from "../../services/socketConnection";
+import { useAppSelector } from "../../hooks/reduxStoreHook";
+import { markAsSeen } from "../../services/api";
 
 const StyledDrawer = styled(Drawer)(({ theme }) => ({
-  '& .MuiDrawer-paper': {
-    width: '300px',
+  "& .MuiDrawer-paper": {
+    width: "300px",
     backgroundColor: alpha(theme.palette.background.paper, 0.9),
-    borderLeft: '1px solid ' + alpha(theme.palette.divider, 0.1),
+    borderLeft: "1px solid " + alpha(theme.palette.divider, 0.1),
   },
 }));
-
-
 
 interface NavSidebarProps {
   open: boolean;
   onClose: () => void;
-  notifications: string[];
+  notifications: any[];
 }
 
-const NotificationSidebar: React.FC<NavSidebarProps> = ({ open, onClose, notifications }) => {
-  // const [notificationstate, setNotificationstate] = useState([]);
-
+const NotificationSidebar: React.FC<NavSidebarProps> = ({
+  open,
+  onClose,
+  notifications,
+}) => {
+  const userState = useAppSelector((s) => s.user);
   useEffect(() => {
-
-    // Listen for notification updates
-    socket.on('notificationUpdate', (newNotification) => {
-      //setNotificationstate((prevNotifications) => [...prevNotifications, newNotification]);
-      console.log('New notification received:', newNotification);
+    socket.on("notificationUpdate", (newNotification) => {
+      console.log("New notification received:", newNotification);
     });
 
-    // Cleanup on unmount
     return () => {
-      socket.off('notificationUpdate');
+      socket.off("notificationUpdate");
     };
   }, []);
 
@@ -42,9 +40,16 @@ const NotificationSidebar: React.FC<NavSidebarProps> = ({ open, onClose, notific
     <StyledDrawer anchor="right" open={open} onClose={onClose}>
       <List>
         {notifications.map((notification, index) => (
-          <ListItem key={index}>
-            <ListItemText primary={notification} />
-          </ListItem>
+          <ListItemButton key={index} onClick={()=>{markAsSeen(notification._id,{seenBy:userState.currentUser.user.id})}}>
+            {notification.seenBy.includes(userState.currentUser.user.id) ? (
+              <ListItemText primary={notification.message} />
+            ) : (
+              <ListItemText
+                className="text-blue-600"
+                primary={notification.message}
+              />
+            )}
+          </ListItemButton>
         ))}
       </List>
     </StyledDrawer>

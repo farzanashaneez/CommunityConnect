@@ -42,6 +42,9 @@ async grantservice(id: string, update:string): Promise<Service> {
   async getAllServices(type:string): Promise<Service[]> {
     return this.serviceRepository.getAllServices(type);
   }
+  async getAllServicesOfUser(userId:string): Promise<Service[]> {
+    return this.serviceRepository.getAllServicesOfUser(userId);
+  }
   getAllRequestedServices(status:string): Promise<ServiceRequest[]>{
     return this.serviceRepository.getAllRequestedServices(status);
 

@@ -3,6 +3,8 @@ import { MongoUserRepository } from '../../infrastructure/database/MongoUserRepo
 import { UserUseCases } from '../../application/usecases/userUseCases';
 import { adminMiddleware, authMiddleware } from '../../infrastructure/middlewares/authMiddleware';
 import express,{Response,Request,NextFunction} from 'express';
+import { uploadImageToCloudinary,upload } from '../../infrastructure/middlewares/uploadImageToCloudinary';
+
 
 const router = express.Router();
 const userRepository = new MongoUserRepository();
@@ -14,7 +16,7 @@ router.post('/login', (req, res, next) => userController.login(req, res, next));
 router.get('/',authMiddleware, (req, res, next) => userController.getUsers(req, res, next));
 router.post('/members/:id',authMiddleware, (req:Request, res:Response, next:NextFunction) => userController.addMember(req, res, next));
 router.post('/updatename/:id',authMiddleware, (req:Request, res:Response, next:NextFunction) => userController.updatName(req, res, next));
-router.post('/addprofileImage/:id',authMiddleware, (req:Request, res:Response, next:NextFunction) => userController.updateImage(req, res, next));
+router.post('/addprofileImage/:id',upload.single('image'), uploadImageToCloudinary, (req:Request, res:Response, next:NextFunction) => userController.updateImage(req, res, next));
 router.post('/addcoverphoto/:id',authMiddleware, (req:Request, res:Response, next:NextFunction) => userController.updateImage(req, res, next));
 
 router.get('/details/:id',authMiddleware, (req:Request, res:Response, next:NextFunction) => userController.getUserById(req, res, next));

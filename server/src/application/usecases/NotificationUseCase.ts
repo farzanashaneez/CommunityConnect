@@ -9,8 +9,8 @@ export class NotificationUseCase {
     return this.notificationRepository.createNotification(notificationData);
   }
 
-  async getNotificationById(id: string): Promise<Notification | null> {
-    return this.notificationRepository.getNotificationById(id);
+  async getNotificationByFilter(id: string): Promise<Notification[] | null> {
+    return this.notificationRepository.getNotificationByFilter(id);
   }
 
   async updateNotification(id: string, notificationData: Partial<Notification>): Promise<Notification> {

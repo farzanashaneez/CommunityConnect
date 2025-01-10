@@ -77,8 +77,9 @@ export class MongoPostRepository implements PostRepository {
     return posts;
   }
 
-  async getPostsByTag(tag: string): Promise<Post[]> {
-    const posts = await PostModel.find({ tags: tag });
+  async getPostsByUser(UserId: string): Promise<Post[]> {
+    
+    const posts = await PostModel.find({ author: new mongoose.Types.ObjectId(UserId) });
     return posts.map((post) => post.toObject());
   }
 

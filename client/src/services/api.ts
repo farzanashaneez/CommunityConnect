@@ -1,4 +1,5 @@
 
+import { IdCard } from "lucide-react";
 import api from "./configAxios";
 
 
@@ -59,12 +60,13 @@ export const updateName = async (token: string,id:string,firstname:string,lastna
   });
   return response.data;
 };
-export const addProfileImage = async (token: string,id:string, data:object) => {
-  const response = await api.post(`${API_URL}/users/addprofileImage/${id}`, data, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+export const addProfileImage = async (id:string, data:object) => {
+  console.log("data====",data,id)
+  const response = await api.post(`${API_URL}/users/addprofileImage/${id}`, data
+    // headers: {
+    //   Authorization: `Bearer ${token}`,
+    // },
+  );
   return response.data;
 };
 export const addCoverphoto = async (token: string,id:string, data:object) => {
@@ -85,6 +87,10 @@ export const createService=async(servicedata:any)=>{
 export const getAllServices=async(type:string)=>{
   console.log("type===>",type)
   const response=await api.get(`${API_URL}/services/type/${type}`);
+  return response.data;
+}
+export const getAllServicesOfUser=async(userId:string)=>{
+  const response=await api.get(`${API_URL}/services/user/${userId}`);
   return response.data;
 }
 export const getAllRequestedServices=async(status:string)=>{
@@ -153,29 +159,7 @@ export const updateAnnouncementApi = async (id: string, announcementData: any) =
   return response.data;
 };
 
-// // Post Management
-// export const createPost = async (postData: any) => {
-//   console.log("postData", postData);
-//   const response = await api.post(`${API_URL}/posts`, postData);
-//   return response.data;
-// };
 
-// export const fetchAllPosts = async () => {
-//   const response = await api.get(`${API_URL}/posts`);
-//   return response.data;
-// };
-
-// export const deletePost = async (id: string) => {
-//   console.log("id===>", id);
-//   const response = await api.delete(`${API_URL}/posts/delete/${id}`);
-//   return response.data;
-// };
-
-// export const updatePost = async (id: string, postData: any) => {
-//   console.log("id===>", id);
-//   const response = await api.put(`${API_URL}/posts/update/${id}`, postData);
-//   return response.data;
-// };
 
 // Event Management
 export const createEventApi = async (eventData: any) => {
@@ -242,7 +226,10 @@ export const fetchAllPosts = async () => {
   const response = await api.get(`${API_URL}/posts`);
   return response.data;
 };
-
+export const fetchAllPostsOfUser=async(userId:string)=>{
+  const response=await api.get(`${API_URL}/posts/user/${userId}`);
+  return response.data;
+}
 export const sharePost=async (postid:string,userid:string,toUsers:string[])=>{
   const frontend=import.meta.env.VITE_FRONTEND_URL;
   const url = `Check out this post: <a href="${frontend}/posts/${postid}" target="_blank">${frontend}/posts/${postid}</a>`;
@@ -291,5 +278,15 @@ export const shareComment = async (postId: string, commentId: string) => {
 
 export const getDashboardData=async()=>{
   const response = await api.get(`${API_URL}/getDashboardData`);
+  return response.data;
+}
+
+// getting notification
+export const getAllNotification=async(id:string)=>{
+  const response = await api.get(`${API_URL}/notifications/filter/${id}`);
+  return response.data;
+}
+export const markAsSeen=async(id:string,data:any)=>{
+  const response = await api.put(`${API_URL}/notifications/update/${id}`,data);
   return response.data;
 }

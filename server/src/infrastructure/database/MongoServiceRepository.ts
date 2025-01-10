@@ -83,7 +83,9 @@ export class MongoServiceRepository implements ServiceRepository {
   async getAllServices(type:string): Promise<Service[]> {
     return ServiceModel.find({'type':type}).exec();
   }
-
+  async getAllServicesOfUser(userId:string): Promise<Service[]> {
+    return ServiceModel.find({'provider':userId}).exec();
+  }
   async getAllRequestedServices(status:string): Promise<ServiceRequest[]> {
     const requests = await ServiceRequestModel.find({ status })
     .populate({

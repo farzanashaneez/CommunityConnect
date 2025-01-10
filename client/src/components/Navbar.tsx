@@ -7,6 +7,8 @@ import ChatIcon from '@mui/icons-material/Chat';
 import { Link, useNavigate } from 'react-router-dom';
 import NotificationSidebar from './notification/NotificationSidebar';
 import { socket } from '../services/socketConnection';
+import { getAllNotification } from '../services/api';
+import { useAppSelector } from '../hooks/reduxStoreHook';
 
 const StyledLink = styled(Link)(({ theme }) => ({
   color: theme.palette.text.primary,
@@ -36,18 +38,14 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
 const NavBar: React.FC = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false); // State to control sidebar visibility
-  const [notifications, setNotifications] = useState<any[]>([
-    'New message from John',
-    'Your event has been approved',
-    'Reminder: Meeting at 3 PM',
-  ]);
+  const [notifications, setNotifications] = useState<any[]>([]);
   const navigate = useNavigate();
-
+const userstate=useAppSelector(s=>s.user)
   useEffect(() => {
 
     // Listen for notification updates
     socket.on('notificationUpdate', (newNotification) => {
-      setNotifications((prevNotifications) => [...prevNotifications, newNotification.message]);
+      setNotifications((prevNotifications) => [newNotification.message,...prevNotifications, ]);
       console.log('New notification received:', newNotification);
     });
 
@@ -56,6 +54,22 @@ const NavBar: React.FC = () => {
       socket.off('notificationUpdate');
     };
   }, []);
+useEffect(()=>{
+  const fetchnotification=async()=>{
+    try{
+      const notification=await getAllNotification(userstate.currentUser.user.id)
+      console.log('notification data',notification)
+      setNotifications(notification);
+    }
+    catch(err){
+console.log('error in notfctn',err)
+    }
+   
+  }
+  fetchnotification();
+
+},[])
+
 
   const handleChatClick = () => {
     navigate('/chatroom');

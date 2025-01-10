@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Post, PostProps } from './Post';
-import { fetchAllPosts } from '../../services/api';
+import { fetchAllPosts, fetchAllPostsOfUser } from '../../services/api';
 import { useCommunityContext } from '../../context/communityContext';
+import { useAppSelector } from '../../hooks/reduxStoreHook';
+import { Box, Typography } from '@mui/material';
 
-export default function PostList() {
+export default function PostList({isUser=false}) {
   const [posts, setPosts] = useState<PostProps['post'][]>([]);
   const { updateMediaPosts } = useCommunityContext();
-
+  const userState = useAppSelector((state) => state.user);
+    const id = userState.currentUser.user.id;
 
   useEffect(() => {
     const loadPosts = async () => {
@@ -18,8 +21,16 @@ export default function PostList() {
         console.error('Error fetching posts:', error);
       }
     };
-
-    loadPosts();
+    const loadPostsOfUser = async () => {
+      try {
+        const fetchedPosts = await fetchAllPostsOfUser(id);
+        setPosts(fetchedPosts);
+        updateMediaPosts(fetchedPosts)
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+      }
+    };
+    isUser?loadPostsOfUser():loadPosts();
   }, []);
   const handlePostUpdate = (updatedPost: PostProps['post']) => {
     setPosts(currentPosts => 
@@ -31,9 +42,25 @@ export default function PostList() {
   };
   return (
     <div className="space-y-4 max-h-0.5 px-1 ">
-      {posts.map((post) => (
+      {posts.length > 0 ? (
+      posts.map((post) => (
         <Post key={post._id} post={post} onPostUpdate={handlePostUpdate} />
-      ))}
+      ))
+    ) : (
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          height: '200px', 
+          border: '1px solid #DEDEDE',
+          borderRadius: 2,
+          p: 2
+        }}
+      >
+        <Typography variant="body1">No posts available</Typography>
+      </Box>
+    )}
     </div>
   );
 }

@@ -120,11 +120,30 @@ export class MongoUserRepository implements UserRepository {
   }
   
   async deleteUser(id: string): Promise<void> {
-    const result = await UserModel.findByIdAndDelete(id).exec();
-    if (!result) {
-      throw new Error('User not found');
-    }
+    const session = await mongoose.startSession();
+    session.startTransaction();
+  
+    try {
+      // Step 1: Find and delete the user
+      const user = await UserModel.findByIdAndDelete(id).session(session).exec();
+      if (!user) {
+        throw new Error('User not found');
+      }
+  
+      // Step 2: Update the apartment's isFilled status to false if the user has an apartment
+      if (user.apartmentId) {
+        await this.apartmentService.markFilled(user.apartmentId.toString(),false);
+      }
+  
+      await session.commitTransaction();
+      session.endSession();
+    } catch (error) {
+      // Rollback the transaction in case of error
+      await session.abortTransaction();
+      throw error;
+    } 
   }
+  
   async getUserCount():Promise<number>{
     const [totalUsers, aggregateResult] = await Promise.all([
       UserModel.countDocuments().exec(),

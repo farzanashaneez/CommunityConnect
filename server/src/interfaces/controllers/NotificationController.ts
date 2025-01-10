@@ -20,7 +20,7 @@ export class NotificationController {
   async getNotificationById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
-      const notification = await this.notificationUseCase.getNotificationById(id);
+      const notification = await this.notificationUseCase.getNotificationByFilter(id);
       if (notification) {
         res.json(notification);
       } else {
@@ -63,8 +63,8 @@ export class NotificationController {
 
   async getNotificationsByUserId(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { userId } = req.params;
-      const notifications = await this.notificationUseCase.getNotificationsByUserId(userId);
+      const { id } = req.params;
+      const notifications = await this.notificationUseCase.getNotificationsByUserId(id);
       res.json(notifications);
     } catch (error: any) {
       res.status(400).json({ message: 'Error fetching notifications', error: error?.message });
