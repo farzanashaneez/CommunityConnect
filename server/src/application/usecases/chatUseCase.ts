@@ -6,7 +6,7 @@ import { ChatRepository } from "../interfaces/ChatRepository";
 export class ChatUseCase {
   constructor(private chatRepository: ChatRepository) {}
 
-  async createChat(data: object,type:string): Promise<Chat> {
+  async createChat(data: object,type:string): Promise<Chat | null> {
     return this.chatRepository.createChat(data,type);
   }
 
@@ -14,10 +14,11 @@ export class ChatUseCase {
     return this.chatRepository.getChatById(id);
   }
 
-  async addMessage(chatId: string, senderId: string, content: string): Promise<Chat> {
+  async addMessage(chatId: string, senderId: string, content: string,status:"sending" | "sent" | "delivered" | "read" ): Promise<Chat> {
     const message: Partial<Message> = {
       senderId,
       content,
+      status:'sent',
       createdAt: new Date()
     };
     return this.chatRepository.addMessage(chatId, message);

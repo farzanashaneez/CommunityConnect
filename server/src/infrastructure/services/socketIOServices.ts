@@ -2,6 +2,9 @@
 
 import { Server as SocketIOServer, Socket } from "socket.io";
 
+interface CustomSocket extends Socket {
+  userId?: string;
+}
 let io: SocketIOServer;
 const chatSocketMap = new Map<string, Set<string>>(); // chatId -> Set of socketIds
 const userSocketMap = new Map<string, string>(); // userId -> socketId
@@ -58,26 +61,55 @@ export const initializeSocket = (server: any) => {
       sendTypingStatusToChat(chatId, userId, isTyping);
     });
 
-    socket.on("userConnected", (userId: string) => {
-      onlineUsers.set(userId, true);
-      userSocketMap.set(userId, socket.id);
-      broadcastOnlineStatus();
-    });
+    // socket.on("userConnected", (userId: string) => {
+    //   onlineUsers.set(userId, true);
+    //   userSocketMap.set(userId, socket.id);
+    //   broadcastOnlineStatus();
+    // });
 
     // Handling user disconnection
+    // socket.on("disconnect", () => {
+    //   // Remove socketId from all chat rooms it was part of
+    //   for (let [chatId, socketIds] of chatSocketMap) {
+    //     socketIds.delete(socket.id);
+    //   }
+    //   for (let [userId, socketId] of userSocketMap) {
+    //     if (socketId === socket.id) {
+    //       onlineUsers.set(userId, false);
+    //       userSocketMap.delete(userId);
+    //       io.emit("userStatusChanged", { userId, isOnline: false });
+    //       break;
+    //     }
+    //   }
+    // });
+
+    socket.on("userConnected", ({ userId }: { userId: string }) => {
+      onlineUsers.set(userId, true);
+      userSocketMap.set(userId, socket.id);
+      (socket as CustomSocket).userId = userId;
+      debounce(broadcastOnlineStatus, 1000)();
+    });
+    socket.on("beoffline", ({ userId }: { userId: string }) => {
+      onlineUsers.set(userId, false);
+     
+    });
+
     socket.on("disconnect", () => {
-      // Remove socketId from all chat rooms it was part of
-      for (let [chatId, socketIds] of chatSocketMap) {
-        socketIds.delete(socket.id);
+      if ((socket as CustomSocket).userId) {
+        onlineUsers.set((socket as CustomSocket).userId!, false);
+        userSocketMap.delete((socket as CustomSocket).userId!);
+        io.emit("userStatusChanged", { userId: (socket as CustomSocket).userId, isOnline: false });
       }
-      for (let [userId, socketId] of userSocketMap) {
-        if (socketId === socket.id) {
-          onlineUsers.set(userId, false);
-          userSocketMap.delete(userId);
-          io.emit("userStatusChanged", { userId, isOnline: false });
-          break;
-        }
-      }
+       // Remove socketId from all chat rooms it was part of
+  for (let [chatId, socketIds] of chatSocketMap) {
+    socketIds.delete(socket.id);
+    if (socketIds.size === 0) {
+      chatSocketMap.delete(chatId);
+    }
+  }
+
+  // Broadcast updated online status
+  broadcastOnlineStatus();
     });
   });
 };
@@ -122,3 +154,10 @@ export const emitNotificationUpdate = (notificationData:object) => {
 export const emitNotificationUpdatetoId = (requesterId:string,notificationData:object) => {
   io.to(requesterId).emit("notificationUpdate", notificationData); // Notify all clients about the new/updated notification
 };
+function debounce(func: Function, delay: number) {
+  let timeoutId: NodeJS.Timeout;
+  return (...args: any[]) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => func(...args), delay);
+  };
+}

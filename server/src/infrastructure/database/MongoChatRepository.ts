@@ -33,7 +33,7 @@ export class MongoChatRepository implements ChatRepository {
       createdBy: string;
     },
     type: string
-  ): Promise<Chat> {
+  ): Promise<Chat | null> {
     console.log("data#####=============", data);
     let newChat;
     const { participants, createdBy } = data;
@@ -52,7 +52,23 @@ export class MongoChatRepository implements ChatRepository {
       });
     }
 
-    return newChat.save();
+  const savedChat = await newChat.save();
+
+  return ChatModel.findById(savedChat._id)
+  .populate({
+    path: "participants",
+    select: "imageUrl firstName apartmentId email",
+    populate: {
+      path: "apartmentId", // Path to populate within participants
+      select: "apartmentNumber buildingSection", // Fields to include from the Apartment model
+    },
+  })
+    .populate({
+      path: "messages",
+      select: "senderId content createdAt",
+    })
+    .exec();
+
   }
 
   async getChatById(id: string): Promise<Chat | null> {
@@ -68,6 +84,14 @@ export class MongoChatRepository implements ChatRepository {
       isgroup: false,
       participants: { $all: [sender, receiver] },
       $expr: { $eq: [{ $size: "$participants" }, 2] }
+    })
+    .populate({
+      path: "participants",
+      select: "imageUrl firstName apartmentId email",
+      populate: {
+        path: "apartmentId", // Path to populate within participants
+        select: "apartmentNumber buildingSection", // Fields to include from the Apartment model
+      },
     })
       .populate({
         path: "messages",
@@ -111,6 +135,7 @@ export class MongoChatRepository implements ChatRepository {
         select: "content senderId",
         options: { sort: { createdAt: -1 }, limit: 1 }, // Fetch only the last message
       })
+      .sort({createdAt:-1})
       .exec();
   }
 

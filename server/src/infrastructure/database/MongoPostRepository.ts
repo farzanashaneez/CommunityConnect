@@ -78,8 +78,9 @@ export class MongoPostRepository implements PostRepository {
   }
 
   async getPostsByUser(UserId: string): Promise<Post[]> {
-    
-    const posts = await PostModel.find({ author: new mongoose.Types.ObjectId(UserId) });
+    const posts = await PostModel.find({
+      author: new mongoose.Types.ObjectId(UserId),
+    });
     return posts.map((post) => post.toObject());
   }
 
@@ -171,11 +172,12 @@ export class MongoPostRepository implements PostRepository {
           );
         }
 
-        await ChatServices.addMessage(chat._id, {
+      if(chat){  await ChatServices.addMessage(chat._id, {
           senderId: sharedby,
           content: shareMessage,
           status: "sent",
         });
+      }
 
         // socketService.emitToUser(recipientId, 'newMessage', { chatId: chat._id, message: shareMessage });
       }
@@ -189,10 +191,6 @@ export class MongoPostRepository implements PostRepository {
     }
   }
   async findRecent(count: number): Promise<Post[]> {
-    return PostModel.find()
-      .sort({ createdAt: -1 })
-      .limit(count)
-      .exec();
+    return PostModel.find().sort({ createdAt: -1 }).limit(count).exec();
   }
-  
 }

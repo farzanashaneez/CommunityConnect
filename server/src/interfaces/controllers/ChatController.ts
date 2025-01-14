@@ -37,8 +37,8 @@ export class ChatController {
   async addMessage(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
-      const { senderId, content } = req.body;
-      const updatedChat = await this.chatUseCase.addMessage(id, senderId, content);
+      const { senderId, content,status } = req.body;
+      const updatedChat = await this.chatUseCase.addMessage(id, senderId, content,status);
 
       const io = getIO();
        io.emit("receiveMessage", { senderId, content });

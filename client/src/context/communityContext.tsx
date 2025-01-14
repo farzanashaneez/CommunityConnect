@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import CustomSnackbar from "../components/customSnackbar";
 import { socket } from "../services/socketConnection";
-import { ServiceRequest } from "../interfaces/communityInterfaces";
 import { PostProps } from "../components/postComponents/Post";
 
 // Define the types for the context
