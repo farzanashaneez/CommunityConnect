@@ -11,7 +11,7 @@ const userSocketMap = new Map<string, string>(); // userId -> socketId
 const onlineUsers = new Map<string, boolean>(); // userId -> online status
 
 
-export const initializeSocket = (server: any) => {
+ const initializeSocket = (server: any) => {
   io = new SocketIOServer(server, {
     cors: {
       origin:"http://localhost:5173", // Replace with frontend URL in production
@@ -120,13 +120,13 @@ const broadcastOnlineStatus = () => {
   io.emit("onlineStatusUpdate", onlineStatus);
 };
 
-export const getIO = () => {
+ const getIO = () => {
   if (!io) throw new Error("Socket.IO not initialized!");
   return io;
 };
 
 
-export const sendMessageToChat = (chatId: string, message: string) => {
+ const sendMessageToChat = (chatId: string, message: string) => {
   const socketIds = chatSocketMap.get(chatId);
   if (socketIds) {
     socketIds.forEach(socketId => {
@@ -135,7 +135,7 @@ export const sendMessageToChat = (chatId: string, message: string) => {
   }
 };
 
-export const sendTypingStatusToChat = (chatId: string, userId: string, isTyping: boolean) => {
+ const sendTypingStatusToChat = (chatId: string, userId: string, isTyping: boolean) => {
   const socketIds = chatSocketMap.get(chatId);
   console.log("userId",chatSocketMap)
 
@@ -148,10 +148,10 @@ export const sendTypingStatusToChat = (chatId: string, userId: string, isTyping:
   }
 };
 
-export const emitNotificationUpdate = (notificationData:object) => {
+ const emitNotificationUpdate = (notificationData:object) => {
   io.emit("notificationUpdate", notificationData); // Notify all clients about the new/updated notification
 };
-export const emitNotificationUpdatetoId = (requesterId:string,notificationData:object) => {
+ const emitNotificationUpdatetoId = (requesterId:string,notificationData:object) => {
   io.to(requesterId).emit("notificationUpdate", notificationData); // Notify all clients about the new/updated notification
 };
 function debounce(func: Function, delay: number) {

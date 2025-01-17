@@ -28,5 +28,5 @@ router.put('/markservicecompleted/:id', (req, res,next) => serviceController.mar
 router.post('/requestservice/:id', (req, res,next) => serviceController.requestLocalService(req, res,next));
 router.get('/getallservicerequest/:status', (req, res,next) => serviceController.getAllServiceRequst(req, res,next));
 
-
+router.post('/contact-service-provider',(req,res,next)=>serviceController.contactserviceProvider(req,res,next))
 export default router;

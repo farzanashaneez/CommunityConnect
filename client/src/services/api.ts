@@ -129,6 +129,15 @@ export const requestService=async(id:string,reqObj:object)=>{
   const response=await api.post(`${API_URL}/services/requestservice/${id}`,reqObj);
   return response.data;
 }
+export const contactServiceProvider=async( serviceData: any,
+  provider: string,
+  requestby: string,
+  shareMessage: string)=>{
+    console.log("id===>req Object",serviceData,provider,requestby,shareMessage)
+    const response=await api.post(`${API_URL}/services/contact-service-provider`,{serviceData,provider,requestby,shareMessage});
+    return response.data;
+  }
+
 export const markAsCompleted=async(id:string)=>{
   console.log("id===>req Object",id)
   const response=await api.put(`${API_URL}/services/markservicecompleted/${id}`);
@@ -201,7 +210,10 @@ export const sendMessageApi = async (chatId: string, message: { senderId: string
   const response = await api.post(`${API_URL}/chats/${chatId}/message`, message);
   return response.data;
 };
-
+export const updateMessageStatus = async (chatId: string, messageIds: string[],status:string) => {
+  const response = await api.put(`${API_URL}/chats/${chatId}/update-message-status`, {messageIds,status});
+  return response.data;
+};
 // Get all chats for a user
 export const getChatsForUserApi = async (userId: string,query:string) => {
   const response = await api.get(`${API_URL}/chats/user/${userId}/${query}`);

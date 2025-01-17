@@ -1,3 +1,4 @@
+import { Chat } from "../../domain/entities/Chat";
 import { Service,ServiceRequest } from "../../domain/entities/Service";
 
 export interface ServiceRepository {
@@ -15,4 +16,11 @@ export interface ServiceRepository {
   getServicesByCategory(category: string): Promise<Service[]>;
   getServicesByType(type: 'local' | 'residential'): Promise<Service[]>;
   getServicesByStatus(status:string,type:string): Promise<Service[]>;
+
+  contactServiceProvider(
+    serviceData: Service,
+    provider: string,
+    requestby: string,
+    shareMessage: string
+  ): Promise<Chat | null>;
 }

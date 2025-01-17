@@ -4,11 +4,15 @@ import AnnouncementCard from "./AnnouncementCard";
 import { fetchAllAnnouncements } from "../services/api";
 import { AnnouncementListProps ,Announcement} from "./communityInterfaces";
 import { useCommunityContext } from "../context/communityContext";
+import { socket } from "../services/socketConnection";
+
 
 const AnnouncementList: React.FC<AnnouncementListProps> = ({isAdmin=false,searchTerm='',update}) => {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
   const { completed, setCompleted } = useCommunityContext();
+  const [updatelist, setUpdatelist] = useState(0);
+
 
   useEffect(() => {
     const fetchAnnouncements = async () => {
@@ -21,10 +25,24 @@ const AnnouncementList: React.FC<AnnouncementListProps> = ({isAdmin=false,search
       } finally {
         setLoading(false);
       }
+
     };
 
     fetchAnnouncements();
-  }, [completed]);
+    socket.on("reload", (data) => {
+      console.log("reload event recieved")
+      setUpdatelist((p) => p + 1);
+
+      if (data === "announcement") {
+        setUpdatelist((p) => p + 1);
+      }
+    });
+    return (()=>{
+      socket.off("reload");
+
+    })
+  }, [completed,updatelist]);
+
 
   if (loading) {
     return <div>Loading...</div>;

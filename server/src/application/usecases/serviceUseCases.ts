@@ -1,5 +1,6 @@
 // src/application/useCases/ServiceUseCase.ts
 
+import { Chat } from "../../domain/entities/Chat";
 import { Service,ServiceRequest } from "../../domain/entities/Service";
 import { ServiceRepository } from "../interfaces/ServiceRepository";
 
@@ -60,4 +61,13 @@ async grantservice(id: string, update:string): Promise<Service> {
   async getServicesByStatus(status:string,type:string): Promise<Service[]> {
     return this.serviceRepository.getServicesByStatus(status,type);
   }
+
+async contactServiceProvider(
+  serviceData: Service,
+  provider: string,
+  requestby: string,
+  shareMessage: string
+): Promise<Chat | null> {
+return this.serviceRepository.contactServiceProvider(serviceData,provider,requestby,shareMessage)
+}
 }

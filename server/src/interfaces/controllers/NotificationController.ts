@@ -1,7 +1,8 @@
 // src/infrastructure/controllers/NotificationController.ts
 import { NextFunction, Request, Response } from 'express';
 import { NotificationUseCase } from '../../application/usecases/NotificationUseCase';
-import { emitNotificationUpdate } from '../../infrastructure/services/socketIOServices';
+import { getIO } from '../../infrastructure/services/socket';
+//import { emitNotificationUpdate } from '../../infrastructure/services/socketIOServices';
 
 export class NotificationController {
   constructor(private notificationUseCase: NotificationUseCase) {}
@@ -10,7 +11,11 @@ export class NotificationController {
     try {
       const notificationData = req.body;
       const newNotification = await this.notificationUseCase.createNotification(notificationData);
-      emitNotificationUpdate(newNotification);
+     // emitNotificationUpdate(newNotification);
+     
+     const io=getIO();
+     io.emit("notificationUpdate", newNotification); // Notify all clients about the new/updated notification
+
       res.status(201).json(newNotification);
     } catch (error: any) {
       res.status(400).json({ message: 'Error creating notification', error: error?.message });

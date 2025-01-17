@@ -1,5 +1,6 @@
 export interface Service {
     id?: string;
+    _id:string;
     name: string;
     type: 'local' | 'residential';
     price: number;

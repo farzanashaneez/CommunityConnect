@@ -6,6 +6,7 @@ interface CommentListProps {
     user: {
       name: string
       image: string
+      _id:string
     }
     text: string
     likes: number

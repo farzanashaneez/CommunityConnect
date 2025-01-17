@@ -1,20 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { Post, PostProps } from './Post';
 import { fetchAllPosts, fetchAllPostsOfUser } from '../../services/api';
 import { useCommunityContext } from '../../context/communityContext';
-import { useAppSelector } from '../../hooks/reduxStoreHook';
 import { Box, Typography } from '@mui/material';
 
-export default function PostList({isUser=false}) {
+export default function PostList({isUser=false,userid=''}) {
   const [posts, setPosts] = useState<PostProps['post'][]>([]);
-  const { updateMediaPosts } = useCommunityContext();
-  const userState = useAppSelector((state) => state.user);
-    const id = userState.currentUser.user.id;
+  const { updateMediaPosts,postUpdated } = useCommunityContext();
+  //const userState = useAppSelector((state) => state.user);
+   // const id = userState.currentUser.user.id;
 
   useEffect(() => {
     const loadPosts = async () => {
       try {
         const fetchedPosts = await fetchAllPosts();
+        console.log("posts",fetchedPosts)
         setPosts(fetchedPosts);
         updateMediaPosts(fetchedPosts)
       } catch (error) {
@@ -23,7 +23,7 @@ export default function PostList({isUser=false}) {
     };
     const loadPostsOfUser = async () => {
       try {
-        const fetchedPosts = await fetchAllPostsOfUser(id);
+        const fetchedPosts = await fetchAllPostsOfUser(userid);
         setPosts(fetchedPosts);
         updateMediaPosts(fetchedPosts)
       } catch (error) {
@@ -31,7 +31,7 @@ export default function PostList({isUser=false}) {
       }
     };
     isUser?loadPostsOfUser():loadPosts();
-  }, []);
+  }, [postUpdated]);
   const handlePostUpdate = (updatedPost: PostProps['post']) => {
     setPosts(currentPosts => 
       currentPosts.map(post => 

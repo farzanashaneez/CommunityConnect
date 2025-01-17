@@ -2,7 +2,8 @@ import { NextFunction, Request, Response } from 'express';
 import { EventUseCase } from '../../application/usecases/eventUseCase';
 import { CustomRequest } from '../../infrastructure/middlewares/uploadImageToCloudinary';
 import notificationServices from '../../application/services/notificationServices';
-import { emitNotificationUpdate } from '../../infrastructure/services/socketIOServices';
+import { getIO } from '../../infrastructure/services/socket';
+//import { emitNotificationUpdate } from '../../infrastructure/services/socketIOServices';
 
 export class EventController {
   constructor(private eventUseCase: EventUseCase) {}
@@ -22,7 +23,10 @@ export class EventController {
       Promise.resolve().then(async () => {
       const notificationMessage = `New event created: ${newEvent.name}`;
       await notificationServices.createNotification(notificationMessage, [], true); // Send to all users
-      emitNotificationUpdate({ message: notificationMessage });
+     // emitNotificationUpdate({ message: notificationMessage });
+      const io=getIO();
+      io.emit("notificationUpdate", notificationMessage); // Notify all clients about the new/updated notification
+ 
       })
       
       res.status(201).json(newEvent);

@@ -14,7 +14,7 @@ const PostSchema = Yup.object().shape({
 
 export default function NewPostBox() {
   const userState=useAppSelector(state=>state.user)
-  const {addedPost}=useCommunityContext();
+  const {addedPost,setPostUpdated}=useCommunityContext();
   return (
     <Paper elevation={3} className="p-4">
       <Formik
@@ -32,6 +32,7 @@ export default function NewPostBox() {
           
             await createPost(formData);
             addedPost(true);
+            setPostUpdated(true)
             resetForm();
           } catch (error) {
             console.error('Error creating post:', error);

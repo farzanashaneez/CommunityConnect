@@ -7,7 +7,9 @@ const announcementSchema = new Schema<Announcement>({
   description: { type: String, required: true },
   announcementtype:{ type: String,enum:["general","urgent"],default:"general"},
   date: { type: Date, default: Date.now },
-  imageUrl:{ type:String}
+  imageUrl:{ type:String},
+  createdAt: { type: Date, default: Date.now },
+
 });
 
 
@@ -39,7 +41,7 @@ export class MongoAnnouncementRepository implements AnnouncementRepository {
   }
 
   async getAllAnnouncements(): Promise<Announcement[]> {
-    return AnnouncementModel.find().exec();
+    return AnnouncementModel.find().sort({createdAt:-1}).exec();
   }
 
   async getAnnouncementsByStatus(status: 'active' | 'inactive'): Promise<Announcement[]> {

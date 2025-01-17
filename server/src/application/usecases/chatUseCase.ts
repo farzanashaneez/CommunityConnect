@@ -14,7 +14,7 @@ export class ChatUseCase {
     return this.chatRepository.getChatById(id);
   }
 
-  async addMessage(chatId: string, senderId: string, content: string,status:"sending" | "sent" | "delivered" | "read" ): Promise<Chat> {
+  async addMessage(chatId: string, senderId: string, content: string,status:"sending" | "sent" | "delivered" | "read" ): Promise<Message> {
     const message: Partial<Message> = {
       senderId,
       content,
@@ -23,7 +23,9 @@ export class ChatUseCase {
     };
     return this.chatRepository.addMessage(chatId, message);
   }
-
+async updateMessageStatus(messageids:string[],status:string):Promise<any>{
+  return this.chatRepository.updateMessageStatus(messageids,status);
+}
   async getChatsForUser(userId: string,query:string): Promise<Chat[]> {
     return this.chatRepository.getChatsForUser(userId,query);
   }

@@ -5,11 +5,14 @@ import EditIcon from '@mui/icons-material/Edit';
 import { fetchUserDetails, addMember, updateName, addProfileImage } from '../../services/api';
 import { useAppSelector } from '../../hooks/reduxStoreHook';
 import ImageCropper from '../../components/ImageCropper';
-import { Formik } from 'formik';
 import PostList from '../../components/postComponents/PostList';
 import ServiceList from '../../components/ServiceList';
-import UserServices from '../../components/home/userServices';
-import { Bold } from 'lucide-react';
+import UserServices from '../../components/home/UserServices';
+import Logout from '@mui/icons-material/Logout';
+import { useNavigate } from 'react-router-dom';
+import ConfirmationDialog from '../../components/ConfirmationDialogue';
+import { store } from '../../redux-store/store';
+import { signoutSuccess } from '../../redux-store/user/userSlice';
 
 const UserProfile: React.FC = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -28,6 +31,9 @@ const UserProfile: React.FC = () => {
   const [openCropper, setOpenCropper] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
+
+  const navigate = useNavigate();
+  const [open,setOpen]=useState(false)
 
   const handleAddClick = () => {
     setOpenCropper(true);
@@ -115,6 +121,15 @@ const UserProfile: React.FC = () => {
       console.error('Error updating name:', error);
     }
   };
+  const handleLogout = () => {
+    setOpen(true)
+
+  };
+  const logoutconfirm=()=>{
+    store.dispatch((signoutSuccess())) ;
+
+    navigate('/login');
+  }
 
   return (
     <Box sx={{ width: '100%', margin: 'auto', mt: 0, padding: '5px' }}>
@@ -221,6 +236,7 @@ const UserProfile: React.FC = () => {
               <Typography variant="body2">No members found.</Typography>
             )}
           </Box>
+          <Button onClick={handleLogout}><Logout/></Button>
         </Box>
 
 
@@ -233,7 +249,7 @@ const UserProfile: React.FC = () => {
       <Grid container spacing={2} direction={{ xs: 'column-reverse', md: 'row' }}>
   <Grid item xs={12} sm={9}>
     <Typography variant="h5" fontWeight='bold' gutterBottom>My Posts</Typography>
-    <PostList isUser={true}/>
+    <PostList isUser={true} userid={id}/>
   </Grid>
   <Grid item xs={12} sm={2} >
     <Typography variant="h5" fontWeight='bold' gutterBottom>My Services</Typography>
@@ -397,6 +413,13 @@ const UserProfile: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      <ConfirmationDialog
+        open={open}
+        onClose={()=>{setOpen(false)}}
+        onConfirm={()=>{logoutconfirm()}}
+        title="loggout..!"
+        message="Do you want to continue?"
+      />
     </Box>
   );
 };

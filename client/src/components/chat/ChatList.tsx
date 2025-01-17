@@ -5,7 +5,8 @@ import {
   ListItemText, 
   Avatar, 
   ListItemButton,
-  Box
+  Box,
+  Typography
 } from '@mui/material';
 import { socket } from '../../services/socketConnection';
 import { useAppSelector } from '../../hooks/reduxStoreHook';
@@ -23,14 +24,17 @@ interface ChatListProps {
   onSelectChat: (chat: Chat) => void;
   isMobile: boolean;
   onDrawerClose?: () => void;
+
   isgroup?:boolean
 }
 
 const ChatList: React.FC<ChatListProps> = ({ chats, selectedChat, onSelectChat, isMobile, onDrawerClose, isgroup = true }) => {
-  const [onlineUsers, setOnlineUsers] = useState<{ userId: string }[]>([]);
+  const [onlineUsers, setOnlineUsers] = useState<[userId:string, isOnline:boolean][]>([]);
+
   const userState = useAppSelector((state) => state.user);
   const id = userState.currentUser.user.id;
   useEffect(() => {
+    console.log('chatlist',chats)
     socket.on("onlineStatusUpdate", (onlineStatus) => {
       setOnlineUsers(onlineStatus);
       console.log("Online users ", onlineStatus);
@@ -39,7 +43,7 @@ const ChatList: React.FC<ChatListProps> = ({ chats, selectedChat, onSelectChat, 
     return () => {
       socket.off("onlineStatusUpdate");
     };
-  }, []);
+  }, [chats,onlineUsers]);
 
 //   const isUserOnline = (selectedChat: any) => {
 // console.log(selectedChat,",,,,,,,",onlineUsers)
@@ -79,9 +83,12 @@ const ChatList: React.FC<ChatListProps> = ({ chats, selectedChat, onSelectChat, 
                 ? <img src={chat.participants[0].imageUrl} alt="avatar" style={{ width: '100%', height: '100%' }} />
                 : chat.participants[0]?.firstname?.charAt(0) || 'N/A'}
             </Avatar>
-            {onlineUsers.some(
-                (user) => user.userId === selectedChat?.participants[0]?._id || user.userId === selectedChat?.participants[1]?._id && user.userId !== id
-              ) && (
+            {!isgroup && onlineUsers.some(
+  ([userId, isOnline]) => 
+    isOnline && 
+    (userId === chat?.participants[0]?._id || userId === chat?.participants[1]?._id) &&
+    userId !== id
+) && (
               <FiberManualRecordIcon 
                 sx={{ 
                   position: 'absolute', 
@@ -93,14 +100,25 @@ const ChatList: React.FC<ChatListProps> = ({ chats, selectedChat, onSelectChat, 
               />
             )}
           </Box>
+          {chat.messages?.[0]?.status==='read'?
           <ListItemText 
             primary={
               isgroup
                 ? (chat.isgroup ? chat.groupName : chat.participants[0]?.firstName || `${chat.participants[1]?.apartmentId.buildingSection}${chat.participants[1]?.apartmentId.apartmentNumber}`)
                 :(chat.participants[0]._id===id? (chat.participants[1]?.firstName || `${chat.participants[1]?.apartmentId.buildingSection}${chat.participants[1]?.apartmentId.apartmentNumber}`): (chat.participants[0]?.firstName || `${chat.participants[0]?.apartmentId.buildingSection}${chat.participants[0]?.apartmentId.apartmentNumber}`))
             }
-            secondary={chat.messages?.[0]?.content ?? "No messages yet"}
-          />
+            secondary={chat.messages?.[0]?.content ? chat.messages?.[0]?.content?.substring(0, 12) + "..." : ""}
+            />
+          :
+          <ListItemText 
+          primary={
+            isgroup
+              ? (chat.isgroup ? chat.groupName : chat.participants[0]?.firstName || `${chat.participants[1]?.apartmentId.buildingSection}${chat.participants[1]?.apartmentId.apartmentNumber}`)
+              :(chat.participants[0]._id===id? (chat.participants[1]?.firstName || `${chat.participants[1]?.apartmentId.buildingSection}${chat.participants[1]?.apartmentId.apartmentNumber}`): (chat.participants[0]?.firstName || `${chat.participants[0]?.apartmentId.buildingSection}${chat.participants[0]?.apartmentId.apartmentNumber}`))
+          }
+          secondary= {<Typography variant="body1" fontWeight="bold">{chat.messages?.[0]?.content ? chat.messages?.[0]?.content?.substring(0, 12) + "..." : ""}</Typography>}
+        />
+}
         </ListItemButton>
       ))}
     </List>

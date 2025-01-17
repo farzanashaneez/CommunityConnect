@@ -1,4 +1,5 @@
 import { ThumbsUp, MoreHorizontal } from 'lucide-react'
+import ProfileLink from '../ProfileLink'
 
 interface CommentProps {
   comment: {
@@ -6,6 +7,7 @@ interface CommentProps {
     user: {
       name: string
       image: string
+      _id:string
     }
     text: string
     likes: number
@@ -24,7 +26,9 @@ export function Comment({ comment }: CommentProps) {
       />
       <div className="flex-grow bg-gray-100 rounded-lg p-2">
         <div className="flex justify-between items-center mb-1">
+        <ProfileLink  id={comment.user._id}>
           <h4 className="font-semibold text-sm">{comment.user.name}</h4>
+          </ProfileLink>
           <button className="text-gray-500 hover:text-gray-700">
             <MoreHorizontal size={16} />
           </button>

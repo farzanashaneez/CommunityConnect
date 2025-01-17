@@ -41,7 +41,7 @@ const NotificationSidebar: React.FC<NavSidebarProps> = ({
       <List>
         {notifications.map((notification, index) => (
           <ListItemButton key={index} onClick={()=>{markAsSeen(notification._id,{seenBy:userState.currentUser.user.id})}}>
-            {notification.seenBy.includes(userState.currentUser.user.id) ? (
+            {notification?.seenBy?.includes(userState.currentUser.user.id) ? (
               <ListItemText primary={notification.message} />
             ) : (
               <ListItemText

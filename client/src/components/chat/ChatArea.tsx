@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import parse from "html-react-parser";
+import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 
 import {
   Box,
@@ -17,8 +18,15 @@ import SendIcon from "@mui/icons-material/Send";
 import DoneIcon from "@mui/icons-material/Done"; // Single tick
 import DoneAllIcon from "@mui/icons-material/DoneAll"; // Double tick
 import AccessTimeIcon from "@mui/icons-material/AccessTime"; // Sending icon
-import { getChatByIdApi, sendMessageApi } from "../../services/api";
+import {
+  deleteChatApi,
+  getChatByIdApi,
+  sendMessageApi,
+  updateMessageStatus,
+} from "../../services/api";
 import { useAppSelector } from "../../hooks/reduxStoreHook";
+import { Delete } from "@mui/icons-material";
+import ConfirmationDialog from "../ConfirmationDialogue";
 
 const socket = io("http://localhost:5000", {
   path: "/socket.io",
@@ -52,6 +60,8 @@ interface ChatAreaProps {
   isTablet: boolean;
   toggleDrawer: () => void;
   toggleDetails: () => void;
+  onUpdateMessage: () => void;
+  ondeleteChat: () => void;
 }
 
 const ChatArea: React.FC<ChatAreaProps> = ({
@@ -60,63 +70,166 @@ const ChatArea: React.FC<ChatAreaProps> = ({
   isTablet,
   toggleDrawer,
   toggleDetails,
+  onUpdateMessage,
+  ondeleteChat,
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState<string>("");
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
-  const [onlineUsers, setOnlineUsers] = useState<{ userId: string }[]>([]);
-
+  const [onlineUsers, setOnlineUsers] = useState<
+    [userId: string, isOnline: boolean][]
+  >([]);
+  const [isMessageRecieved, setIsMessageRecieved] = useState(false);
   const userState = useAppSelector((state) => state.user);
   const id = userState.currentUser.user.id;
+  const [open, setOpen] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const updatemessagestatusHelper = async (
+    unreadMessageIds: string[],
+    status: string
+  ) => {
+    console.log(">>>>>>>>>>", unreadMessageIds);
+
+    try {
+      const response = await updateMessageStatus(
+        selectedChat._id,
+        unreadMessageIds,
+        status
+      );
+    } catch (error) {
+      console.error("Error updating  messages:", error);
+    }
+  };
+
   useEffect(() => {
-    socket.emit("userConnected", { userId: id });
-  }, []);
-  // Connect to socket and fetch messages when selectedChat changes
-  useEffect(() => {
-    console.log("chatarea called",selectedChat)
     if (selectedChat) {
       fetchMessages(selectedChat?._id);
       socket.emit("joinChat", selectedChat?._id);
     }
 
     socket.on("newMessage", (newMessage: Message) => {
-      setMessages((prevMessages) => [...prevMessages, newMessage]);
-      fetchMessages(selectedChat?._id);
+      console.log("--->", newMessage);
+      setMessages((prevMessages) => {
+        if (!prevMessages.some((msg) => msg._id === newMessage._id)) {
+          return [...prevMessages, newMessage];
+        } else return prevMessages;
+      });
+      setIsMessageRecieved(true);
     });
 
     socket.on("userTyping", ({ userId, isTyping }) => {
-      setTypingUsers((prevUsers) => {
-        if (isTyping && !prevUsers.includes(userId) && userId !== id) {
-          return [...prevUsers, userId];
-        } else if (!isTyping) {
-          return prevUsers.filter((u) => u !== userId);
-        }
-        return prevUsers;
-      });
+      if (userId !== id) {
+        // Only update if the typing user is not the current user
+        setTypingUsers((prevUsers) => {
+          if (isTyping && !prevUsers.includes(userId)) {
+            return [...prevUsers, userId];
+          } else if (!isTyping) {
+            return prevUsers.filter((u) => u !== userId);
+          }
+          return prevUsers;
+        });
+      }
     });
+
     socket.on("onlineStatusUpdate", (onlineStatus) => {
       setOnlineUsers(onlineStatus);
       console.log("Online users ", onlineUsers);
     });
+
     return () => {
       socket.off("newMessage");
       socket.off("userTyping");
       socket.off("onlineStatusUpdate");
       socket.emit("leaveChat", selectedChat?._id);
     };
-  }, [selectedChat, onlineUsers]);
+  }, [selectedChat]);
+
   useEffect(() => {
     scrollToBottom();
   }, [messages, selectedChat]);
 
+  useEffect(() => {
+    onUpdateMessage();
+
+    socket.on("messageStatusUpdate", (messageids) => {
+      console.log("messageStatusUpdate called", messageids);
+      setMessages((prevMessages) =>
+        prevMessages.map((message) =>
+          message.status !== "sending"
+            ? { ...message, status: "read" }
+            : message
+        )
+      );
+    });
+    return () => {
+      socket.off("messageStatusUpdate");
+    };
+  }, [messages]);
+  useEffect(() => {
+    if (messages.length > 0 && isMessageRecieved) {
+      console.log("in useefect", messages);
+      const unreadMessageIdsfromsocket = messages
+        .filter(
+          (msg) =>
+            msg.senderId !== id &&
+            msg.status === "sent" &&
+            msg._id.startsWith("socket")
+        )
+        .map((msg) => msg._id);
+
+      if (unreadMessageIdsfromsocket.length > 0) {
+        console.log(
+          "in useefect unreadMessageIds=",
+          selectedChat?._id,
+          unreadMessageIdsfromsocket
+        );
+
+        //  updatemessagestatusHelper(unreadMessageIds);
+        socket.emit("statusUpdatedFromFrontent", {
+          chatid: selectedChat?._id,
+          unreadMessageIds: unreadMessageIdsfromsocket,
+          from: true,
+        });
+      }
+
+      const unreadMessageIds = messages
+        .filter(
+          (msg) =>
+            msg.senderId !== id &&
+            msg.status === "sent" &&
+            !msg._id.startsWith("socket")
+        )
+        .map((msg) => msg._id);
+
+      if (unreadMessageIds.length > 0) {
+        console.log("in useefect unreadMessageIds=", unreadMessageIds);
+
+        updatemessagestatusHelper(unreadMessageIds, "read");
+      }
+      setIsMessageRecieved(false);
+    }
+  }, [messages, isMessageRecieved]);
+
   const fetchMessages = async (chatId: string) => {
     try {
       const response = await getChatByIdApi(chatId);
+      const unreadMessageIds = response.messages
+        .filter(
+          (msg: any) =>
+            msg.senderId !== id &&
+            msg.status !== "read" &&
+            !msg._id.startsWith("socket")
+        )
+        .map((msg: any) => msg._id);
+      console.log("selected chat", selectedChat, unreadMessageIds);
+
+      if (unreadMessageIds.length > 0) {
+        updatemessagestatusHelper(unreadMessageIds, "read");
+      }
       setMessages(response.messages || []);
     } catch (error) {
       console.error("Error fetching messages:", error);
@@ -137,25 +250,28 @@ const ChatArea: React.FC<ChatAreaProps> = ({
 
     setMessages((prevMessages) => [...prevMessages, tempMessage]);
     setInputMessage("");
+    socket.emit("sendMessage", {
+      _id: `socket${tempMessage._id}`,
+      chatId: selectedChat?._id,
+      senderId: id,
+      content: inputMessage,
+      status: "sent",
+      createdAt: new Date(),
+    });
 
     try {
       const response = await sendMessageApi(selectedChat._id, {
         senderId: id,
         content: inputMessage,
-        status: "sending",
+        status: "delivered",
       });
-      // Emit the message to the server via socket
-      socket.emit("sendMessage", {
-        chatId: selectedChat?._id,
-        senderId: id,
-        content: inputMessage,
-      });
-
-      // Update the message status to "sent"
+      //updatemessagestatusHelper([response._id])
+      console.log(messages);
+      onUpdateMessage();
       setMessages((prevMessages) =>
-        prevMessages.map((msg) =>
-          msg._id === tempMessage._id ? { ...msg, status: "sent" } : msg
-        )
+        prevMessages
+          .filter((msg) => msg.status !== "sending")
+          .map((msg) => (msg._id === tempMessage._id ? response : msg))
       );
     } catch (error) {
       console.error("Failed to send message:", error);
@@ -192,6 +308,32 @@ const ChatArea: React.FC<ChatAreaProps> = ({
       });
     }, 2000); // Stop typing after 2 seconds of inactivity
   };
+
+  const handleDeleteChat = async (chatid: string) => {
+    try {
+      deleteChatApi(chatid);
+      console.log("chat deleted");
+      ondeleteChat();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleOpenDialog = () => {
+    setOpen(true);
+  };
+  const handleCloseDialog = () => {
+    setOpen(false);
+  };
+  const handleConfirm = () => {
+    try {
+      handleDeleteChat(selectedChat._id);
+      handleCloseDialog();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
       {/* Header Section */}
@@ -210,63 +352,78 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         )}
 
         {/* Avatar and Heading */}
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Avatar sx={{ mr: 2 }}>
-            {selectedChat?.participants[0]?.imageUrl ? (
-              <img
-                src={selectedChat.participants[0].imageUrl}
-                alt="avatar"
-                style={{ width: "100%", height: "100%" }}
-              />
-            ) : (
-              (selectedChat?.participants[0]?._id===id && !selectedChat?.isgroup) ? selectedChat?.participants[1]?.firstName?.charAt(0) : selectedChat?.participants[0]?.firstName?.charAt(0) 
-            )}
-          </Avatar>
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Avatar sx={{ mr: 2 }}>
+              {selectedChat?.participants[0]?.imageUrl ? (
+                <img
+                  src={selectedChat.participants[0].imageUrl}
+                  alt="avatar"
+                  style={{ width: "100%", height: "100%" }}
+                />
+              ) : selectedChat?.participants[0]?._id === id &&
+                !selectedChat?.isgroup ? (
+                selectedChat?.participants[1]?.firstName?.charAt(0)
+              ) : (
+                selectedChat?.participants[0]?.firstName?.charAt(0)
+              )}
+            </Avatar>
 
-          <Typography variant="h6">
-            {selectedChat?.isgroup
-              ?
-               selectedChat.groupName
-              : ( 
-                selectedChat?.participants[0]?._id===id ? 
-                selectedChat?.participants[1]?.firstName ||
-                `${
-                  selectedChat?.participants[1]?.apartmentId?.buildingSection ||
-                  ""
-                } ${
-                  selectedChat?.participants[1]?.apartmentId?.apartmentNumber ||
-                  ""
-                }` 
-                :
-                selectedChat?.participants[0]?.firstName ||
-                `${
-                  selectedChat?.participants[1]?.apartmentId?.buildingSection ||
-                  ""
-                } ${
-                  selectedChat?.participants[1]?.apartmentId?.apartmentNumber ||
-                  ""
-                }`
-                 )}
-          </Typography>
-
-          {!selectedChat?.isgroup && (
-            <Typography
-              variant="caption"
-              color={
-                onlineUsers.some(
-                  (user) => user.userId === selectedChat?.participants[0]?._id
-                )
-                  ? "green"
-                  : "gray"
-              }
-            >
-              {onlineUsers.some(
-                (user) => user.userId === selectedChat?.participants[0]?._id
-              )
-                ? "Online"
-                : "Offline"}
+            <Typography variant="h6">
+              {selectedChat?.isgroup
+                ? selectedChat.groupName
+                : selectedChat?.participants[0]?._id === id
+                ? selectedChat?.participants[1]?.firstName ||
+                  `${
+                    selectedChat?.participants[1]?.apartmentId
+                      ?.buildingSection || ""
+                  } ${
+                    selectedChat?.participants[1]?.apartmentId
+                      ?.apartmentNumber || ""
+                  }`
+                : selectedChat?.participants[0]?.firstName ||
+                  `${
+                    selectedChat?.participants[1]?.apartmentId
+                      ?.buildingSection || ""
+                  } ${
+                    selectedChat?.participants[1]?.apartmentId
+                      ?.apartmentNumber || ""
+                  }`}
             </Typography>
-          )}
+
+            {onlineUsers.some(
+              ([userId, isOnline]) =>
+                isOnline &&
+                (userId === selectedChat?.participants[0]?._id ||
+                  userId === selectedChat?.participants[1]?._id) &&
+                userId !== id
+            ) && (
+              <FiberManualRecordIcon
+                sx={{
+                  position: "relative",
+                  bottom: 0,
+                  right: 0,
+                  marginLeft:'5px',
+                  color: "green",
+                  fontSize: 18,
+                }}
+              />
+            )}
+          </Box>
+          <Button
+            onClick={() => {
+              handleOpenDialog();
+            }}
+          >
+            <Delete />
+          </Button>
         </Box>
 
         {isTablet && selectedChat && (
@@ -311,21 +468,13 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                   })()}
                 </Typography>
               )}
-
+              <Typography variant="body1">{message?.content}</Typography>
+              {/* Message Time */}
               <Typography
-                variant="body1"
-                sx={{
-                  "& a": {
-                    color: "#1976d2",
-                    "&:hover": {
-                      color: "#1565c0",
-                    },
-                  },
-                }}
+                variant="caption"
+                sx={{ ml: 1, color: "text.secondary" }}
               >
-                {/* {parse(message?.content)} */}
-                                {message?.content}
-
+                {formatMessageTime(message.createdAt)}
               </Typography>
               {/* Message Status Icons */}
               {message.senderId === id && (
@@ -333,7 +482,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                   sx={{ display: "flex", justifyContent: "flex-end", mt: 0.5 }}
                 >
                   {message.status === "sending" && (
-                             <AccessTimeIcon fontSize="small" />
+                    <AccessTimeIcon fontSize="small" />
                   )}
                   {message.status === "sent" && <DoneIcon fontSize="small" />}
                   {message.status === "delivered" && (
@@ -398,8 +547,23 @@ const ChatArea: React.FC<ChatAreaProps> = ({
           <SendIcon />
         </Button>
       </Paper>
+      <ConfirmationDialog
+        open={open}
+        onClose={handleCloseDialog}
+        onConfirm={handleConfirm}
+        title="Confirm Delete"
+        message="Are you sure you want to delete this chat?"
+        confirmText="Yes"
+        cancelText="No"
+      />
     </Box>
   );
 };
 
 export default ChatArea;
+const formatMessageTime = (date: Date) => {
+  return new Date(date).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};

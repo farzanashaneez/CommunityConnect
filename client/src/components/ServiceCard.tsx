@@ -11,10 +11,18 @@ import {
   DialogActions,
   Button,
   TextField,
+  Box,
+  Avatar,
+  Divider,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { deleteServiceApi, requestService, updateServiceApi } from "../services/api";
+import {
+  contactServiceProvider,
+  deleteServiceApi,
+  requestService,
+  updateServiceApi,
+} from "../services/api";
 import { useSnackbar } from "../hooks/useSnackbar";
 import CustomSnackbar from "./customSnackbar";
 import { useCommunityContext } from "../context/communityContext";
@@ -22,6 +30,8 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import ConfirmationDialog from "./ConfirmationDialogue";
 import { useAppSelector } from "../hooks/reduxStoreHook";
+import ProfileLink from "./ProfileLink";
+import { useNavigate } from "react-router-dom";
 
 interface Service {
   _id: string;
@@ -29,18 +39,21 @@ interface Service {
   description: string;
   price: number;
   imageUrl: string;
+  provider:any
 }
 
 interface ServiceCardProps {
   service: Service;
   type?: "local" | "residential";
   isAdmin: boolean;
+  isprofile?:boolean
 }
 
 const ServiceCard: React.FC<ServiceCardProps> = ({
   service,
   type,
   isAdmin = false,
+  isprofile =false
 }) => {
   const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
   const { deleteService, updateService } = useCommunityContext();
@@ -53,11 +66,13 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const [confirmData, setConfirmData] = useState<object | null>(null);
 
-
   const userState = useAppSelector((state) => state.user);
-  const {requestServiceAlert}=useCommunityContext();
+  const id = userState.currentUser.user.id;
+
+  const navigate=useNavigate();
+  const { requestServiceAlert } = useCommunityContext();
   const handleOpenDialog = (id: string, data: object) => {
-    console.log("open section ",data,userState)
+    console.log("open section ", data, userState);
     setConfirmId(id);
     setConfirmData(data);
     setOpen(true);
@@ -70,18 +85,15 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
   };
 
   const handleConfirm = () => {
-    try{
+    try {
       if (confirmId && confirmData) {
         requestService(confirmId, confirmData); // Pass id and data to requestService
       }
       handleCloseDialog();
-      requestServiceAlert('service',false)
-
+      requestServiceAlert("service", false);
+    } catch (err) {
+      requestServiceAlert("service", true);
     }
-    catch(err){
-      requestServiceAlert('service',true)
-    }
-    
   };
 
   const handleDelete = async (id: string) => {
@@ -111,6 +123,17 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
   const handleDetailsOpen = () => setDetailsDialogOpen(true);
   const handleDetailsClose = () => setDetailsDialogOpen(false);
 
+  const handleContactProvider=async(serviceData: any, provider: string, requestby: string, shareMessage: string)=>{
+try{
+  const message=`I would like to know more about the service- ${serviceData.name} you provided `
+const chatdata=await contactServiceProvider(serviceData,provider,requestby,message)
+console.log('chat data',chatdata)
+navigate(`/chatroom/${chatdata._id}`)
+}
+catch(err){
+console.log('cannot contact',err)
+}
+  }
   return (
     <>
       <Card
@@ -118,6 +141,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
         sx={{
           mb: 2,
           p: 2,
+          pb:0,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -208,25 +232,70 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
               Charge: {service.price}-aed
             </Typography>
           )}
-          {type==='local' ? (
+          {type === "local" ? (
             <Button
               onClick={(e) => {
                 e.stopPropagation(); // Prevent triggering card click
-                handleOpenDialog(service._id, { userId: userState?.currentUser.user.id }); 
+                handleOpenDialog(service._id, {
+                  userId: userState?.currentUser.user.id,
+                });
               }}
             >
               request
             </Button>
           ) : (
-            <Button
-              onClick={(e) => {
-                e.stopPropagation(); // Prevent triggering card click
-                handleDetailsOpen();
-              }}
-            >
-              contact
-            </Button>
+           <></>
           )}
+       {!isprofile && service.provider._id!==id &&
+       <>
+        <Divider sx={{my:'5px'}}></Divider>
+        {type === "residential" && (
+             <Box sx={{
+              display: "flex",
+              flexDirection: "column",
+              position: "relative",
+    marginTop: 'auto',
+    marginBottom: '1px',
+    marginLeft: '10px',
+            }}>
+<Typography variant="body2"> Provided by</Typography>
+
+            
+            <Box sx={{
+              display: "flex",
+              alignItems: "center",
+              position: "relative",
+              bottom: 1,
+              left: 10,
+            }}>
+              <Avatar
+                src={service.provider.imageUrl}
+                alt={service.provider.firstName}
+                sx={{ width: 24, height: 24, marginRight: 1 }}
+              >
+                {service?.provider?.firstName?.charAt(0)}
+              </Avatar>
+              
+              <ProfileLink  id={service.provider._id}> <Typography variant="body2">{service.provider.firstName}</Typography> </ProfileLink>
+
+              <Button
+           
+           onClick={(e) => {
+            e.preventDefault(); // Prevent default behavior
+            e.stopPropagation();
+
+            handleContactProvider(service,service.provider._id,id,'message'); // Call the function to open details
+          }}
+         >
+           contact
+         </Button>
+            </Box>
+            </Box>
+          )}
+       </>
+       }   
+       
+         
         </CardContent>
         <CustomSnackbar
           open={snackbar.open}

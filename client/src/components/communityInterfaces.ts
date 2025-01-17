@@ -4,6 +4,7 @@ export interface Service {
     description: string;
     price: number;
     imageUrl: string;
+    provider:any
   }
   
  export  interface ServiceListProps {

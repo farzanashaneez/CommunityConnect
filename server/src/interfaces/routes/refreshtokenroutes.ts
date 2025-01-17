@@ -12,9 +12,8 @@ router.post('/', (req: Request, res: Response, next: NextFunction) => {
     if (!refreshToken) {
       return res.status(401).json({ message: 'Refresh token is required' });
     }
-const r='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NDdmMWU5Yjk1YzBlNjVjZTM2YTRhMCIsImlhdCI6MTczNTE4NDc1MCwiZXhwIjoxNzM1Nzg5NTUwfQ.IZ9UUJZefGbBtChGiIIzkcaCwHj_sH3vWDktUgGqK7E'
     try {
-      const decoded: any = jwt.verify(r, process.env.REFRESH_SECRET || 'refreshsecret');
+      const decoded: any = jwt.verify(refreshToken, process.env.REFRESH_SECRET || 'refreshsecret');
       console.log('decoded*****************', decoded);
       const user: any = await UserService.getUser(decoded.id);
 
@@ -26,11 +25,13 @@ const r='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NDdmMWU5Yjk1YzBlNjVjZT
 
       res.json({ accessToken: newAccessToken });
     } catch (error) {
-      console.log("error in refreshtoken",error)
-      res.status(403).json({ message: 'Invalid refresh token' });
-    }
+      console.error("Error in refreshtoken:", error);
+      if (error instanceof jwt.JsonWebTokenError) {
+        return res.status(403).json({ message: 'Invalid refresh token' });
+      }
+      res.status(500).json({ message: 'Internal server error' })
   };
-
+  }
   handleRefreshToken().catch(next);
 });
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   Box, 
   Typography, 
@@ -6,8 +6,14 @@ import {
   Paper,
   IconButton,
   Drawer,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { useAppSelector } from '../../hooks/reduxStoreHook';
+import ProfileLink from '../ProfileLink';
 
 interface ChatDetailsProps {
   selectedChat: any;
@@ -17,6 +23,12 @@ interface ChatDetailsProps {
 }
 
 const ChatDetails: React.FC<ChatDetailsProps> = ({ selectedChat, isTablet, detailsOpen, toggleDetails }) => {
+  const userState = useAppSelector((state) => state.user);
+  const id = userState.currentUser.user.id;
+  const [userIndex,setUserIndex]=useState(0)
+useEffect(()=>{
+  setUserIndex(s=>selectedChat?.participants[userIndex]._id===id? 1 : 0 )
+},[selectedChat])
   const content = (
     <Box sx={{ 
       display: 'flex', 
@@ -34,26 +46,51 @@ const ChatDetails: React.FC<ChatDetailsProps> = ({ selectedChat, isTablet, detai
         alignItems: 'center',
       }}>
         <Avatar sx={{ width: 64, height: 64, mb: 1 }}>
-          {selectedChat?.participants[0]?.imageUrl 
-            ? <img src={selectedChat.participants[0].imageUrl} alt="avatar" style={{ width: '100%', height: '100%' }} />
-            : selectedChat.participants[0]?.firstname?.charAt(0) || 'N/A'}
+          {selectedChat?.participants[userIndex]?.imageUrl 
+            ? <img src={selectedChat.participants[userIndex].imageUrl} alt="avatar" style={{ width: '100%', height: '100%' }} />
+            : selectedChat.participants[userIndex]?.firstname?.charAt(0) || 'N/A'}
         </Avatar>
         <Typography variant="h6">
           {selectedChat?.isgroup 
             ? selectedChat.groupName 
-            : selectedChat.participants[0]?.firstname || 
-              `${selectedChat.participants[1]?.apartmentId?.buildingSection} ${selectedChat.participants[1]?.apartmentId?.apartmentNumber}`}
+            :(  <ProfileLink  id={`${selectedChat.participants[userIndex]?._id}`}><span>{selectedChat.participants[userIndex]?.firstname || 
+            `${selectedChat.participants[userIndex]?.apartmentId?.buildingSection} ${selectedChat.participants[userIndex]?.apartmentId?.apartmentNumber}`}</span></ProfileLink>) }
         </Typography>
       </Box>
 
       {/* Additional Details */}
+      {selectedChat.isgroup ? (
+    // For group chat: Display list of members with profile pictures and names
+   <> <Typography variant='body1' sx={{m:'auto'}}>MEMBERS</Typography>
+    <List>
+      {selectedChat?.participants?.map((participant:any, index:number) => (
+        <ProfileLink key={index} id={`${participant?._id}`}>
+        <ListItem key={index}>
+          <ListItemAvatar>
+            <Avatar src={participant.imageUrl || ''}>
+              {participant.firstName?.[0] || 'U'}
+            </Avatar>
+          </ListItemAvatar>
+          <ListItemText
+            primary={participant.firstName || 'Unknown'}
+            secondary={
+              `${participant.apartmentId?.buildingSection || ''}${participant.apartmentId?.apartmentNumber || ''}`
+            }
+          />
+        </ListItem>
+        </ProfileLink>
+      ))}
+    </List>
+    </>
+  ) : (
       <Box sx={{ flexGrow: 1, overflow: 'auto', p: 2 }}>
-        <Typography variant="body1">Email: {selectedChat?.email || 'N/A'}</Typography>
-        <Typography variant="body1">Phone: {selectedChat?.phone || 'N/A'}</Typography>
+        <Typography variant="body1">Email: {selectedChat?.participants[userIndex].email || 'N/A'}</Typography>
+        <Typography variant="body1">Phone: {selectedChat?.participants[userIndex].mobileNumber || 'N/A'}</Typography>
         {/* Add more details as needed */}
       </Box>
-    </Box>
-  );
+  
+  )}
+ </Box> );
 
   if (!isTablet) {
     return (

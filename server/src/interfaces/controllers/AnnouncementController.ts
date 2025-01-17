@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import { AnnouncementUseCase } from '../../application/usecases/announcementUseCase';
 import { CustomRequest } from '../../infrastructure/middlewares/uploadImageToCloudinary';
+import notificationServices from '../../application/services/notificationServices';
+import { getIO } from '../../infrastructure/services/socket';
 
 export class AnnouncementController {
   constructor(private announcementUseCase: AnnouncementUseCase) {}
@@ -17,6 +19,17 @@ export class AnnouncementController {
       };
 
       const newAnnouncement = await this.announcementUseCase.createAnnouncement(announcementData);
+      Promise.resolve().then(async () => {
+        const notificationMessage = `New Announcement : ${announcementData.title} is added`;
+        await notificationServices.createNotification(
+          notificationMessage,
+        ); 
+        const io=getIO();
+        io.emit("notificationUpdate", {
+          message: notificationMessage,
+        }); // Notify all clients about the new/updated notification
+
+      });
       res.status(201).json(newAnnouncement);
     } catch (error: any) {
       res.status(400).json({ message: 'Error creating announcement', error: error?.message });

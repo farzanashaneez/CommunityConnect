@@ -65,7 +65,7 @@ export class MongoChatRepository implements ChatRepository {
   })
     .populate({
       path: "messages",
-      select: "senderId content createdAt",
+      select: "senderId content status createdAt",
     })
     .exec();
 
@@ -75,7 +75,7 @@ export class MongoChatRepository implements ChatRepository {
     return ChatModel.findById(id)
       .populate({
         path: "messages",
-        select: "senderId content createdAt",
+        select: "senderId content status createdAt",
       })
       .exec();
   }
@@ -95,11 +95,11 @@ export class MongoChatRepository implements ChatRepository {
     })
       .populate({
         path: "messages",
-        select: "senderId content createdAt",
+        select: "senderId content status createdAt",
       })
       .exec();
   }
-  async addMessage(chatId: string, message: Partial<Message>): Promise<Chat> {
+  async addMessage(chatId: string, message: Partial<Message>): Promise<Message> {
     console.log("chat message ------------------", message);
     const newMessage = new MessageModel(message);
     const savedMessage = await newMessage.save();
@@ -117,14 +117,20 @@ export class MongoChatRepository implements ChatRepository {
     if (!updatedChat) {
       throw new Error("Chat not found");
     }
-    return updatedChat;
+    return newMessage;
   }
-
+async updateMessageStatus(messageids:string[],status:string):Promise<any>{
+  return MessageModel.updateMany(
+    { _id: { $in: messageids } },
+    { $set: { status: status } },
+    { new: true }
+  );
+}
   async getChatsForUser(userId: string, query: string): Promise<Chat[]> {
     return ChatModel.find({ participants: { $elemMatch: { $eq: userId } } })
       .populate({
         path: "participants",
-        select: "imageUrl firstName apartmentId email",
+        select: "imageUrl firstName apartmentId email mobileNumber",
         populate: {
           path: "apartmentId", // Path to populate within participants
           select: "apartmentNumber buildingSection", // Fields to include from the Apartment model
@@ -132,10 +138,10 @@ export class MongoChatRepository implements ChatRepository {
       })
       .populate({
         path: "messages",
-        select: "content senderId",
+        select: "senderId content status createdAt",
         options: { sort: { createdAt: -1 }, limit: 1 }, // Fetch only the last message
       })
-      .sort({createdAt:-1})
+      .sort({updatedAt:-1})
       .exec();
   }
 

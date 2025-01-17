@@ -1,7 +1,9 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { ChatUseCase } from '../../application/usecases/chatUseCase';
-import { getIO } from '../../infrastructure/services/socketIOServices';
+import { getIO } from '../../infrastructure/services/socket';
+import { updateMessageStatusSocket } from '../../infrastructure/services/socket/chatHandlers';
+//import { getIO } from '../../infrastructure/services/socketIOServices';
 
 export class ChatController {
   constructor(private chatUseCase: ChatUseCase) {}
@@ -38,12 +40,38 @@ export class ChatController {
     try {
       const { id } = req.params;
       const { senderId, content,status } = req.body;
-      const updatedChat = await this.chatUseCase.addMessage(id, senderId, content,status);
+      const newmessage = await this.chatUseCase.addMessage(id, senderId, content,status);
 
-      const io = getIO();
-       io.emit("receiveMessage", { senderId, content });
+    
 
-      res.json(updatedChat);
+      res.json(newmessage);
+    } catch (error: any) {
+      res.status(400).json({ message: 'Error adding message', error: error?.message });
+    }
+  }
+
+  async updateMessageStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { messageIds, status }:{messageIds:[],status:string} = req.body;
+      const chatId=req.params.chatid;
+
+      const newmessage = await this.chatUseCase.updateMessageStatus(messageIds,status);
+
+     
+    updateMessageStatusSocket(chatId,messageIds)
+    console.log('backend called',chatId,messageIds,newmessage,status) 
+    // try {
+    //   const io = getIO();
+    //   io.emit('statusUpdatedFromFrontent', {
+    //     chatid: chatId,
+    //     unreadMessageIds: messageIds,
+    //     from: false,
+    //   });
+    // } catch (error) {
+    //   console.error('Error emitting event:', error);
+    // }
+
+      res.json(newmessage);
     } catch (error: any) {
       res.status(400).json({ message: 'Error adding message', error: error?.message });
     }

@@ -4,10 +4,11 @@ import { NextFunction, Request, Response } from "express";
 import { ServiceUseCase } from "../../application/usecases/serviceUseCases";
 import { CustomRequest } from "../../infrastructure/middlewares/uploadImageToCloudinary";
 import notificationServices from "../../application/services/notificationServices";
-import {
-  emitNotificationUpdate,
-  emitNotificationUpdatetoId,
-} from "../../infrastructure/services/socketIOServices";
+// import {
+//   emitNotificationUpdate,
+//   emitNotificationUpdatetoId,
+// } from "../../infrastructure/services/socketIOServices";
+import { getIO } from "../../infrastructure/services/socket";
 
 export class ServiceController {
   constructor(private serviceUseCase: ServiceUseCase) {}
@@ -39,9 +40,14 @@ export class ServiceController {
           [newService.provider],
           true
         ); // Send to all users
-        emitNotificationUpdatetoId(newService.provider, {
+        // emitNotificationUpdatetoId(newService.provider, {
+        //   message: notificationMessage,
+        // }); // Emit update
+        const io=getIO();
+        io.to(newService.provider).emit("notificationUpdate", {
           message: notificationMessage,
-        }); // Emit update
+        }); // Notify all clients about the new/updated notification
+
       });
 
       res.status(201).json(newService);
@@ -115,7 +121,9 @@ export class ServiceController {
             [],
             true
           ); // Send to all users
-          emitNotificationUpdate({ message: notificationMessage }); // Emit update
+          const io=getIO();
+          io.emit("notificationUpdate", { message: notificationMessage }); // Notify all clients about the new/updated notification
+     
         });
       }
       res.json(updatedService);
@@ -191,6 +199,7 @@ async getAllServicesOfUser(
     const userId = req.params.userId;
 
     const requestedServices = await this.serviceUseCase.getAllServicesOfUser(userId);
+    console.log("+++++++",requestedServices)
     res.json(requestedServices);
   } catch (error: any) {
     res
@@ -248,6 +257,21 @@ async getAllServicesOfUser(
       res
         .status(400)
         .json({ message: "Error fetching services", error: error?.message });
+    }
+  }
+  async contactserviceProvider(  req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void>{
+
+    try{
+      const {serviceData,provider,requestby,shareMessage}=req.body;
+     console.log("--------------------->",serviceData,provider,requestby,shareMessage)
+const chat=await this.serviceUseCase.contactServiceProvider(serviceData,provider,requestby,shareMessage)
+res.json(chat)
+    }
+    catch(err:any){
+res.status(400).json({message:'error contacting service provider',error:err?.message})
     }
   }
 }

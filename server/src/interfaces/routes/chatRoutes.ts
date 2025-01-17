@@ -18,5 +18,6 @@ router.get('/:id', (req, res, next) => chatController.getChatById(req, res, next
 router.post('/:id/message', (req, res, next) => chatController.addMessage(req, res, next));
 router.get('/user/:userId/:query', (req, res, next) => chatController.getChatsForUser(req, res, next));
 router.delete('/:id', (req, res, next) => chatController.deleteChat(req, res, next));
+router.put('/:chatid/update-message-status', (req, res, next) =>chatController.updateMessageStatus(req,res,next))
 
 export default router;

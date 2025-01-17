@@ -7,7 +7,7 @@ import { Box, Typography } from '@mui/material';
 
 
 
-const UserServices: React.FC<{userId:string}> = ({ userId}) => {
+const UserServices: React.FC<{userId:any}> = ({ userId}) => {
   const [serviceList, setServiceList] = useState<Service[]>([]);
 
  useEffect(()=>{
@@ -15,7 +15,7 @@ const UserServices: React.FC<{userId:string}> = ({ userId}) => {
     const fetchServices = async () => {
       try {
         const response = await getAllServicesOfUser(userId);
-        console.log("response",response)
+        console.log("response from user Service",response)
         setServiceList(response);
       } catch (error) {
         console.error("Error fetching services:", error);
@@ -29,7 +29,7 @@ const UserServices: React.FC<{userId:string}> = ({ userId}) => {
       {serviceList.length > 0 ? (
         serviceList.map(service => (
           <Grid container columns={1} key={service._id}>
-            <ServiceCard service={service} type={'residential'} isAdmin={false} />
+            <ServiceCard service={service} type={'residential'} isAdmin={false} isprofile={true}/>
           </Grid>
         ))
       ) : (
@@ -38,7 +38,7 @@ const UserServices: React.FC<{userId:string}> = ({ userId}) => {
               display: 'flex', 
               justifyContent: 'center', 
               alignItems: 'center', 
-              height: '200px', 
+              height: '400px', 
               width:'100%',
               border: '1px solid #DEDEDE',
               borderRadius: 2,

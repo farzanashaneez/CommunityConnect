@@ -59,10 +59,11 @@ export class MongoPostRepository implements PostRepository {
       .populate("author")
       .populate({
         path: "comments.author",
-        select: "firstName lastName email imageUrl",
+        select: "_id firstName lastName email imageUrl",
         transform: (doc) => {
           if (doc) {
             return {
+              _id:doc._id,
               fullName: `${doc.firstName} ${doc.lastName}`,
               email: doc.email,
               imageUrl: doc.imageUrl,

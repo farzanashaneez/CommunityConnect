@@ -21,6 +21,7 @@ import ConfirmationDialog from "../ConfirmationDialogue";
 import { addComment, deletePost, likePost } from "../../services/api";
 import { useCommunityContext } from "../../context/communityContext";
 import SharePostTo from "./SharePostTo";
+import ProfileLink from "../ProfileLink";
 
 export interface PostProps {
   post: {
@@ -132,7 +133,9 @@ export function Post({ post, onPostUpdate }: PostProps) {
             <Avatar src={post?.author?.imageUrl} alt="User" className="mr-2" />
             <div>
               <Typography variant="subtitle1" component="h3">
-                {post?.author?.firstName || post?.author?.email}
+               
+                <ProfileLink  id={post.author._id}>  {post?.author?.firstName || post?.author?.email} </ProfileLink>
+
               </Typography>
               <Typography variant="caption" color="textSecondary">
                 {new Date(post.createdAt).toLocaleString()}
@@ -208,7 +211,7 @@ export function Post({ post, onPostUpdate }: PostProps) {
               <div className="flex-grow bg-gray-100 rounded-lg p-2 max-w-screen-sm">
                 <div className="flex justify-between items-center mb-1">
                   <Typography variant="subtitle2">
-                    {comment.author.fullName || comment.author.email}
+                  <ProfileLink  id={comment.author._id}>  {comment.author.fullName || comment.author.email} </ProfileLink>
                   </Typography>
                   <Typography variant="caption" color="textSecondary">
                     {new Date(comment.createdAt).toLocaleString()}

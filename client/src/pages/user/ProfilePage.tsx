@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Container, Card, CardContent, Typography, Button, Divider, Avatar, Box } from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import { Container, Card, CardContent, Typography, Button, Divider, Avatar, Box, Grid } from "@mui/material";
+// import Grid from "@mui/material/Grid2";
 import { styled } from "@mui/system";
 import { useParams } from "react-router-dom";
 import { fetchUserDetails } from "../../services/api";
+import PostList from "../../components/postComponents/PostList";
+import UserServices from "../../components/home/UserServices";
 
 const CoverPhoto = styled("div")({
   height: "200px",
@@ -72,93 +74,82 @@ const ProfilePage: React.FC = () => {
 
   return (
     <Container maxWidth="xl">
-      <Card>
-        <CoverPhoto>
-          <ProfileImage src={user.imageUrl || "/src/assets/defaultProfile.jpg"} />
-        </CoverPhoto>
-        <CardContent>
-          <ProfileInfo>
-            <Grid container alignItems="center" spacing={2}>
-              <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 12, sm: 6 }}>
+    <Card elevation={3} sx={{ mb: 4, overflow: 'visible' }}>
+      <CoverPhoto>
+        <ProfileImage src={user.imageUrl || "/src/assets/defaultProfile.jpg"} />
+      </CoverPhoto>
+      <CardContent sx={{ pt: 8, px: 4 }}>
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <Grid container alignItems="center" justifyContent="space-between">
+              <Grid item>
                 <Typography variant="h4" component="h1">
                   {user.firstName} {user.lastName}
                 </Typography>
               </Grid>
-              <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 12, sm: 6 }} justifyContent="flex-end">
+              <Grid item>
                 <Button variant="contained" color="primary">
                   Message
                 </Button>
               </Grid>
             </Grid>
-          </ProfileInfo>
-
-          <Grid container spacing={3}>
-            <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 12, md: 4 }}>
-              <Card variant="outlined">
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Contact Information
-                  </Typography>
-                  <Typography variant="body1">Apartment No: {user?.apartmentId?.apartmentNumber||""}</Typography>
-                  <Typography variant="body1">Contact: {user.mobileNumber}</Typography>
-                  <Typography variant="body1">Email: {user.email}</Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 12, md: 8 }}>
-              <Card variant="outlined">
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Connections
-                  </Typography>
-                  <Grid container spacing={2}>
-                    <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 6 }}>
-                      <Typography variant="body1">Members: {user.members.length}</Typography>
-                    </Grid>
-                    <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 6 }}>
-                      <Typography variant="body1">Professionals:</Typography>
-                      {user.members.map((member, index) => (
-                        <Typography variant="body2" key={index}>
-                          - {member.profession}: {member.name}
-                        </Typography>
-                      ))}
-                    </Grid>
-                  </Grid>
-                </CardContent>
-              </Card>
-            </Grid>
           </Grid>
-        </CardContent>
-      </Card>
-      <Divider sx={{ my: 3 }} />
-      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3, mt: 3 }}>
-        <Box sx={{ flex: { xs: "1 1 100%", lg: "1 1 calc(50% - 12px)" } }}>
-          <Card variant="outlined">
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                About
-              </Typography>
-              <Typography variant="body1">
-                This is a brief description about {user.firstName} {user.lastName}. It can include personal information,
-                interests, or any other relevant details.
-              </Typography>
-            </CardContent>
-          </Card>
-        </Box>
-        <Box sx={{ flex: { xs: "1 1 100%", lg: "1 1 calc(50% - 12px)" } }}>
-          <Card variant="outlined">
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Additional Information
-              </Typography>
-              <Typography variant="body1">
-                This section can include any other relevant information about the profile.
-              </Typography>
-            </CardContent>
-          </Card>
-        </Box>
-      </Box>
-    </Container>
+          
+          <Grid item xs={12} md={4}>
+            <Card variant="outlined" sx={{ height: '100%' }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Contact Information
+                </Typography>
+                <Typography variant="body1">Apartment No: {user?.apartmentId?.apartmentNumber || ""}</Typography>
+                <Typography variant="body1">Contact: {user.mobileNumber}</Typography>
+                <Typography variant="body1">Email: {user.email}</Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          
+          <Grid item xs={12} md={8}>
+            <Card variant="outlined" sx={{ height: '100%' }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Connections :{user.members.length}
+                </Typography>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="body1">Members: </Typography>
+                    {user.members.map((member, index) => (
+                      <Typography variant="body2" key={index}>
+                        -  {member.name} : {member.profession}
+                      </Typography>
+                    ))}
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                   
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      </CardContent>
+    </Card>
+    
+    <Divider sx={{ my: 3 }} />
+    
+    <Box sx={{ width: '100%', mb: 4 }}>
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={9}>
+          <Typography variant="h5" fontWeight='bold' gutterBottom>Posts</Typography>
+          <PostList isUser={true} userid={id}/>
+        </Grid>
+        <Grid item xs={12} md={3}>
+          <Typography variant="h5" fontWeight='bold' gutterBottom>Services</Typography>
+          <UserServices userId={id}/>
+        </Grid>
+      </Grid>
+    </Box>
+  </Container>
+  
   );
 };
 

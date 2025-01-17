@@ -9,7 +9,7 @@ import errorHandler from "./infrastructure/middlewares/errorHandlerMiddleware";
 import serviceRoutes from "./interfaces/routes/serviceRoutes";
 import eventRoutes from  "./interfaces/routes/eventRoutes";
 import announcementRoutes from  "./interfaces/routes/announcementRoutes";
-import { initializeSocket } from "./infrastructure/services/socketIOServices";
+import { initializeSocket } from "./infrastructure/services/socket";
 import chatRoutes from "./interfaces/routes/chatRoutes";
 import postRoutes from "./interfaces/routes/postRoutes";
 import notificationRoutes from './interfaces/routes/notificationRoutes';

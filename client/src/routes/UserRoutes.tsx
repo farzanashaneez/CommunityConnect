@@ -46,7 +46,9 @@ const UserRoutes: React.FC = () => {
                     <Route path="/services" element={<Services />} />
                     <Route path="/announcements" element={<Announcements />} />
                     <Route path="/events" element={<Events />} />
-                    <Route path="/chatroom" element={<Chatroom />} />
+                    <Route path="/chatroom/:chatid" element={<Chatroom />} />
+                    <Route path="/chatroom/" element={<Chatroom />} />
+
                     <Route path="/profile" element={<UserProfile />} />
                     <Route path="/user/details/:id" element={<ProfilePage />} />
                     <Route path='/posts/:postid' element={<PostDetails/>}/>

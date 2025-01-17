@@ -12,9 +12,12 @@ interface CommunityContextType {
   requestServiceAlert:(type?:string,isFailed?:boolean)=>void;
   deletePostAlert:(success:boolean)=>void;
   completed: boolean; // To track the completion of actions
+  postUpdated:boolean;
   openSnackbar: (message: string, severity: 'success' | 'error' | 'info' | 'warning') => void;
   closeSnackbar: () => void;
   setCompleted: (status: boolean) => void; 
+  setPostUpdated: (status: boolean) => void; 
+
   mediaPosts: PostProps['post'][];
   updateMediaPosts: (posts: PostProps['post'][]) => void;
 }
@@ -35,6 +38,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error' | 'info' | 'warning'>('info');
   const [completed, setCompleted] = useState(false); 
   const [mediaPosts, setMediaPosts] = useState<PostProps['post'][]>([]);
+  const [postUpdated,setPostUpdated]=useState(false); 
 
   const updateMediaPosts = (posts: PostProps['post'][]) => {
     setMediaPosts(posts.slice(0, 6));
@@ -54,23 +58,43 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   const handleCompleted = (status: boolean) => {
     setCompleted(status);
   };
-
+  const handlepostUpdated= (status: boolean) => {
+    setPostUpdated(status);
+  };
   const deleteService = (id: string,type?:string) => {
     if(type==='event'){
+      socket.emit("update",'event');
+
       openSnackbar("Event deleted successfully", "success");
     }
-    else
-    openSnackbar("Service deleted successfully", "success");
+    else if(type==='announcement'){
+      openSnackbar("Announcement deleted successfully", "success");
+      socket.emit("update",'announcement');
+      openSnackbar("Announcement deleted successfully", "success");
 
+    }
+    else{
+    openSnackbar("Service deleted successfully", "success");
+    socket.emit("update",'service');
+
+  }
     handleCompleted(true); 
   };
 
   const updateService = (updatedService: Service,type?:string) => {
  if(type==='event'){
       openSnackbar("Event updated successfully", "success");
+      socket.emit("update",'event');
+
+    } else if(type==='announcement'){
+      openSnackbar("Announcement updated successfully", "success");
+      socket.emit("update",'announcement');
+
     }
-    else
+    else{
         openSnackbar("Service updated successfully", "success");
+        socket.emit("update",'service');
+      }
 
     handleCompleted(true); 
   };
@@ -78,6 +102,12 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
     if(task==='event'){
       openSnackbar("Event added successfully", "success");
       socket.emit("update",'event');
+    }
+    else if(task==='announcement'){
+      openSnackbar("Announcement added successfully", "success");
+      socket.emit("update",'announcement');
+
+      handlepostUpdated(true);
     }
     else
     openSnackbar("Service added successfully", "success");
@@ -130,6 +160,8 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
       deletePostAlert,
       completed, 
       setCompleted: handleCompleted ,
+      postUpdated,
+      setPostUpdated:handlepostUpdated,
       mediaPosts,
       updateMediaPosts
     }}>
