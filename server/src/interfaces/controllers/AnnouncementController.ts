@@ -3,6 +3,7 @@ import { AnnouncementUseCase } from '../../application/usecases/announcementUseC
 import { CustomRequest } from '../../infrastructure/middlewares/uploadImageToCloudinary';
 import notificationServices from '../../application/services/notificationServices';
 import { getIO } from '../../infrastructure/services/socket';
+import { sendNotification } from '../../infrastructure/services/fcm';
 
 export class AnnouncementController {
   constructor(private announcementUseCase: AnnouncementUseCase) {}
@@ -27,7 +28,7 @@ export class AnnouncementController {
         const io=getIO();
         io.emit("notificationUpdate", {
           message: notificationMessage,
-        }); // Notify all clients about the new/updated notification
+        }); 
 
       });
       res.status(201).json(newAnnouncement);

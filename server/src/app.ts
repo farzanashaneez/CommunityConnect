@@ -16,7 +16,14 @@ import notificationRoutes from './interfaces/routes/notificationRoutes';
 import refreshRoutes from './interfaces/routes/refreshtokenroutes';
 import dashboardRoute  from './interfaces/routes/dashboardRoutes';
 import http from "http";
-// import { Server as SocketIOServer, Socket } from "socket.io";
+import { ServiceAccount } from 'firebase-admin';
+import {initializeApp, cert } from "firebase-admin/app";
+ const serviceAccount =require('../FB-service-account-key.json');
+
+initializeApp({
+  credential: cert(serviceAccount as ServiceAccount)
+});
+
 
 conncetDb();
 dotenv.config()

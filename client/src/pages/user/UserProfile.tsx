@@ -245,7 +245,7 @@ const UserProfile: React.FC = () => {
 
       <Divider sx={{width:'95%',m:'auto',my:1,mb:3}}/>   
 
-      <Box sx={{ width: '90%',margin:'auto',marginBottom:'15px' }}>
+      <Box sx={{ width: '90%',margin:'auto',marginBottom:'15px',paddingTop:'5px' }}>
       <Grid container spacing={2} direction={{ xs: 'column-reverse', md: 'row' }}>
   <Grid item xs={12} sm={9}>
     <Typography variant="h5" fontWeight='bold' gutterBottom>My Posts</Typography>

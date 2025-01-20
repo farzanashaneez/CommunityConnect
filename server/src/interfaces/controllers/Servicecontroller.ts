@@ -9,6 +9,7 @@ import notificationServices from "../../application/services/notificationService
 //   emitNotificationUpdatetoId,
 // } from "../../infrastructure/services/socketIOServices";
 import { getIO } from "../../infrastructure/services/socket";
+import { sendNotification } from "../../infrastructure/services/fcm";
 
 export class ServiceController {
   constructor(private serviceUseCase: ServiceUseCase) {}
@@ -182,6 +183,8 @@ async getAllServiceRequst(
     console.log("status===>", status);
 
     const requestedServices = await this.serviceUseCase.getAllRequestedServices(status);
+    await sendNotification('cn2LXkcEISeuc-VTx_4bQL:APA91bEiNe3xCFMqFj-SRPjsuowYuh26K6cJOjAEXopXwHyITYDXahkruPnaAZzcdqrB213998bRI3gtuyD4cjDe-1XoRq1TkPzsLapkTsFk0qwjDaZVxXc','title','checking notification is working')
+
     res.json(requestedServices);
   } catch (error: any) {
     res

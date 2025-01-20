@@ -38,7 +38,7 @@ const UserServices: React.FC<{userId:any}> = ({ userId}) => {
               display: 'flex', 
               justifyContent: 'center', 
               alignItems: 'center', 
-              height: '400px', 
+              height: '200px', 
               width:'100%',
               border: '1px solid #DEDEDE',
               borderRadius: 2,
