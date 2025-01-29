@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getMessaging, getToken, onMessage } from 'firebase/messaging';
+import { getMessaging, getToken, isSupported, onMessage } from 'firebase/messaging';
 
 const firebaseConfig = {
     apiKey: "AIzaSyCAHTbyXj-yKlbkbewluJZdTS0H_bfo_yc",
@@ -10,9 +10,20 @@ const firebaseConfig = {
     appId: "1:364597264106:web:f643778a260770166a2193",
     measurementId: "G-4XX3EEMEDF"
 };
-
+console.log('==========')
 const app = initializeApp(firebaseConfig);
-const messaging = getMessaging(app);
+// async function initializeMessaging() {
+//     if (await isSupported()) {
+//       const messaging = getMessaging(app);
+//       console.log('Messaging  supported');
+
+//       // Proceed with messaging setup
+//     } else {
+//       console.log('Messaging not supported');
+//     }
+//   }
+//   initializeMessaging();
+const messaging:any = getMessaging(app);
 
 export { messaging, getToken, onMessage };
 

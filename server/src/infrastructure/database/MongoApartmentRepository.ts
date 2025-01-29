@@ -18,7 +18,7 @@ export class MongoApartmentRepository implements ApartmentRepository {
   }
 
   async findAll(): Promise<Apartment[]> {
-    return ApartmentModel.find().exec(); // Fetch all apartments from the database
+    return ApartmentModel.find({type:{$ne:'security'}}).exec(); // Fetch all apartments from the database
   }
   async getapartmentCount():Promise<number>{
     return ApartmentModel.countDocuments().exec();

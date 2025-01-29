@@ -6,6 +6,7 @@ import UserService from '../../application/services/UserService';
 interface CustomUser {
   id: string;
   isAdmin: boolean;
+  isSeccurity:boolean
 }
 
 export interface CustomRequest extends Request {
@@ -39,6 +40,13 @@ console.log("token",req.headers,"----->",token)
 
 export const adminMiddleware = (req: CustomRequest, res: Response, next: NextFunction) => {
     if (req.user && req.user?.isAdmin) {
+      next();
+    } else {
+      res.status(403).json({ message: 'Access denied. Admin rights required.' });
+    }
+  };
+  export const seccurityMiddleware = (req: CustomRequest, res: Response, next: NextFunction) => {
+    if (req.user && req.user?.isSeccurity) {
       next();
     } else {
       res.status(403).json({ message: 'Access denied. Admin rights required.' });

@@ -46,7 +46,7 @@ const NotificationSidebar: React.FC<NavSidebarProps> = ({
             ) : (
               <ListItemText
                 className="text-blue-600"
-                primary={notification.message}
+                primary={notification?.message}
               />
             )}
           </ListItemButton>

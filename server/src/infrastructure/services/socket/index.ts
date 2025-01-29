@@ -8,7 +8,7 @@ let io: SocketIOServer;
 export const initializeSocket = (server: any) => {
   io = new SocketIOServer(server, {
     cors: {
-      origin: "http://localhost:5173",
+      origin: "http://192.168.0.101:5173",
       methods: ["GET", "POST"],
     },
     path: "/socket.io",

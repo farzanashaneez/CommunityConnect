@@ -7,6 +7,9 @@ class UserService {
   async getUser(id:string){
     return this.userRepository.findById(id)
   }
+  async getFCMTokens(){
+    return this.userRepository.getAllFCMTokens();
+  }
 }
 
 export default new UserService();

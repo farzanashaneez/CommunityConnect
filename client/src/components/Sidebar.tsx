@@ -23,6 +23,7 @@ const Sidebar: React.FC = () => {
           <li><Link to="/admin/servicerequest" className={`${isActive('/admin/servicerequest')} hover:text-blue-700 block py-2`}>Service Request</Link></li>
           <li><Link to="/admin/events" className={`${isActive('/admin/events')} hover:text-blue-700 block py-2`}>Events</Link></li>
           <li><Link to="/admin/announcements" className={`${isActive('/admin/announcements')} hover:text-blue-700 block py-2`}>Announcements</Link></li>
+          <li><Link to="/admin/halls" className={`${isActive('/admin/halls')} hover:text-blue-700 block py-2`}>Halls</Link></li>
           <li><Link to="/admin/posts" className={`${isActive('/admin/posts')} hover:text-blue-700 block py-2`}>Posts</Link></li>
           <li><Link to="/admin/settings" className={`${isActive('/admin/settings')} hover:text-blue-700 block py-2`}>Settings</Link></li>
         </ul>

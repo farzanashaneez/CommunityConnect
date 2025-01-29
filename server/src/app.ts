@@ -15,6 +15,10 @@ import postRoutes from "./interfaces/routes/postRoutes";
 import notificationRoutes from './interfaces/routes/notificationRoutes';
 import refreshRoutes from './interfaces/routes/refreshtokenroutes';
 import dashboardRoute  from './interfaces/routes/dashboardRoutes';
+import bookRoutes  from './interfaces/routes/bookingRoutes';
+import hallRoutes  from './interfaces/routes/hallRoutes';
+import stripeRoute from './interfaces/routes/stripeRoute'
+
 import http from "http";
 import { ServiceAccount } from 'firebase-admin';
 import {initializeApp, cert } from "firebase-admin/app";
@@ -48,6 +52,9 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/refresh-token',refreshRoutes)
 app.use('/api/posts', postRoutes);
 app.use('/api/getDashboardData', dashboardRoute);
+app.use('/api/booking', bookRoutes);
+app.use('/api/hall', hallRoutes);
+app.use('/api/payment',stripeRoute);
 
 
 app.use(errorHandler);
@@ -55,7 +62,10 @@ app.use(errorHandler);
 
 
 const PORT = process.env.PORT || 5000;
-server.listen(PORT,()=>{
+server.listen({
+  port: 5000,
+  host: '0.0.0.0'
+},()=>{
     console.log(`Server running on port ${PORT}`)
 })
 

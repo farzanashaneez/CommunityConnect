@@ -16,6 +16,8 @@ const userSchema = new Schema<User>({
     required: true,
   },
   isAdmin: { type: Boolean, default: false },
+  isSecurity: { type: Boolean, default: false },
+
   imageUrl: { type: String },
 
   members: [
@@ -25,6 +27,13 @@ const userSchema = new Schema<User>({
       profession: { type: String, required: true },
     },
   ],
+  fcmTokens: [
+    {
+      token: { type: String, required: true },
+      deviceInfo: { type: String },
+      lastUsed: { type: Date, default: Date.now }
+    }
+  ]
 });
 
 const UserModel = mongoose.model<User>("User", userSchema);
@@ -66,7 +75,7 @@ export class MongoUserRepository implements UserRepository {
   }
 
   async findAll(): Promise<User[]> {
-    return UserModel.find().populate("apartmentId").exec(); // Populate to get apartment details if needed
+    return UserModel.find({isSecurity:false}).populate("apartmentId").exec(); // Populate to get apartment details if needed
   }
   async findById(userId: string): Promise<User | null> {
     const objectId = new mongoose.Types.ObjectId(userId);
@@ -92,7 +101,35 @@ export class MongoUserRepository implements UserRepository {
       { new: true }
     ).exec();
   }
+  async addFcmToken(
+    userId: string,
+    fcmTokens: { token: string; deviceInfo: string; lastUsed: Date }
+  ): Promise<User | null> {
+    const objectId = new mongoose.Types.ObjectId(userId);
+
+ 
+  await UserModel.updateOne(
+    { _id: objectId },
+    { $pull: { fcmTokens: { token: fcmTokens.token } } }
+  );
+
   
+  return UserModel.findByIdAndUpdate(
+    objectId,
+    { $push: { fcmTokens } },
+    { new: true }
+  ).exec();
+  }
+  async getAllFCMTokens():Promise<string[]>{
+    console.log("getallfcm")
+    const users = await UserModel.aggregate([
+      { $unwind: '$fcmTokens' },
+      { $project: { _id: 0, token: '$fcmTokens.token' } }
+    ]);
+    console.log("getallfcm",users)
+
+return users.map(user=>user.token);
+  }
   async updateName(
     userId: string,
     fullName: { firstname: string; lastname: string }
@@ -158,7 +195,8 @@ export class MongoUserRepository implements UserRepository {
     return  totalUsers+totalMembers   }
 
   async findRecent(count: number): Promise<User[]> {
-    return UserModel.find()
+
+    return UserModel.find({isSecurity:false})
     .populate("apartmentId")
       .sort({ createdAt: -1 })
       .limit(count)

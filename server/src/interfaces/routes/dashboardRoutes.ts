@@ -1,5 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express';
-import DashboardService from '../../application/services/dashboardService';
+import DashboardService from '../../application/services/DashboardService';
 
 const router = express.Router();
 

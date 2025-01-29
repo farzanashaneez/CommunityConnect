@@ -37,6 +37,21 @@ export class UserController {
       next(error);
     }
   }
+  async loginAsSecurity(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { email, password } = req.body;
+      const data = await this.userUseCases.loginAsSeccurity(email, password);
+      if (!data?.token) {
+        const error = new Error("Invalid credentials");
+        (error as any).statusCode = 401;
+        throw error;
+      }
+      res.json({ message: "Login successful", data });
+    } catch (error) {
+      console.log("Login error:", error);
+      next(error);
+    }
+  }
 
   async getUsers(
     req: Request,
@@ -90,6 +105,25 @@ export class UserController {
       next(error);
     }
   }
+  
+  async updatePassword(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.params.id; 
+      const updatedUser = await this.userUseCases.updateUser(userId, req.body.password);
+      if (!updatedUser) {
+        const error = new Error("User not found");
+        (error as any).statusCode = 404; 
+        throw error;
+      }
+      res.json({ message: "User updated successfully", updatedUser });
+    } catch (error) {
+      next(error);
+    }
+  }
 
   async addMember(
     req: Request,
@@ -126,6 +160,40 @@ export class UserController {
     }
   }
 
+  async addFcmToken(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      console.log("add addFcmToken called");
+      const userId = req.params.id;
+      const { token, deviceInfo, lastUsed } = req.body;
+
+      if (!token || !deviceInfo || !lastUsed) {
+        const error = new Error("All fields are required");
+        (error as any).statusCode = 404;
+        throw error;
+      }
+
+      const updatedUser = await this.userUseCases.addFcmToken(userId, {
+        token,
+        deviceInfo,
+        lastUsed,
+      });
+
+      if (!updatedUser) {
+        const error = new Error("User not found");
+        (error as any).statusCode = 404;
+        throw error;
+      }
+      const fcmTokens = updatedUser?.fcmTokens || [];
+      res.json({ message: "Member added successfully", fcmTokens });
+    } catch (error) {
+      console.log("Add member error:", error);
+      next(error);
+    }
+  }
   async updatName(
     req: Request,
     res: Response,
@@ -177,5 +245,16 @@ export class UserController {
         .status(400)
         .json({ message: "Error deleting service", error: error?.message });
     }
+  }
+  async getAllFCMTokens(req: Request,
+    res: Response,
+    next: NextFunction):Promise<void>{
+try{
+const tokens=await this.userUseCases.getAllFCMTokens();
+res.json(tokens)
+}
+catch(err){
+next(err)
+}
   }
 }

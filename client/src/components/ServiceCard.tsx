@@ -67,7 +67,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
   const [confirmData, setConfirmData] = useState<object | null>(null);
 
   const userState = useAppSelector((state) => state.user);
-  const id = userState.currentUser.user.id;
+  const id = userState?.currentUser?.user?.id;
 
   const navigate=useNavigate();
   const { requestServiceAlert } = useCommunityContext();
@@ -232,7 +232,7 @@ console.log('cannot contact',err)
               Charge: {service.price}-aed
             </Typography>
           )}
-          {type === "local" ? (
+          {type === "local" && !isAdmin ? (
             <Button
               onClick={(e) => {
                 e.stopPropagation(); // Prevent triggering card click
@@ -278,7 +278,7 @@ console.log('cannot contact',err)
               
               <ProfileLink  id={service.provider._id}> <Typography variant="body2">{service.provider.firstName}</Typography> </ProfileLink>
 
-              <Button
+           { !isAdmin &&  <Button
            
            onClick={(e) => {
             e.preventDefault(); // Prevent default behavior
@@ -289,6 +289,7 @@ console.log('cannot contact',err)
          >
            contact
          </Button>
+}
             </Box>
             </Box>
           )}

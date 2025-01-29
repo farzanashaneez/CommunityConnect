@@ -12,6 +12,9 @@ import AdminSettings from '../pages/admin/AdminSettings';
 import PageNotFound from '../pages/PageNotFound';
 import AdminServiceRequest from '../pages/admin/AdminServiceRequest';
 import Dashboard from '../pages/admin/Dashboard';
+import AdminHalls from '../pages/admin/AdminHall';
+import AdminBookings from '../pages/admin/AdminBookings';
+import AdminHallAvailabilityPage from '../pages/admin/AdminHallAvailability';
 
 
 const drawerWidth = 240;
@@ -86,6 +89,11 @@ const AdminRoutes: React.FC = () => {
           <Route path='/events' element={<AdminEvents />} />
           <Route path='/posts' element={<AdminPosts />} />
           <Route path='/announcements' element={<AdminAnnouncements />} />
+          <Route path='/halls' element={<AdminHalls />} />
+          <Route path='/halls/allbooking' element={<AdminBookings />} />
+          <Route path='/halls/availability/:hallid' element={<AdminHallAvailabilityPage />} />
+
+          {/* /admin/halls/availability/:hallid */}
           <Route path='/settings' element={<AdminSettings />} />
           <Route path='/servicerequest' element={<AdminServiceRequest />} />
           <Route path="*" element={<PageNotFound />} />

@@ -183,7 +183,7 @@ async getAllServiceRequst(
     console.log("status===>", status);
 
     const requestedServices = await this.serviceUseCase.getAllRequestedServices(status);
-    await sendNotification('cn2LXkcEISeuc-VTx_4bQL:APA91bEiNe3xCFMqFj-SRPjsuowYuh26K6cJOjAEXopXwHyITYDXahkruPnaAZzcdqrB213998bRI3gtuyD4cjDe-1XoRq1TkPzsLapkTsFk0qwjDaZVxXc','title','checking notification is working')
+    // await sendNotification('cn2LXkcEISeuc-VTx_4bQL:APA91bEiNe3xCFMqFj-SRPjsuowYuh26K6cJOjAEXopXwHyITYDXahkruPnaAZzcdqrB213998bRI3gtuyD4cjDe-1XoRq1TkPzsLapkTsFk0qwjDaZVxXc','title','checking notification is working')
 
     res.json(requestedServices);
   } catch (error: any) {

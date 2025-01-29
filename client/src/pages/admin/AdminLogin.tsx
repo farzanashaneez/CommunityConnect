@@ -50,13 +50,7 @@ const formik = useFormik({
         const response = await login(values.email, values.password);
         console.log(response);
 
-        // setSnackbarMessage('Logged in successfully!');
-        // dispatch(loggedin(response.data));
-
-        // console.log("admin State after dispatch",adminState)
-
-        // setOpenSnackbar(true);
-        // navigate('/admin/dashboard');
+      
 
         if (response.data.user.isAdmin) {
           setSnackbarMessage('Logged in successfully!');

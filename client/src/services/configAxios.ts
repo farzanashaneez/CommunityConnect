@@ -1,9 +1,11 @@
 import axios, { AxiosInstance } from 'axios';
 import { store } from '../redux-store/store'; // Adjust this path as needed
 import { loggedOut } from '../redux-store/user/adminSlice'; // Adjust import path
+import {  loggedOut as securitylogout  } from '../redux-store/user/securitySlice'; // Adjust import path
+
 import { signoutSuccess,signinSuccess } from '../redux-store/user/userSlice'; // Adjust import path
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'http://192.168.0.101:5000/api';
 
 const api: AxiosInstance = axios.create({
   baseURL: API_URL,
@@ -12,18 +14,16 @@ const api: AxiosInstance = axios.create({
 api.interceptors.request.use(
   (config) => {
     const state = store.getState();
-
-
-   
     const admintoken = state.admin?.currentAdmin?.token;
     const currenttoken= state.user?.currentUser?.token;
-    console.log('admin token',admintoken,config.url)
-    // if (admintoken) {
-    //   config.headers['Authorization'] = `Bearer ${admintoken}`;
-    //config.url?.startsWith('/admin') 
-    // }
+    const securitytoken=state.security?.currentSecurity?.token;
+    console.log('security token',securitytoken,config.url)
+    
     if (window.location.pathname.startsWith('/admin') && admintoken) {
       config.headers['Authorization'] = `Bearer ${admintoken}`;
+    }
+    else if (window.location.pathname.startsWith('/security') && admintoken) {
+      config.headers['Authorization'] = `Bearer ${securitytoken}`;
     }
      else if (currenttoken) {
       config.headers['Authorization'] = `Bearer ${currenttoken}`;
@@ -60,6 +60,7 @@ api.interceptors.response.use(
         }
       } else {
         store.dispatch(loggedOut());
+        store.dispatch(securitylogout());
       }
     }
     return Promise.reject(error);

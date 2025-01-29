@@ -30,7 +30,8 @@ const serviceRequestSchema = new Schema<ServiceRequest>({
   },
   requestedDate: { type: Date, default: Date.now() },
   status: { type: String, enum: ["pending", "completed"], default: "pending" },
-});
+  
+}, { timestamps: true });
 
 const ServiceModel = mongoose.model<Service>("Service", serviceSchema);
 const ServiceRequestModel = mongoose.model<ServiceRequest>(
@@ -105,7 +106,7 @@ export class MongoServiceRepository implements ServiceRepository {
   }
 
   async getAllServices(type: string): Promise<Service[]> {
-    return ServiceModel.find({ type: type }).exec();
+    return ServiceModel.find({ type: type }).sort({createdAt:-1}).exec();
   }
   async getAllServicesOfUser(userId: string): Promise<Service[]> {
     console.log('user id+++++++++',userId)
@@ -124,6 +125,7 @@ export class MongoServiceRepository implements ServiceRepository {
           select: "apartmentNumber buildingSection",
         },
       })
+      .sort({createdAt:-1})
       .exec();
     const rawRequests = await ServiceRequestModel.find({ status }).lean();
     console.log("mongo result of service request", rawRequests);
@@ -149,6 +151,7 @@ export class MongoServiceRepository implements ServiceRepository {
           select: "apartmentNumber buildingSection",
         },
       })
+      .sort({updatedAt:-1})
       .exec();
   }
   async findRecent(count: number): Promise<Service[]> {

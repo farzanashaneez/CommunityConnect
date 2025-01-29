@@ -17,5 +17,6 @@ export interface Service {
     requestId:any;
     serviceId:any;
     requestedDate?:Date;
-    status?:string
+    status?:string;
+    createdAt?:Date;
   }

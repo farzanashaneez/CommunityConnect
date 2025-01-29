@@ -3,7 +3,8 @@ import { AnnouncementUseCase } from '../../application/usecases/announcementUseC
 import { CustomRequest } from '../../infrastructure/middlewares/uploadImageToCloudinary';
 import notificationServices from '../../application/services/notificationServices';
 import { getIO } from '../../infrastructure/services/socket';
-import { sendNotification } from '../../infrastructure/services/fcm';
+import { sendMulticastNotification, sendNotification } from '../../infrastructure/services/fcm';
+import UserService from '../../application/services/UserService';
 
 export class AnnouncementController {
   constructor(private announcementUseCase: AnnouncementUseCase) {}
@@ -20,17 +21,23 @@ export class AnnouncementController {
       };
 
       const newAnnouncement = await this.announcementUseCase.createAnnouncement(announcementData);
-      Promise.resolve().then(async () => {
-        const notificationMessage = `New Announcement : ${announcementData.title} is added`;
-        await notificationServices.createNotification(
-          notificationMessage,
-        ); 
-        const io=getIO();
-        io.emit("notificationUpdate", {
-          message: notificationMessage,
-        }); 
+      const tokensFCM=await UserService.getFCMTokens();
+      console.log("token FCM =================================>",tokensFCM)
+      if(tokensFCM){
+        await sendMulticastNotification(tokensFCM,newAnnouncement.title,`${newAnnouncement.announcementtype} :${newAnnouncement.description}`)
 
-      });
+      }
+      // Promise.resolve().then(async () => {
+      //   const notificationMessage = `New Announcement : ${announcementData.title} is added`;
+      //   await notificationServices.createNotification(
+      //     notificationMessage,
+      //   ); 
+      //   const io=getIO();
+      //   io.emit("notificationUpdate", {
+      //     message: notificationMessage,
+      //   }); 
+
+      // });
       res.status(201).json(newAnnouncement);
     } catch (error: any) {
       res.status(400).json({ message: 'Error creating announcement', error: error?.message });

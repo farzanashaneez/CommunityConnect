@@ -1,9 +1,44 @@
 
-import { IdCard } from "lucide-react";
 import api from "./configAxios";
+import { isSupported } from "firebase/messaging";
+import { loadStripe } from '@stripe/stripe-js';
+import axios from "axios";
+const key = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY as string;
+const stripePromise = loadStripe(key);
 
 
-const API_URL = 'http://localhost:5000/api';
+
+const API_URL = 'http://192.168.0.101:5000/api';
+
+// stripe api
+export const handleStripePayment = async (bookingData:any,slotData:any): Promise<void> => {
+  console.log('key',key)
+  try {
+    const stripe = await stripePromise;
+    
+    if (!stripe) {
+      throw new Error('Stripe failed to initialize');
+    }
+
+    const response = await axios.post(`${API_URL}/payment/create-checkout-session`,{bookingData,slotData});
+    const session = response.data;
+
+    if (!session || !session.id) {
+      throw new Error('Failed to create Stripe session');
+    }
+
+    const result = await stripe.redirectToCheckout({
+      sessionId: session.id,
+    });
+
+    if (result.error) {
+      throw result.error;
+    }
+  } catch (error) {
+    console.error('Payment error:', error);
+    // You might want to show an error message to the user here
+  }
+};
 
 
 export const register = async (userData: any) => {
@@ -13,6 +48,10 @@ export const register = async (userData: any) => {
 
 export const login = async (email: string, password: string) => {
   const response = await api.post(`${API_URL}/users/login`, { email, password });
+  return response.data;
+};
+export const loginAsSecurity = async (email: string, password: string) => {
+  const response = await api.post(`${API_URL}/users/security-login`, { email, password });
   return response.data;
 };
 
@@ -52,12 +91,26 @@ export const addMember = async (token: string,id:string, memberData: { name: str
   });
   return response.data;
 };
+
+export const addFCMtokenToServer = async (id:string, fcmToken: { token: string; deviceInfo: string; lastUsed: Date }) => {
+  if (await isSupported()){
+console.log('not supported')
+const response = await api.post(`${API_URL}/users/add-fcmtoken/${id}`, fcmToken);
+return response.data;
+};
+return null;
+  }
+
 export const updateName = async (token: string,id:string,firstname:string,lastname:string) => {
   const response = await api.post(`${API_URL}/users/updatename/${id}`, {firstname,lastname}, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
+  return response.data;
+};
+export const updatePassword = async (id:string,password:string) => {
+  const response = await api.post(`${API_URL}/users/updatepassword/${id}`, {password});
   return response.data;
 };
 export const addProfileImage = async (id:string, data:object) => {
@@ -300,5 +353,62 @@ export const getAllNotification=async(id:string)=>{
 }
 export const markAsSeen=async(id:string,data:any)=>{
   const response = await api.put(`${API_URL}/notifications/update/${id}`,data);
+  return response.data;
+}
+
+//hallbooking
+export const getAllavailableSlot=async(days:number,hallid:string)=>{
+  const response=await api.get(`${API_URL}/booking/slots/${hallid}/${days}`)
+  return response.data;
+
+}
+export const createHall=async(hallDetails:any)=>{
+  const response=await api.post(`${API_URL}/hall/create`,hallDetails)
+  return response.data;
+}
+export const updateHall=async(hallDetails:any,hallid:string)=>{
+  const response=await api.put(`${API_URL}/hall/update/${hallid}`,hallDetails)
+  return response.data;
+}
+export const deleteHall=async(hallid:string)=>{
+  const response=await api.delete(`${API_URL}/hall/delete/${hallid}`)
+  return response.data;
+}
+export const getAllHall=async()=>{
+  const response=await api.get(`${API_URL}/hall`)
+  return response.data;
+}
+export const fetchHallDetails=async(id:string)=>{
+  const response=await api.get(`${API_URL}/hall/${id}`)
+  return response.data;
+}
+ 
+export const bookAHall=async(bookingData:any,slotData:any)=>{
+  const response=await api.post(`${API_URL}/booking`,{bookingData,slotData})
+  return response.data;
+}
+export const getAllBookings=async()=>{
+  const response=await api.get(`${API_URL}/booking`)
+  return response.data;
+}
+export const fetchAllSlots=async(hallid:string)=>{
+  const response=await api.get(`${API_URL}/booking/slots/allslots/${hallid}/30`)
+  return response.data;
+}
+export const updateSlotStatus=async(slotid:string,status:string)=>{
+  const response=await api.put(`${API_URL}/booking/slots/update/${slotid}`,{status})
+  return response.data;
+}
+
+export const getAllBookingOfUser=async(id:string)=>{
+  const response=await api.get(`${API_URL}/booking/user/${id}`)
+  return response.data;
+}
+export const confirmBooking=async(bookingId:string)=>{
+  const response=await api.put(`${API_URL}/booking/update/${bookingId}`,{status:'confirmed'})
+  return response.data;
+}
+export const deleteBooking=async(bookingId:string)=>{
+  const response=await api.delete(`${API_URL}/booking/delete/${bookingId}`,)
   return response.data;
 }

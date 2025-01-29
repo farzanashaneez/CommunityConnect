@@ -12,6 +12,8 @@ import Services from '../pages/user/Services';
 import ProfilePage from '../pages/user/ProfilePage';
 import PostDetails from '../pages/user/PostDetails';
 import AllMediaPage from '../pages/user/AllMediaPage';
+import HallBookingCalendar from '../pages/user/HallBooking';
+import BookingHistory from '../pages/user/BookingHistory';
 
 const UserRoutes: React.FC = () => {
     const location = useLocation();
@@ -53,6 +55,11 @@ const UserRoutes: React.FC = () => {
                     <Route path="/user/details/:id" element={<ProfilePage />} />
                     <Route path='/posts/:postid' element={<PostDetails/>}/>
                     <Route path='/all-media' element={<AllMediaPage/>}/>
+
+                    <Route path='/hallbooking' element={<HallBookingCalendar/>}/>
+                    <Route path='/hallbooking/history' element={<BookingHistory/>}/>
+                    <Route path='/success' element={<BookingHistory/>}/>
+
 
                 </Routes>
             </Box>

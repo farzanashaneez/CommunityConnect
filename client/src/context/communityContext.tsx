@@ -109,6 +109,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
 
       handlepostUpdated(true);
     }
+    
     else
     openSnackbar("Service added successfully", "success");
     socket.emit("update",'service');
@@ -129,6 +130,9 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   const requestServiceAlert = (type?:string,isFailed?:boolean) => {
     if(type==='service' && !isFailed){
          openSnackbar("service requested successfully", "success");
+       
+          socket.emit("update",'servicerequest');
+        
        }
        else if(isFailed){
         openSnackbar("something went wrong", "error");
