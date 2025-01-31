@@ -45,7 +45,10 @@ export const register = async (userData: any) => {
   const response = await api.post(`${API_URL}/users/register`, userData);
   return response.data;
 };
-
+export const registerSecurity = async (userData: any) => {
+  const response = await api.post(`${API_URL}/users/register-security`, userData);
+  return response.data;
+};
 export const login = async (email: string, password: string) => {
   const response = await api.post(`${API_URL}/users/login`, { email, password });
   return response.data;
@@ -64,6 +67,15 @@ export const fetchAllUsers = async () => {
   const response = await api.get(`${API_URL}/users`);
   return response.data;
 };
+export const fetchAllSecurities = async () => {
+  const response = await api.get(`${API_URL}/users/all-securities`);
+  return response.data;
+};
+
+export const verifyEmail = async (email:string) => {
+  const response = await api.get(`${API_URL}/users/verify-email/${email}`);
+  return response.data;
+};
 
 export const deleteUser=async(id:string)=>{
   console.log("id===>",id)
@@ -74,27 +86,19 @@ export const deleteUser=async(id:string)=>{
 export const fetchUserDetails = async (id:string) => {
   console.log("iid",id)
   const response = await api.get(`${API_URL}/users/details/${id}`
-  // , {
-  //   headers: {
-  //     Authorization: `Bearer ${token}`,
-  //   },
-  // }
+ 
   );
   return response.data;
 };
 
 export const addMember = async (token: string,id:string, memberData: { name: string; relation: string; profession: string }) => {
-  const response = await api.post(`${API_URL}/users/members/${id}`, memberData, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await api.post(`${API_URL}/users/members/${id}`, memberData);
   return response.data;
 };
 
 export const addFCMtokenToServer = async (id:string, fcmToken: { token: string; deviceInfo: string; lastUsed: Date }) => {
   if (await isSupported()){
-console.log('not supported')
+console.log('supported')
 const response = await api.post(`${API_URL}/users/add-fcmtoken/${id}`, fcmToken);
 return response.data;
 };
@@ -102,35 +106,28 @@ return null;
   }
 
 export const updateName = async (token: string,id:string,firstname:string,lastname:string) => {
-  const response = await api.post(`${API_URL}/users/updatename/${id}`, {firstname,lastname}, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await api.post(`${API_URL}/users/updatename/${id}`, {firstname,lastname});
   return response.data;
 };
 export const updatePassword = async (id:string,password:string) => {
-  const response = await api.post(`${API_URL}/users/updatepassword/${id}`, {password});
+  console.log('password in api',password)
+  const pass=password;
+  const response = await api.post(`${API_URL}/users/updatepassword/${id}`,{password:pass,d:'123'});
   return response.data;
 };
 export const addProfileImage = async (id:string, data:object) => {
   console.log("data====",data,id)
   const response = await api.post(`${API_URL}/users/addprofileImage/${id}`, data
-    // headers: {
-    //   Authorization: `Bearer ${token}`,
-    // },
+   
   );
   return response.data;
 };
 export const addCoverphoto = async (token: string,id:string, data:object) => {
-  const response = await api.post(`${API_URL}/users/addcoverphoto/${id}`, data, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await api.post(`${API_URL}/users/addcoverphoto/${id}`, data);
   return response.data;
 };
 
+// service Api
 export const createService=async(servicedata:any)=>{
   console.log("servicedata",servicedata)
   const response=await api.post(`${API_URL}/services`,servicedata);
@@ -410,5 +407,19 @@ export const confirmBooking=async(bookingId:string)=>{
 }
 export const deleteBooking=async(bookingId:string)=>{
   const response=await api.delete(`${API_URL}/booking/delete/${bookingId}`,)
+  return response.data;
+}
+
+//QRCode
+export const generateQRcode=async(qrData:any)=>{
+  const response=await api.post(`${API_URL}/qrverification/generate`,qrData)
+  return response.data;
+}
+export const verifyQRcode=async(token:string)=>{
+  const response=await api.get(`${API_URL}/qrverification/verify/${token}`)
+  return response.data;
+}
+export const getQRData=async(id:string)=>{
+  const response=await api.get(`${API_URL}/qrverification/${id}`)
   return response.data;
 }

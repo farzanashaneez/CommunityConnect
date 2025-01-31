@@ -5,4 +5,7 @@ export default class ApartmentService{
     async markFilled(id:string,doFill:boolean){
 return this.apartmentrepo.markFilled(id,doFill)
     }
+    async createApartmentForSecurity(){
+        return this.apartmentrepo.createApartmentForSecurity();
+    }
 }

@@ -24,20 +24,24 @@ export class AnnouncementController {
       const tokensFCM=await UserService.getFCMTokens();
       console.log("token FCM =================================>",tokensFCM)
       if(tokensFCM){
+        console.log("token FCM =================================>",tokensFCM)
+
         await sendMulticastNotification(tokensFCM,newAnnouncement.title,`${newAnnouncement.announcementtype} :${newAnnouncement.description}`)
 
       }
-      // Promise.resolve().then(async () => {
-      //   const notificationMessage = `New Announcement : ${announcementData.title} is added`;
-      //   await notificationServices.createNotification(
-      //     notificationMessage,
-      //   ); 
-      //   const io=getIO();
-      //   io.emit("notificationUpdate", {
-      //     message: notificationMessage,
-      //   }); 
+      Promise.resolve().then(async () => {
+        const notificationMessage = `New Announcement : ${announcementData.title} is added`;
+        await notificationServices.createNotification(
+          notificationMessage,
+          [],
+          true
+        ); 
+        const io=getIO();
+        io.emit("notificationUpdate", {
+          message: notificationMessage,
+        }); 
 
-      // });
+      });
       res.status(201).json(newAnnouncement);
     } catch (error: any) {
       res.status(400).json({ message: 'Error creating announcement', error: error?.message });
@@ -82,6 +86,8 @@ export class AnnouncementController {
   async getAllAnnouncements(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const announcements = await this.announcementUseCase.getAllAnnouncements();
+    
+      
       res.json(announcements);
     } catch (error: any) {
       res.status(400).json({ message: 'Error fetching announcements', error: error?.message });

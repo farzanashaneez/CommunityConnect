@@ -73,7 +73,7 @@ const AdminRoutes: React.FC = () => {
         component="main"
         sx={{
           flexGrow: 1,
-          width: { lg: `calc(100% - ${drawerWidth}px)`, xs: '100%' },
+          width: { lg: `calc(100% - ${drawerWidth}px)`,md: `calc(100% - ${drawerWidth}px)`, xs: '100%' },
           p: { xs: 2, md: 3 },
           marginLeft: isMobile ? 0 : `${drawerWidth}px`,
           transition: theme.transitions.create(['margin', 'width'], {

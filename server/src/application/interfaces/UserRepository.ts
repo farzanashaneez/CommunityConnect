@@ -6,6 +6,7 @@ export interface UserRepository {
     deleteUser(id: string): Promise<void>;
     findByEmail(email: string): Promise<User | null>;
     findAll(): Promise<User[]>;
+    findAllSecurities(): Promise<User[]>;
     findById(userId: string): Promise<User | null>; 
     update(userId: string, userData: Partial<User>): Promise<User | null>; 
     addMember(userId: string, memberData: { name: string; relation: string; profession: string }): Promise<User | null>; 

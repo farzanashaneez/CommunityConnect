@@ -29,6 +29,7 @@ function sendNotification(token: string, title: string, body: string): Promise<s
 }
 
 function sendMulticastNotification(tokens: string[], title: string, body: string): Promise<messaging.BatchResponse> {
+  console.log({token:tokens,title:title,body:body})
   const message: MulticastMessage = {
     notification: {
       title,

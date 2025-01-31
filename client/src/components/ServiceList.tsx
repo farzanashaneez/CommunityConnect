@@ -42,7 +42,7 @@ const ServiceList: React.FC<ServiceListProps> = ({ type, searchTerm = '', status
   return (
     <Grid container spacing={2} sx={{justifyContent:'center'}}>
       {serviceList.map(service => (
-    <Grid   container spacing={{ xs: 2, md: 3 }} columns={{ xs: 6, sm: 4, md: 2 }}>
+    <Grid key={service._id}  container spacing={{ xs: 2, md: 3 }} columns={{ xs: 6, sm: 4, md: 2 }}>
     <ServiceCard key={service._id} service={service} type={type} isAdmin={isAdmin}/>
         </Grid>
       ))}

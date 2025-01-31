@@ -1,235 +1,378 @@
-import React, { useState, useEffect } from "react";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
+import React, { useState, useEffect } from 'react';
 import {
-  fetchAllApartments,
-  fetchAllUsers,
-  register,
-  deleteUser,
-} from "../../services/api";
-import { Snackbar } from "@mui/material";
-import UserRow from "../../components/UserRow";
+  Box,
+  Button,
+  Container,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  IconButton,
+  Paper,
+  Snackbar,
+  Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Tabs,
+  Typography
+} from '@mui/material';
+import { Add as AddIcon, Close as CloseIcon, Security as SecurityIcon, Person as PersonIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { Formik, Form } from 'formik';
+import * as Yup from 'yup';
+import { TextField, Select } from '@mui/material';
+import { deleteUser, fetchAllApartments, fetchAllSecurities, fetchAllUsers, register, registerSecurity } from '../../services/api';
+import { User } from '../../types/User';
 
 const validationSchema = Yup.object().shape({
-  apartmentId: Yup.string().required("Apartment is required"),
+  apartmentId: Yup.string().required('Apartment is required'),
   email: Yup.string()
-    .email("Invalid email format")
-    .matches(
-      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-      "Invalid email"
-    )
-    .required("Email is required"),
+    .email('Invalid email format')
+    .matches(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, 'Invalid email')
+    .required('Email is required'),
   mobileNumber: Yup.string()
-    .matches(/^[0-9]{10}$/, "Invalid phone number")
-    .required("Phone number is required"),
+    .matches(/^[0-9]{10}$/, 'Invalid phone number')
+    .required('Phone number is required'),
 });
 
-const AdminUser: React.FC = () => {
-  const [users, setUsers] = useState<any[]>([]);
-  const [apartments, setApartments] = useState<any[]>([]);
+const securityValidationSchema = Yup.object().shape({
+  email: Yup.string()
+    .email('Invalid email format')
+    .required('Email is required'),
+  mobileNumber: Yup.string()
+    .matches(/^[0-9]{10}$/, 'Invalid phone number')
+    .required('Phone number is required'),
+});
 
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
+const AdminDashboard = () => {
+  const [users, setUsers] = useState<User[]>([]);
+  const [security, setSecurity] = useState<User[]>([]);
+  const [apartments, setApartments] = useState([]);
+  const [selectedTab, setSelectedTab] = useState(0);
+  const [openUserDialog, setOpenUserDialog] = useState(false);
+  const [openSecurityDialog, setOpenSecurityDialog] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '' });
 
   useEffect(() => {
-    fetchUsers();
-    fetchApartments();
+    fetchInitialData();
   }, []);
 
-  const fetchUsers = async () => {
+  const fetchInitialData = async () => {
     try {
-      const response = await fetchAllUsers();
-      console.log("users :==", response);
-      setUsers(response);
+      const [usersResponse, apartmentsResponse,secuurityResponse] = await Promise.all([
+        fetchAllUsers(),
+        fetchAllApartments(),
+        fetchAllSecurities()
+      ]);
+      setUsers(usersResponse);
+      setApartments(apartmentsResponse);
+      setSecurity(secuurityResponse)
     } catch (error) {
-      console.error("Error fetching users:", error);
+      showSnackbar('Error fetching data');
     }
   };
 
-  const fetchApartments = async () => {
-    try {
-      const response = await fetchAllApartments();
-      setApartments(response);
-    } catch (error) {
-      console.error("Error fetching apartments:", error);
-    }
+  const showSnackbar = (message:string) => {
+    setSnackbar({ open: true, message });
   };
 
-  const handleSubmit = async (
-    values: any,
-    { setSubmitting, resetForm }: any
-  ) => {
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  const handleAddUser = async (values:any, { resetForm }:any) => {
     try {
       const generatedPassword = Math.random().toString(36).slice(-8);
-      const newUser = { ...values, password: generatedPassword };
-      const response = await register(newUser);
-      console.log(response);
-      setSnackbarMessage("User registered successfully!");
-      setOpenSnackbar(true);
-      fetchUsers();
+      await register({ ...values, password: generatedPassword });
+      showSnackbar('User added successfully');
+      fetchInitialData();
       resetForm();
+      setOpenUserDialog(false);
+    } catch (error) {
+      showSnackbar('Error adding user');
+    }
+  };
+
+  const handleRemoveUser = async (userId:string) => {
+    try {
+      await deleteUser(userId);
+      showSnackbar('User removed successfully');
+      fetchInitialData();
+    } catch (error) {
+      showSnackbar('Error removing user');
+    }
+  };
+
+  const handleAddSecurity = async (values:any, { resetForm }:any) => {
+    try {
+      const generatedPassword = Math.random().toString(36).slice(-8);
+      await registerSecurity({ ...values, password: generatedPassword});
+
+        showSnackbar('Security staff added successfully');
+        fetchInitialData();
+      resetForm();
+      setOpenSecurityDialog(false);
     } catch (error) {
       console.error("Error adding user:", error);
       let errorMessage = "Error :";
       if (error instanceof Error) {
         errorMessage += ` ${(error as any).response?.data.message}`;
       }
-      setSnackbarMessage(errorMessage);
+      showSnackbar(errorMessage);
 
-      setOpenSnackbar(true);
     }
-    setSubmitting(false);
-  };
-
-  const handleRemoveUser = async (id: string) => {
-    try {
-      await deleteUser(id);
-      setSnackbarMessage("User removed successfully!");
-      setOpenSnackbar(true);
-      fetchUsers();
-    } catch (error) {
-      console.error("Error removing user:", error);
-      setSnackbarMessage("Error removing user. Please try again.");
-      setOpenSnackbar(true);
-    }
-  };
-  const handleCloseSnackbar = () => {
-    setOpenSnackbar(false);
   };
 
   return (
-    <div className="flex bg-gray-100 min-h-screen p-0">
-      <div className="w-1/2 bg-white rounded-lg shadow-md p-6 mr-6">
-        <h2 className="text-2xl font-bold mb-4 text-gray-800">
-          List of Residents
-        </h2>
-        <div className="space-y-4">
-          {users.map((user) => (
-            <UserRow
-              key={user._id}
-              imageUrl={user.imageUrl || "https://via.placeholder.com/40"}
-              name={user.firstName}
-              apartmentNumber={
-                user.apartmentId
-                  ? `${user.apartmentId.buildingSection}-${user.apartmentId.apartmentNumber}`
-                  : "Unknown" // Ensure to access the correct properties
-              }
-              onRemove={() => handleRemoveUser(user._id)}
-            />
-          ))}
-        </div>
-      </div>
-
-      <div className="w-1/2 h-fit bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-bold mb-6 text-gray-800">Add User</h2>
-        <Formik
-          initialValues={{
-            apartmentId: "",
-            email: "",
-            mobileNumber: "",
-          }}
-          validationSchema={validationSchema}
-          onSubmit={handleSubmit}
-        >
-          {({ isSubmitting }) => (
-            <Form className="space-y-6">
-              <div>
-                <label
-                  htmlFor="apartmentId"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+    <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+      <Paper sx={{ p: 3 }}>
+        <Tabs value={selectedTab} onChange={(_, newValue) => setSelectedTab(newValue)}>
+          <Tab icon={<PersonIcon />} label="Residents" />
+          <Tab icon={<SecurityIcon />} label="Security" />
+        </Tabs>
+        
+        <Box sx={{ mt: 3 }}>
+          {selectedTab === 0 ? (
+            <>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
+                <Typography variant="h5">Residents List</Typography>
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={() => setOpenUserDialog(true)}
                 >
-                  Apartment
-                </label>
-                <Field
-                  as="select"
-                  name="apartmentId"
-                  className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                >
-                  <option value="">Select Apartment</option>
-                  {apartments
-                    .sort((a, b) => {
-                      if (a.buildingSection !== b.buildingSection) {
-                        return a.buildingSection.localeCompare(
-                          b.buildingSection
-                        );
-                      }
-                      return a.apartmentNumber - b.apartmentNumber;
-                    })
-                    .map((apartment) => (
-                      <option key={apartment._id} value={apartment._id}>
-                        {apartment.buildingSection} -{" "}
-                        {apartment.apartmentNumber} ({apartment.type})
-                      </option>
+                  Add Resident
+                </Button>
+              </Box>
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Name</TableCell>
+                      <TableCell>Email</TableCell>
+                      <TableCell>Phone</TableCell>
+                      <TableCell>Apartment</TableCell>
+                      <TableCell align="center">Actions</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {users.map((user) => (
+                      <TableRow key={user._id}>
+                        <TableCell>{user.firstName}</TableCell>
+                        <TableCell>{user.email}</TableCell>
+                        <TableCell>{user.mobileNumber}</TableCell>
+                        <TableCell>
+                          {user.apartmentId 
+                            ? `${user.apartmentId.buildingSection}-${user.apartmentId.apartmentNumber}`
+                            : 'N/A'}
+                        </TableCell>
+                        <TableCell align="center">
+                          <IconButton
+                            color="error"
+                            onClick={() => handleRemoveUser(user._id)}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
                     ))}
-                </Field>
-                <ErrorMessage
-                  name="apartmentId"
-                  component="div"
-                  className="text-red-500 text-sm mt-1"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </>
+          ) : (
+            <>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
+                <Typography variant="h5">Security Staff</Typography>
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={() => setOpenSecurityDialog(true)}
                 >
-                  Email ID
-                </label>
-                <Field
-                  type="email"
-                  name="email"
-                  className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                />
-                <ErrorMessage
-                  name="email"
-                  component="div"
-                  className="text-red-500 text-sm mt-1"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="mobileNumber"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Phone Number
-                </label>
-                <Field
-                  type="tel"
-                  name="mobileNumber"
-                  className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                />
-                <ErrorMessage
-                  name="mobileNumber"
-                  component="div"
-                  className="text-red-500 text-sm mt-1"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                {isSubmitting ? "Adding User..." : "Add User"}
-              </button>
-            </Form>
+                  Add Security Staff
+                </Button>
+              </Box>
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Name</TableCell>
+                      <TableCell>Email</TableCell>
+                      <TableCell>Phone</TableCell>
+                      <TableCell align="center">Actions</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {security.map((staff) => (
+                      <TableRow key={staff._id}>
+                        <TableCell>{staff.firstName}</TableCell>
+                        <TableCell>{staff.email}</TableCell>
+                        <TableCell>{staff.mobileNumber}</TableCell>
+                        <TableCell align="center">
+                          <IconButton color="error"   onClick={() => handleRemoveUser(staff._id)}>
+                            <DeleteIcon />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </>
           )}
-        </Formik>
-      </div>
+        </Box>
+      </Paper>
+
+      {/* Add User Dialog */}
+      <Dialog open={openUserDialog} onClose={() => setOpenUserDialog(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          Add New Resident
+          <IconButton
+            onClick={() => setOpenUserDialog(false)}
+            sx={{ position: 'absolute', right: 8, top: 8 }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          <Formik
+            initialValues={{ apartmentId: '', email: '', mobileNumber: '' }}
+            validationSchema={validationSchema}
+            onSubmit={handleAddUser}
+          >
+            {({ errors, touched, handleChange, handleBlur, values }) => (
+              <Form>
+                <Grid container spacing={2} sx={{ mt: 1 }}>
+                  <Grid item xs={12}>
+                    <Select
+                      fullWidth
+                      name="apartmentId"
+                      value={values.apartmentId}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={touched.apartmentId && Boolean(errors.apartmentId)}
+                      native
+                    >
+                      <option value="">Select Apartment</option>
+                      {apartments.map((apt:any) => (
+                        <option key={apt._id} value={apt._id}>
+                          {`${apt.buildingSection}-${apt.apartmentNumber} (${apt.type})`}
+                        </option>
+                      ))}
+                    </Select>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      name="email"
+                      label="Email"
+                      value={values.email}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={touched.email && Boolean(errors.email)}
+                      helperText={touched.email && errors.email}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      name="mobileNumber"
+                      label="Phone Number"
+                      value={values.mobileNumber}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={touched.mobileNumber && Boolean(errors.mobileNumber)}
+                      helperText={touched.mobileNumber && errors.mobileNumber}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Button type="submit" variant="contained" fullWidth>
+                      Add Resident
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Form>
+            )}
+          </Formik>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Security Dialog */}
+      <Dialog open={openSecurityDialog} onClose={() => setOpenSecurityDialog(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          Add Security Staff
+          <IconButton
+            onClick={() => setOpenSecurityDialog(false)}
+            sx={{ position: 'absolute', right: 8, top: 8 }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          <Formik
+            initialValues={{ email: '', mobileNumber: '', }}
+            validationSchema={securityValidationSchema}
+            onSubmit={handleAddSecurity}
+          >
+            {({ errors, touched, handleChange, handleBlur, values }) => (
+              <Form>
+                <Grid container spacing={2} sx={{ mt: 1 }}>
+                  <Grid item xs={12}>
+                   
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      name="email"
+                      label="Email"
+                      value={values.email}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={touched.email && Boolean(errors.email)}
+                      helperText={touched.email && errors.email}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      name="mobileNumber"
+                      label="Phone Number"
+                      value={values.mobileNumber}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={touched.mobileNumber && Boolean(errors.mobileNumber)}
+                      helperText={touched.mobileNumber && errors.mobileNumber}
+                    />
+                  </Grid>
+                 
+                  <Grid item xs={12}>
+                    <Button type="submit" variant="contained" fullWidth>
+                      Add Security Staff
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Form>
+            )}
+          </Formik>
+        </DialogContent>
+      </Dialog>
+
       <Snackbar
-        open={openSnackbar}
+        open={snackbar.open}
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "center",
-        }}
-        message={snackbarMessage}
+        message={snackbar.message}
+        action={
+          <IconButton size="small" color="inherit" onClick={handleCloseSnackbar}>
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        }
       />
-    </div>
+    </Container>
   );
 };
 
-export default AdminUser;
+export default AdminDashboard;

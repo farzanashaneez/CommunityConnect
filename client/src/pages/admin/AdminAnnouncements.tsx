@@ -43,17 +43,21 @@ const AdminAnnouncements: React.FC = () => {
     validationSchema: Yup.object({
       title: Yup.string().required("Title is required"),
       description: Yup.string().required("Description is required"),
-      date: Yup.string().required("Date is required"),
+      // date: Yup.string().required("Date is required"),
       imageUrl: Yup.string().required("Image is required"),
       announcementtype: Yup.string().required("Announcement type is required"),
     }),
     onSubmit: async (values, { resetForm }) => {
-      try {
+      console.log('ano00uncement ')
+
+      try {console.log('ano00uncement ')
+
         // Prepare form data for API submission
         const formData = new FormData();
         formData.append("title", values.title);
         formData.append("description", values.description);
-        formData.append("date", values.date);
+        //  formData.append("date", values.date);
+        //  formData.append("date",Date.now().toLocaleString());
         formData.append("announcementtype", values.announcementtype); // Include the new field
 
         if (values.imageUrl) {
@@ -63,7 +67,6 @@ const AdminAnnouncements: React.FC = () => {
           });
           formData.append("imageUrl", file);
         }
-
         // API call
         await createAnnouncementApi(formData);
         addCompleted("announcement");
@@ -173,7 +176,7 @@ const AdminAnnouncements: React.FC = () => {
             }
             helperText={formik.touched.description && formik.errors.description}
           />
-          <TextField
+          {/* <TextField
             label="Date"
             type="date"
             fullWidth
@@ -182,7 +185,7 @@ const AdminAnnouncements: React.FC = () => {
             error={formik.touched.date && Boolean(formik.errors.date)}
             helperText={formik.touched.date && formik.errors.date}
             sx={{ mb: 2 }}
-          />
+          /> */}
 
           {/* Announcement type dropdown */}
           <FormControl fullWidth sx={{ mb: 2 }}>

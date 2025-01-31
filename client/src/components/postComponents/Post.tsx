@@ -160,17 +160,15 @@ export function Post({ post, onPostUpdate }: PostProps) {
           {post.content}
         </Typography>
         <div className="grid grid-cols-3 gap-2 mb-4">
-          {post.images.map((photo, index) => (
-            <img
-              key={index}
-              src={photo}
-              alt={`Post photo ${index + 1}`}
-              width={150}
-              height={150}
-              className="rounded-lg object-cover cursor-pointer"
-              onClick={() => handleImageClick(index)}
-            />
-          ))}
+        {post.images.map((photo, index) => (
+    <img
+      key={index}
+      src={photo}
+      alt={`Post photo ${index + 1}`}
+      className="w-full h-48 sm:h-64 md:h-65 lg:80 rounded-lg object-cover cursor-pointer"
+      onClick={() => handleImageClick(index)}
+    />
+  ))}
         </div>
         <div className="flex justify-between items-center mb-4 text-gray-500">
           <Typography variant="body2">

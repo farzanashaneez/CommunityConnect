@@ -16,7 +16,7 @@ import {
   Snackbar,
   Alert
 } from '@mui/material';
-import { loginAsSecurity } from '../../services/api';
+import { loginAsSecurity, updatePassword, verifyEmail } from '../../services/api';
 import { useAppDispatch, useAppSelector } from '../../hooks/reduxStoreHook';
 import { loggedin, loginfailure } from '../../redux-store/user/securitySlice';
 
@@ -26,7 +26,6 @@ const loginSchema = Yup.object({
     .email('Enter a valid email')
     .required('Email is required'),
   password: Yup.string()
-    .min(8, 'Password should be of minimum 8 characters length')
     .required('Password is required'),
 });
 
@@ -38,7 +37,7 @@ const forgotPasswordSchema = Yup.object({
 
 const resetPasswordSchema = Yup.object({
   password: Yup.string()
-    .min(8, 'Password should be of minimum 8 characters length')
+    .min(6, 'Password should be of minimum 8 characters length')
     .required('Password is required'),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref('password')], 'Passwords must match')
@@ -52,6 +51,7 @@ const Login: React.FC = () => {
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
   const [resetPasswordOpen, setResetPasswordOpen] = useState(false);
   const [emailVerified, setEmailVerified] = useState(false);
+  const [verifiedId,setverifiedId]=useState('')
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
@@ -100,18 +100,20 @@ const Login: React.FC = () => {
     validationSchema: forgotPasswordSchema,
     onSubmit: async (values) => {
       try {
-        // Simulate email verification API call
-        // await verifyEmail(values.email);
-        setEmailVerified(true);
+        const availableUser=await verifyEmail(values.email);
+       if(availableUser){
+        setverifiedId(availableUser._id)
+         setEmailVerified(true);
         setSnackbar({
           open: true,
           message: 'Email verified successfully. You can now reset your password.',
           severity: 'success'
         });
+      }
       } catch (error) {
         setSnackbar({
           open: true,
-          message: 'Failed to send reset link. Please try again.',
+          message: 'Failed to verify email. Please try again.',
           severity: 'error'
         });[1]
       }
@@ -127,8 +129,7 @@ const Login: React.FC = () => {
     validationSchema: resetPasswordSchema,
     onSubmit: async (values) => {
       try {
-        // Add your reset password API call here
-        // await resetPassword(values.password);
+        await updatePassword(verifiedId,values.password);
         setSnackbar({
           open: true,
           message: 'Password has been successfully reset',
@@ -158,8 +159,11 @@ const Login: React.FC = () => {
         }}
       >
         <Paper elevation={3} sx={{ p: 4, width: '100%' }}>
+        <Typography component="h1" variant="h4" align="center">
+            Community Connect
+          </Typography>
           <Typography component="h1" variant="h5" align="center">
-            Login
+            Security Login
           </Typography>
           <Box component="form" onSubmit={loginFormik.handleSubmit} sx={{ mt: 1 }}>
             <TextField

@@ -3,6 +3,7 @@ import { sendWelcomeEmail } from "../../infrastructure/services/emailServices";
 import { UserUseCases } from "../../application/usecases/userUseCases";
 import { error } from "console";
 import { CustomRequest } from "../../infrastructure/middlewares/uploadImageToCloudinary";
+import ApartmentService from "../../application/services/ApartmentService";
 
 export class UserController {
   constructor(private userUseCases: UserUseCases) {}
@@ -17,6 +18,24 @@ export class UserController {
       await sendWelcomeEmail(user.email, user.firstName, password);
 
       res.status(201).json({ message: "User registered successfully", user });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async registerSecurity(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      console.log("security registration",req.body)
+      const aprtmntServc=new ApartmentService();
+      const aprtmnt=await aprtmntServc.createApartmentForSecurity();
+        const security=req.body;
+      const { user, password } = await this.userUseCases.registerUser({...security,apartmentId:aprtmnt._id,isSecurity:true,isFilled:true});
+      await sendWelcomeEmail(user.email, user.firstName, password);
+
+      res.status(201).json({ message: "User registered successfully",  });
     } catch (error) {
       next(error);
     }
@@ -66,6 +85,19 @@ export class UserController {
       next(error);
     }
   }
+  async securityUsers(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const users = await this.userUseCases.getAllsecurities();
+      res.json(users);
+    } catch (error) {
+      console.log("Get users error:", error);
+      next(error);
+    }
+  }
 
   async getUserById(
     req: Request,
@@ -75,6 +107,26 @@ export class UserController {
     try {
       const userId = req.params.id;
       const user = await this.userUseCases.getUserById(userId);
+      if (!user) {
+        const error = new Error("User not found");
+        (error as any).statusCode = 404;
+        throw error;
+      }
+      res.json(user);
+    } catch (error) {
+      console.log("Get user by ID error:", error);
+      next(error);
+    }
+  }
+  async getUserByEmail(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userEmail = req.params.email;
+      console.log(userEmail)
+      const user = await this.userUseCases.getUserByEmail(userEmail);
       if (!user) {
         const error = new Error("User not found");
         (error as any).statusCode = 404;
@@ -113,7 +165,8 @@ export class UserController {
   ): Promise<void> {
     try {
       const userId = req.params.id; 
-      const updatedUser = await this.userUseCases.updateUser(userId, req.body.password);
+      console.log("---------xxx--------------",req.body)
+      const updatedUser = await this.userUseCases.updateUserPassword(userId, req.body.password);
       if (!updatedUser) {
         const error = new Error("User not found");
         (error as any).statusCode = 404; 

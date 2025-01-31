@@ -28,7 +28,7 @@ export class MongoNotificationRepository implements NotificationRepository {
         { userIds: id }, 
         { broadcast: true } 
       ]
-    }).exec();
+    }).sort({createdAt:-1}).exec();
   }
 
   async updateNotification(id: string, notificationData: Partial<Notification>): Promise<Notification> {

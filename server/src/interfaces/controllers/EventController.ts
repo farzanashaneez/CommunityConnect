@@ -22,7 +22,7 @@ export class EventController {
       const newEvent = await this.eventUseCase.createEvent(eventData);
       Promise.resolve().then(async () => {
       const notificationMessage = `New event created: ${newEvent.name}`;
-      await notificationServices.createNotification(notificationMessage, [], true); // Send to all users
+      await notificationServices.createNotification(notificationMessage,[],true); // Send to all users
      // emitNotificationUpdate({ message: notificationMessage });
       const io=getIO();
       io.emit("notificationUpdate", notificationMessage); // Notify all clients about the new/updated notification

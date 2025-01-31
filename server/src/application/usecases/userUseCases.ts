@@ -106,9 +106,14 @@ export class UserUseCases {
   async getAllUsers(): Promise<User[]> {
     return this.userRepository.findAll();
   }
-
+  async getAllsecurities(): Promise<User[]> {
+    return this.userRepository.findAllSecurities();
+  }
   async getUserById(userId: string): Promise<User | null> {
     return this.userRepository.findById(userId);
+  }
+  async getUserByEmail(userEmail: string): Promise<User | null> {
+    return this.userRepository.findByEmail(userEmail);
   }
 
   async updateUser(

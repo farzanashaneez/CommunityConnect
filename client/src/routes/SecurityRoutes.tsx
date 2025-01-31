@@ -5,6 +5,7 @@ import SecurityNavBar from '../components/security/SecurityNavBar';
 import Home from '../pages/security/Home';
 import ServiceRequest from '../pages/security/ServiceRequest';
 import UserProfile from '../pages/security/UserProfile';
+import UserVerificationPage from '../pages/security/UserVerificationPage';
 // import NavBar from '../components/Navbar';
 // import Home from '../pages/user/Home';
 // import UserProfile from '../pages/user/UserProfile';
@@ -50,6 +51,7 @@ const SecurityRoutes: React.FC = () => {
                     <Route path="/profile" element={<UserProfile />} />
                    <Route path='/service-requests' element={<ServiceRequest/>}/>
                    <Route path="*" element={<PageNotFound />} />
+                   <Route path="/verifyQRCode/:id" element={<UserVerificationPage/>}/>
 
 
                 </Routes>

@@ -9,7 +9,8 @@ import notificationServices from "../../application/services/notificationService
 //   emitNotificationUpdatetoId,
 // } from "../../infrastructure/services/socketIOServices";
 import { getIO } from "../../infrastructure/services/socket";
-import { sendNotification } from "../../infrastructure/services/fcm";
+import { sendMulticastNotification, sendNotification } from "../../infrastructure/services/fcm";
+import UserService from "../../application/services/UserService";
 
 export class ServiceController {
   constructor(private serviceUseCase: ServiceUseCase) {}
@@ -40,10 +41,7 @@ export class ServiceController {
           notificationMessage,
           [newService.provider],
           true
-        ); // Send to all users
-        // emitNotificationUpdatetoId(newService.provider, {
-        //   message: notificationMessage,
-        // }); // Emit update
+        )
         const io=getIO();
         io.to(newService.provider).emit("notificationUpdate", {
           message: notificationMessage,
@@ -119,8 +117,8 @@ export class ServiceController {
           const notificationMessage = `New service created: ${updatedService.name}`;
           await notificationServices.createNotification(
             notificationMessage,
-            [],
-            true
+            [id],
+            false
           ); // Send to all users
           const io=getIO();
           io.emit("notificationUpdate", { message: notificationMessage }); // Notify all clients about the new/updated notification
@@ -161,12 +159,19 @@ export class ServiceController {
     try {
       const { userId } = req.body;
       const serviceId = req.params.id;
-      console.log("service id, userid",serviceId,userId,req.body)
-      const reqService = await this.serviceUseCase.requestLocalService(
+      const newreqService = await this.serviceUseCase.requestLocalService(
         serviceId,
         userId
       );
-      res.json(reqService);
+      console.log("service id, userid",newreqService)
+
+      const tokensFCM=await UserService.getFCMTokensOfSecurities();
+      console.log("token FCM =============xxxxxxx=============>",tokensFCM)
+      if(tokensFCM){
+        await sendMulticastNotification(tokensFCM,"Service Request..!",'You have new Service Request')
+
+      }
+      res.json(newreqService);
     } catch (err: any) {
       res
         .status(400)

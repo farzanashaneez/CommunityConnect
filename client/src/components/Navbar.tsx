@@ -38,7 +38,7 @@ import {
 } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
 import { socket } from "../services/socketConnection";
-import { getAllNotification } from "../services/api";
+import { getAllNotification, markAsSeen } from "../services/api";
 import { useAppSelector } from "../hooks/reduxStoreHook";
 import { QrCodeIcon } from "lucide-react";
 import QRCodeGenerator from "./QRCodeGenerator";
@@ -142,7 +142,9 @@ const NavBar: React.FC = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [notifCount,setNotifCount] = useState(null)
 
+  
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const navigate = useNavigate();
@@ -170,6 +172,7 @@ const NavBar: React.FC = () => {
       socket.off("notificationUpdate");
     };
   }, []);
+  
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -177,13 +180,15 @@ const NavBar: React.FC = () => {
         const notificationData = await getAllNotification(
           userState.currentUser.user.id
         );
+        const arr=notificationData.filter((notif:any)=>!notif.seenBy?.includes(userState.currentUser.user.id))
+        setNotifCount(arr.length)
         setNotifications(notificationData);
       } catch (err) {
         console.error("Error fetching notifications:", err);
       }
     };
     fetchNotifications();
-  }, [userState.currentUser.user.id]);
+  }, []);
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -198,6 +203,29 @@ const NavBar: React.FC = () => {
     setMobileOpen(false);
   };
 
+  const handleMarkAsSeen = async (notificationId: string) => {
+    console.log("seen button clicked")
+    setNotifCount(null)
+    try {
+      await markAsSeen(notificationId, {
+        seenBy: userState.currentUser.user.id
+      });
+      
+      // Update local state after successful API call
+      setNotifications(prevNotifications =>
+        prevNotifications.map(notif =>
+          notif._id === notificationId
+            ? {
+                ...notif,
+                seenBy: [...(notif.seenBy || []), userState.currentUser.user.id]
+              }
+            : notif
+        )
+      );
+    } catch (error) {
+      console.error('Error marking notification as seen:', error);
+    }
+  };
   const renderMobileDrawer = (
     <Box sx={{ width: 250 }} role="presentation">
       <Box
@@ -293,7 +321,7 @@ const NavBar: React.FC = () => {
                 color="primary"
                 onClick={() => setNotificationsOpen(true)}
               >
-                <Badge badgeContent={notifications.length} color="error">
+                <Badge badgeContent={notifCount} color="error">
                   <NotificationsIcon />
                 </Badge>
               </IconButton>
@@ -359,21 +387,28 @@ const NavBar: React.FC = () => {
           </Box>
           <List>
             {notifications.map((notification, index) => (
-              <ListItem
-                key={index}
-                sx={{
+             
+              <ListItemButton 
+            key={index}
+            onClick={() => handleMarkAsSeen(notification._id)}
+            sx={{
                   mb: 1,
                   borderRadius: 1,
                   backgroundColor: theme.palette.action.hover,
                 }}
-              >
-                <ListItemText
-                  primary={notification.message || notification}
-                  primaryTypographyProps={{
-                    variant: "body2",
-                  }}
-                />
-              </ListItem>
+            
+          >
+            {notification?.seenBy?.includes(userState.currentUser.user.id) ? (
+              <ListItemText  sx={{ mb: 1, color: theme.palette.primary.main,
+              }}
+               primary={notification.message} />
+            ) : (
+              <ListItemText
+                className="text-blue-600"
+                primary={notification.message}
+              />
+            )}
+          </ListItemButton>
             ))}
           </List>
         </Box>

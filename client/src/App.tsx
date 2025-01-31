@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import AdminRoutes from './routes/AdminRoutes';
@@ -11,10 +9,12 @@ import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, Button } from '@mui/material';
 import { theme } from '../src/theme';
 import { CommunityProvider } from './context/communityContext';
-import { messaging, getToken, onMessage } from './services/firebase';
-import { addFCMtokenToServer } from './services/api';
 import SecurityRoutes from './routes/SecurityRoutes';
 import Login from './pages/security/Login';
+import { initializeMessaging, getMessagingToken, subscribeToMessages } from './services/firebase';
+import { addFCMtokenToServer } from './services/api';
+
+const VAPID_KEY = 'BN5wvCCizvcqm5gCUAFnWhISLmtnChy-15htSS2RT5zJzSd8WZNJhWEmR0Fvsnfftp2TCnwt8wbhoJFerovDRKo';
 
 const App: React.FC = () => {
   const adminState = useAppSelector((state) => state.admin);
@@ -24,8 +24,8 @@ const App: React.FC = () => {
   const [showNotificationPrompt, setShowNotificationPrompt] = useState(false);
   
   useEffect(() => {
-     registerServiceWorker();
-     checkNotificationPermission();
+    registerServiceWorker();
+    checkNotificationPermission();
   }, []);
 
   const registerServiceWorker = async () => {
@@ -33,9 +33,8 @@ const App: React.FC = () => {
       try {
         const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' });
         console.log('Service Worker registered successfully:', registration);
-        //  checkNotificationPermission();
       } catch (error) {
-        console.error('Service Worker registration failed:.....', error);
+        console.error('Service Worker registration failed:', error);
       }
     }
   };
@@ -44,7 +43,6 @@ const App: React.FC = () => {
     if (Notification?.permission === 'default') {
       setShowNotificationPrompt(true);
     } else if (Notification?.permission === 'granted') {
-      console.log("notification granted")
       setupFCM();
     }
   };
@@ -54,11 +52,8 @@ const App: React.FC = () => {
       const permission = await Notification?.requestPermission();
       if (permission === 'granted') {
         setShowNotificationPrompt(false);
-        console.log("notification granted by button")
-
         setupFCM();
       } else {
-        //do the delete db option from backend
         console.log('Notification permission denied');
       }
     } catch (error) {
@@ -67,41 +62,57 @@ const App: React.FC = () => {
   };
 
   const setupFCM = async () => {
-    const currentPath =  window.location.pathname;
-      const isRestrictedRoute = currentPath.startsWith('/admin') || 
-                                currentPath.startsWith('/security') && !userState.currentUser;
+    const currentPath = window.location.pathname;
+    const isRestrictedRoute = currentPath.startsWith('/admin') || 
+                            (currentPath.startsWith('/security') && !userState.currentUser);
 
-    if(!isRestrictedRoute){
-    try {
-      const token = await getToken(messaging, { vapidKey: 'BN5wvCCizvcqm5gCUAFnWhISLmtnChy-15htSS2RT5zJzSd8WZNJhWEmR0Fvsnfftp2TCnwt8wbhoJFerovDRKo' });
-      console.log('FCM Token:', token);
-      if (token) {
-        console.log('sendtoken called')
-        sendTokenToServer(token);
+    if (!isRestrictedRoute) {
+      try {
+        // Initialize messaging first
+        await initializeMessaging();
+        
+        // Get the FCM token using the new function
+        const token = await getMessagingToken(VAPID_KEY);
+        
+        if (token) {
+          console.log('FCM Token:', token);
+          await sendTokenToServer(token);
+        }
+      } catch (error) {
+        console.error('An error occurred while setting up FCM:', error);
       }
-    } catch (error) {
-      console.error('An error occurred while retrieving token:', error);
     }
-  }
   };
 
-  const sendTokenToServer = async(token: string) => {
-
+  const sendTokenToServer = async (token: string) => {
     console.log('Sending token to server:', token);
-    let platform = (navigator as any)?.userAgentData?.platform || navigator?.platform || 'unknown';
-        try{
-         if( userState.currentUser.user.id )
-          await addFCMtokenToServer(userState.currentUser.user.id,{token,deviceInfo:platform,lastUsed:new Date()})
-    }
-    catch(err){
-
+    const platform = (navigator as any)?.userAgentData?.platform || navigator?.platform || 'unknown';
+    
+    try {
+      if (userState.currentUser?.user?.id) {
+        await addFCMtokenToServer(userState.currentUser.user.id, {
+          token,
+          deviceInfo: platform,
+          lastUsed: new Date()
+        });
+        
+      }
+      if (securityState.currentSecurity?.user?.id) {
+        await addFCMtokenToServer(securityState.currentSecurity.user.id, {
+          token,
+          deviceInfo: platform,
+          lastUsed: new Date()
+        });
+      }
+    } catch (err) {
+      console.error('Error sending token to server:', err);
     }
   };
 
   useEffect(() => {
-    const unsubscribe = onMessage(messaging, (payload) => {
+    const unsubscribe = subscribeToMessages((payload) => {
       console.log('Message received:', payload);
-      if (Notification?.permission === 'granted') {
+      if (Notification?.permission === 'granted' && 'serviceWorker' in navigator) {
         navigator.serviceWorker.ready.then(registration => {
           registration.showNotification(payload.notification?.title || 'New Message', {
             body: payload.notification?.body || "You have a new message!",
@@ -135,13 +146,11 @@ const App: React.FC = () => {
             <Route path="/admin/*" element={adminState.currentAdmin !== null ? <AdminRoutes /> : <Navigate to={"/adminlogin"} />} />
             <Route path="/security/*" element={securityState.currentSecurity !== null ? <SecurityRoutes /> : <Navigate to={"/securitylogin"} />} />
             <Route path="/securitylogin" element={<Login />} />
-
           </Routes>
         </Router>
       </CommunityProvider>
     </ThemeProvider>
   );
-
 };
 
 export default App;

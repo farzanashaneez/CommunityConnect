@@ -18,6 +18,7 @@ import dashboardRoute  from './interfaces/routes/dashboardRoutes';
 import bookRoutes  from './interfaces/routes/bookingRoutes';
 import hallRoutes  from './interfaces/routes/hallRoutes';
 import stripeRoute from './interfaces/routes/stripeRoute'
+import QRRoutes from './interfaces/routes/QRCodeRoutes'
 
 import http from "http";
 import { ServiceAccount } from 'firebase-admin';
@@ -55,6 +56,7 @@ app.use('/api/getDashboardData', dashboardRoute);
 app.use('/api/booking', bookRoutes);
 app.use('/api/hall', hallRoutes);
 app.use('/api/payment',stripeRoute);
+app.use('/api/qrverification',QRRoutes);
 
 
 app.use(errorHandler);

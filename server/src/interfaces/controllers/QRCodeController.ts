@@ -1,33 +1,45 @@
-import { Request, Response, NextFunction } from 'express';
-import { QRCodeService } from '../../infrastructure/services/QRCodeService';
+import { Request, Response } from 'express';
+import { QRCodeUseCase } from '../../application/usecases/QRCodeUseCase';
 
 export class QRCodeController {
-  constructor(private qrCodeService: QRCodeService) {}
+  constructor(
+    private qrCodeUseCase: QRCodeUseCase,
+   
+  ) {}
 
-  async generateQRCode(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async generateQRCode(req: Request, res: Response): Promise<void> {
     try {
-      const { user, expirationHours = 24 } = req.body;
-      const expirationDate = new Date(Date.now() + expirationHours * 60 * 60 * 1000);
-      const data = JSON.stringify({
-        userId: user.id,
-        name: user.name,
-        expirationDate: expirationDate.toISOString(),
-      });
-
-      const qrCodeImage = await this.qrCodeService.generateQRCode(data);
-      res.json({ qrCodeImage });
+      const { userId,token,expiry } = req.body;
+      console.log(req.body)
+      const data = await this.qrCodeUseCase.GenerateQRCodeUseCase(userId,token,expiry);
+      res.json({ data });
     } catch (error) {
-      next(error);
+      res.status(500).json({ error: 'Failed to generate QR code' });
     }
   }
-
-  verifyQRCode(req: Request, res: Response, next: NextFunction): void {
+  async getToken(req: Request, res: Response): Promise<void> {
     try {
-      const { encryptedData } = req.body;
-      const result = this.qrCodeService.verifyQRCode(encryptedData);
-      res.json(result);
+      const { id } = req.params;
+      const token = await this.qrCodeUseCase.getToken(id);
+      console.log('0000000000000000000000000000000000000000000',token)
+
+      res.status(201).json(token);
     } catch (error) {
-      next(error);
+      res.status(500).json({ error: 'Failed to get token' });
+    }
+  }
+  async verifyQRCode(req: Request, res: Response): Promise<void> {
+    try {
+      const { token } = req.params;
+      const userId = await this.qrCodeUseCase.VerifyQRCodeUseCase(token);
+      
+      if (userId) {
+        res.json({ userId });
+      } else {
+        res.status(400).json({ error: 'Invalid or expired QR code' });
+      }
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to verify QR code' });
     }
   }
 }

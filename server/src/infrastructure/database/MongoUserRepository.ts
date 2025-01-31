@@ -77,6 +77,9 @@ export class MongoUserRepository implements UserRepository {
   async findAll(): Promise<User[]> {
     return UserModel.find({isSecurity:false}).populate("apartmentId").exec(); // Populate to get apartment details if needed
   }
+  async findAllSecurities(): Promise<User[]> {
+    return UserModel.find({isSecurity:true}).populate("apartmentId").exec(); // Populate to get apartment details if needed
+  }
   async findById(userId: string): Promise<User | null> {
     const objectId = new mongoose.Types.ObjectId(userId);
 
@@ -123,6 +126,7 @@ export class MongoUserRepository implements UserRepository {
   async getAllFCMTokens():Promise<string[]>{
     console.log("getallfcm")
     const users = await UserModel.aggregate([
+      { $match: { isSecurity: false } },
       { $unwind: '$fcmTokens' },
       { $project: { _id: 0, token: '$fcmTokens.token' } }
     ]);
@@ -130,6 +134,19 @@ export class MongoUserRepository implements UserRepository {
 
 return users.map(user=>user.token);
   }
+
+  async getAllFCMTokensOfSecurities():Promise<string[]>{
+
+    const users = await UserModel.aggregate([
+      { $match: { isSecurity: true } },
+      { $unwind: '$fcmTokens' },
+      { $project: { _id: 0, token: '$fcmTokens.token' } }
+    ]);
+    console.log("getallfcm",users)
+
+return users.map(user=>user.token);
+  }
+
   async updateName(
     userId: string,
     fullName: { firstname: string; lastname: string }

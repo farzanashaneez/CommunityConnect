@@ -25,10 +25,7 @@ const NotificationSidebar: React.FC<NavSidebarProps> = ({
   onClose,
   notifications,
 }) => {
-  // Add state to track seen notifications locally
-  const [localNotifications, setLocalNotifications] = useState(notifications);
   const userState = useAppSelector((s) => s.user);
-
   useEffect(() => {
     socket.on("notificationUpdate", (newNotification) => {
       console.log("New notification received:", newNotification);
@@ -38,50 +35,18 @@ const NotificationSidebar: React.FC<NavSidebarProps> = ({
       socket.off("notificationUpdate");
     };
   }, []);
-  // Update local state when props change
-  useEffect(() => {
-    setLocalNotifications(notifications);
-  }, [notifications]);
-
-  const handleMarkAsSeen = async (notificationId: string) => {
-    console.log("seen button clicked")
-    try {
-      await markAsSeen(notificationId, {
-        seenBy: userState.currentUser.user.id
-      });
-      
-      // Update local state after successful API call
-      setLocalNotifications(prevNotifications =>
-        prevNotifications.map(notif =>
-          notif._id === notificationId
-            ? {
-                ...notif,
-                seenBy: [...(notif.seenBy || []), userState.currentUser.user.id]
-              }
-            : notif
-        )
-      );
-    } catch (error) {
-      console.error('Error marking notification as seen:', error);
-    }
-  };
 
   return (
     <StyledDrawer anchor="right" open={open} onClose={onClose}>
       <List>
-        {localNotifications.map((notification, index) => (
-          <ListItemButton 
-            key={index}
-            onClick={() => handleMarkAsSeen(notification._id)}
-            
-            
-          >
+        {notifications.map((notification, index) => (
+          <ListItemButton key={index} onClick={()=>{markAsSeen(notification._id,{seenBy:userState.currentUser.user.id})}}>
             {notification?.seenBy?.includes(userState.currentUser.user.id) ? (
               <ListItemText primary={notification.message} />
             ) : (
               <ListItemText
                 className="text-blue-600"
-                primary={notification.message}
+                primary={notification?.message}
               />
             )}
           </ListItemButton>

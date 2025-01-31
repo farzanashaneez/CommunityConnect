@@ -10,6 +10,9 @@ class UserService {
   async getFCMTokens(){
     return this.userRepository.getAllFCMTokens();
   }
+  async getFCMTokensOfSecurities(){
+    return this.userRepository.getAllFCMTokensOfSecurities();
+  }
 }
 
 export default new UserService();

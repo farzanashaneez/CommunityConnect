@@ -1,37 +1,57 @@
-import React, { useState, useEffect, useRef } from 'react';
-import QRCode from 'react-qr-code';
-import axios from 'axios';
-import html2canvas from 'html2canvas';
+import React, { useState, useEffect, useRef } from "react";
+import QRCode from "react-qr-code";
+import axios from "axios";
+import html2canvas from "html2canvas";
+import { v4 as uuidv4 } from "uuid";
+import { fetchUserDetails, generateQRcode, getQRData } from "../services/api";
+import { useAppSelector } from "../hooks/reduxStoreHook";
+
+const generateUniqueToken = () => {
+  return uuidv4();
+};
 
 const QRCodeGenerator = () => {
-  const [qrData, setQRData] = useState('');
+  const [qrData, setQRData] = useState("");
   const [expiryTime, setExpiryTime] = useState<Date | null>(null);
+  const [QRToken, setQRToken] = useState('');
+
   const qrCodeRef = useRef<HTMLDivElement>(null);
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
+  const userState = useAppSelector((state) => state.user);
+  const id = userState.currentUser.user.id;
 
   useEffect(() => {
     fetchUserDataAndGenerateQR();
   }, []);
-
+useEffect(()=>{
+console.log('qrdata',qrData)
+},[qrData])
   const fetchUserDataAndGenerateQR = async () => {
     try {
-      const response = await axios.get('/api/user-details');
-      const userData = response.data;
-      
+      // const response = await fetchUserDetails(id)
+      const resp=await getQRData(id);
+      if(resp){
+        // setQRToken(resp.token)
+        console.log("response ",resp)
+        setQRData(`${import.meta.env.VITE_FRONTEND_URL}/security/verifyQRCode/${resp.token}`);
+        // setExpiryTime(resp.expiry)
+      }
+else{
       const expiryDate = new Date(Date.now() + 60 * 60 * 1000); // 1 hour from now
       setExpiryTime(expiryDate);
 
-      const qrContent = JSON.stringify({
-        userId: userData.id,
-        name: userData.name,
+      const uniqueToken = generateUniqueToken();
+      await generateQRcode({
+        userId: id,
+        token: uniqueToken,
         expiry: expiryDate.toISOString(),
-        verificationUrl: `${import.meta.env.VITE_FRONTEND_URL}/verify/${userData.id}`
       });
+      // setQRToken(uniqueToken)
+      setQRData(`${import.meta.env.VITE_FRONTEND_URL}/security/verifyQRCode/${uniqueToken}`);
+}
 
-      setQRData(`${import.meta.env.VITE_FRONTEND_URL}/verify/${userData.id}`);
     } catch (error) {
-      console.error('Error fetching user data:', error);
+      console.error("Error fetching user data:", error);
     }
   };
 
@@ -39,27 +59,29 @@ const QRCodeGenerator = () => {
     if (qrCodeRef.current) {
       try {
         const canvas = await html2canvas(qrCodeRef.current);
-        const imageData = canvas.toDataURL('image/png');
+        const imageData = canvas.toDataURL("image/png");
 
         // Create a blob from the image data
         const blob = await (await fetch(imageData)).blob();
-        const file = new File([blob], 'qrcode.png', { type: 'image/png' });
+        const file = new File([blob], "qrcode.png", { type: "image/png" });
 
         const shareData = {
           files: [file],
-          title: 'QR Code',
-          text: `Here's my QR Code for verification. It expires on ${expiryTime?.toLocaleString()}`
+          title: "QR Code",
+          text: `Here's my QR Code for verification. It expires on ${expiryTime?.toLocaleString()}`,
         };
 
         // Check if Web Share API is supported
 
-        if (typeof navigator.canShare === 'function'  && isMobile ) {
+        if (typeof navigator.canShare === "function" && isMobile) {
           await navigator.share(shareData);
         } else {
-          alert("Sharing is not supported on this browser. Please download the QR code and share manually.");
+          alert(
+            "Sharing is not supported on this browser. Please download the QR code and share manually."
+          );
         }
       } catch (error) {
-        console.error('Error sharing QR code:', error);
+        console.error("Error sharing QR code:", error);
       }
     }
   };
@@ -67,10 +89,10 @@ const QRCodeGenerator = () => {
   const downloadQRCode = async () => {
     if (qrCodeRef.current) {
       const canvas = await html2canvas(qrCodeRef.current);
-      const image = canvas.toDataURL('image/png');
-      const link = document.createElement('a');
+      const image = canvas.toDataURL("image/png");
+      const link = document.createElement("a");
       link.href = image;
-      link.download = 'qrcode.png';
+      link.download = "qrcode.png";
       link.click();
     }
   };
@@ -81,37 +103,45 @@ const QRCodeGenerator = () => {
       {qrData && (
         <div>
           <div ref={qrCodeRef}>
-            <QRCode value={qrData} size={256} />
+            <QRCode value={'http://192.168.0.101:5173/security/verifyQRCode/08f67e8f-e55d-49ad-809c-8ff22aca0571'} size={256} />
           </div>
-          {typeof navigator.canShare === 'function'  && isMobile ? (
-            <button onClick={shareViaWhatsApp} style={{
-              marginTop: '20px',
-              padding: '10px 20px',
-              backgroundColor: '#25D366',
-              color: 'white',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer'
-            }}>
+          {typeof navigator.canShare === "function" && isMobile ? (
+            <button
+              onClick={shareViaWhatsApp}
+              style={{
+                marginTop: "20px",
+                padding: "10px 20px",
+                backgroundColor: "#25D366",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
               Share via WhatsApp
             </button>
           ) : (
-            <button onClick={downloadQRCode} style={{
-              marginTop: '20px',
-              padding: '10px 20px',
-              backgroundColor: '#007bff',
-              color: 'white',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer'
-            }}>
+            <button
+              onClick={downloadQRCode}
+              style={{
+                marginTop: "20px",
+                padding: "10px 20px",
+                backgroundColor: "#007bff",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
               Download QR Code
             </button>
           )}
         </div>
       )}
       {expiryTime && (
-        <p className='my-10'>This QR code will expire on: {expiryTime.toLocaleString()}</p>
+        <p className="my-10">
+          This QR code will expire on: {expiryTime.toLocaleString()}
+        </p>
       )}
     </div>
   );

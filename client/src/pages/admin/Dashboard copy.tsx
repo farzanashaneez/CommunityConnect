@@ -201,7 +201,7 @@ export default function Dashboard() {
                 sx={{ maxHeight: 250, overflow: "auto" }}
               >
                 {dashboardData.recentEvents.map((event) => (
-                  <Grid item xs={6} sm={3} md={6} lg={4}  key={event._id}>
+                  <Grid item xs={6} sm={3}  key={event._id}>
                     <Card sx={{ display: "flex",flexDirection:"column", alignItems: "center", p: 2 }}>
                       <CardMedia
                         component="img"
@@ -211,7 +211,7 @@ export default function Dashboard() {
                       />
                       <CardContent sx={{ p: 0 }}>
                         <Typography variant="body2" fontWeight="light">
-                          {`${event.name.slice(0,12)}` || "Unnamed Event"}
+                          {event.name || "Unnamed Event"}
                         </Typography>
                       </CardContent>
                     </Card>
