@@ -5,45 +5,11 @@ import {  loggedOut as securitylogout ,loggedin as securityloggedin } from '../r
 
 import { signoutSuccess,signinSuccess } from '../redux-store/user/userSlice'; // Adjust import path
 
-const API_URL = 'http://192.168.0.101:5000/api';
+const API_URL = `${import.meta.env.VITE_API_URL}/api`;
 
 const api: AxiosInstance = axios.create({
   baseURL: API_URL,
 });
-
-// api.interceptors.request.use(
-//   (config) => {
-//     const state = store.getState();
-//     const admintoken = state.admin?.currentAdmin?.token;
-//     const currenttoken = state.user?.currentUser?.token;
-//     const securitytoken = state.security?.currentSecurity?.token;
-    
-//     console.log('Debug info:', {
-//       path: window.location.pathname,
-//       startsWithSecurity: window.location.pathname.startsWith('/security'),
-//       hasSecurityToken: !!securitytoken
-//     });
-    
-//     if (window.location.pathname.startsWith('/admin') && admintoken) {
-//       config.headers['Authorization'] = `Bearer ${admintoken}`;
-//       console.log('Using admin token');
-//     } 
-//     else if (window.location.pathname.startsWith('/security') && securitytoken) {
-//       config.headers['Authorization'] = `Bearer ${securitytoken}`;
-//       console.log('Using security token');
-//     }
-//     else if (currenttoken) {
-//       config.headers['Authorization'] = `Bearer ${currenttoken}`;
-//       console.log('Using current token');
-//     }
-    
-//     // Log the final header that will be sent
-//     console.log('Final Authorization header:', config.headers['Authorization']);
-    
-//     return config;
-//   },
-//   (error) => Promise.reject(error)
-// );
 
 
 api.interceptors.request.use(

@@ -36,12 +36,12 @@ const AdminServiceRequest: React.FC = () => {
       </Typography>
       <Divider />
       <Tabs value={tabValue} onChange={handleTabChange} sx={{ mb: 2 }}>
-        <Tab label="Local Service Request" />
+      
         <Tab label="Residential Service Request" />
       </Tabs>
       <Divider sx={{ my: 1 }} />
-      {tabValue === 0 && <LocalServicesTab />}
-      {tabValue === 1 && <ResidentialServicesTab />}
+      {/* {tabValue === 0 && <LocalServicesTab />} */}
+      {tabValue === 0 && <ResidentialServicesTab />}
     </Box>
   );
 };

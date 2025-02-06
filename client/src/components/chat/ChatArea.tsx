@@ -28,7 +28,7 @@ import { useAppSelector } from "../../hooks/reduxStoreHook";
 import { Delete } from "@mui/icons-material";
 import ConfirmationDialog from "../ConfirmationDialogue";
 
-const socket = io("http://192.168.0.101:5000", {
+const socket = io("http://192.168.0.104:5000", {
   path: "/socket.io",
   transports: ["websocket"], // Use WebSocket transport for better performance
 });

@@ -103,7 +103,7 @@ else{
       {qrData && (
         <div>
           <div ref={qrCodeRef}>
-            <QRCode value={'http://192.168.0.101:5173/security/verifyQRCode/08f67e8f-e55d-49ad-809c-8ff22aca0571'} size={256} />
+            <QRCode value={qrData} size={256} />
           </div>
           {typeof navigator.canShare === "function" && isMobile ? (
             <button

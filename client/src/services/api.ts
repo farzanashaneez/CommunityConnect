@@ -8,7 +8,7 @@ const stripePromise = loadStripe(key);
 
 
 
-const API_URL = 'http://192.168.0.101:5000/api';
+const API_URL = `${import.meta.env.VITE_API_URL}/api`;
 
 // stripe api
 export const handleStripePayment = async (bookingData:any,slotData:any): Promise<void> => {

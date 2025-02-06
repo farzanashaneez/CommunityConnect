@@ -1,10 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Calendar,
-  DateCellWrapperProps,
-  momentLocalizer,
-  SlotInfo,
-} from "react-big-calendar";
+import { Calendar, momentLocalizer, SlotInfo } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import {
@@ -64,10 +59,7 @@ interface BookingFormData {
   email: string;
   purpose: string;
 }
-interface CustomDayCellWrapperProps extends DateCellWrapperProps {
-  value: Date;
-  // children?:  React.ReactElement;
-}
+
 const HallBookingPage: React.FC = () => {
   const [halls, setHalls] = useState<Hall[]>([]);
   const [selectedHall, setSelectedHall] = useState<Hall | null>(null);
@@ -77,11 +69,6 @@ const HallBookingPage: React.FC = () => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isBookingFormOpen, setIsBookingFormOpen] = useState(false);
   const [isBooking, setIsBooking] = useState(false);
-  const [moreEventsDialog, setMoreEventsDialog] = useState({
-    open: false,
-    events: [] as Slot[],
-    date: null as Date | null,
-  });
 
   const [bookingForm, setBookingForm] = useState<BookingFormData>({
     name: "",
@@ -91,8 +78,8 @@ const HallBookingPage: React.FC = () => {
   const userState = useAppSelector((state) => state.user);
   const id = userState?.currentUser?.user?.id;
   const theme = useTheme();
-  const isMediumScreen = useMediaQuery(theme.breakpoints.down("md"));
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
     // Fetch halls data
@@ -110,7 +97,6 @@ const HallBookingPage: React.FC = () => {
       const fetchAvailableSlots = async () => {
         const numberOfDays = 30;
         const slots = await getAllavailableSlot(numberOfDays, selectedHall._id);
-        console.log(slots)
         setEvents(slots);
       };
       const fetchuser = async () => {
@@ -137,7 +123,6 @@ const HallBookingPage: React.FC = () => {
   };
 
   const handleSelectEvent = (event: Slot) => {
-    console.log("you have selected an event ============");
     setSelectedSlot(event);
     setIsBookingFormOpen(true);
   };
@@ -170,7 +155,7 @@ const HallBookingPage: React.FC = () => {
         ...selectedSlot,
         status: "booked",
       });
-      //  const resp = await bookAHall(bookindData, selectedSlot);
+      // const resp = await bookAHall(bookindData, selectedSlot);
       // console.log("response booking",resp)
     } catch (err) {
       console.log("bookin error");
@@ -181,220 +166,68 @@ const HallBookingPage: React.FC = () => {
     handleCloseBookingForm();
   };
 
-  // const eventStyleGetter = (event: Slot) => {
-  //   let style = {
-  //     backgroundColor: "#3174ad",
-  //     borderRadius: "0px",
-  //     opacity: 0.8,
-  //     color: "white",
-  //     border: "0px",
-  //     display: "block",
-  //   };
-
-  //   switch (event.slotType) {
-  //     case "HD-morning":
-  //       style.backgroundColor = "#4CAF50";
-  //       break;
-  //     case "HD-evening":
-  //       style.backgroundColor = "#FFC107";
-  //       break;
-  //     case "Fullday":
-  //       style.backgroundColor = "#2196F3";
-  //       break;
-  //   }
-
-  //   return { style };
-  // };
   const eventStyleGetter = (event: Slot) => {
-    let style: React.CSSProperties = {
-      borderRadius: "4px",
-      opacity: 1,
+    let style = {
+      backgroundColor: "#3174ad",
+      borderRadius: "0px",
+      opacity: 0.8,
       color: "white",
-      border: "none",
+      border: "0px",
       display: "block",
-      padding: "2px 4px",
-      fontSize: "12px",
-      fontWeight: "bold",
-      textAlign: "center",
-      whiteSpace: "nowrap",
-      overflow: "hidden",
-      textOverflow: "ellipsis",
     };
 
     switch (event.slotType) {
       case "HD-morning":
-        style.backgroundColor = "#4CAF50"; // Green
+        style.backgroundColor = "#4CAF50";
         break;
       case "HD-evening":
-        style.backgroundColor = "#FFC107"; // Amber
-        style.color = "black"; // Better contrast for amber background
+        style.backgroundColor = "#FFC107";
         break;
       case "Fullday":
-        style.backgroundColor = "#2196F3"; // Blue
+        style.backgroundColor = "#2196F3";
         break;
-      default:
-        style.backgroundColor = "#3174ad"; // Default blue
     }
 
     return { style };
   };
 
-  const DayCellWrapper: React.FC<CustomDayCellWrapperProps> = React.memo(
-    ({ children, value }) => {
-      const eventsForDay = events.filter((event) =>
-        moment(new Date(event.start))
-          .startOf("day")
-          .isSame(moment(value).startOf("day"))
-      );
-
-      const handleShowMore = (e: React.MouseEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log("Events for day:", eventsForDay); // Debug log
-        if (eventsForDay.length > 0) {
-          setMoreEventsDialog({
-            open: true,
-            events: eventsForDay,
-            date: value,
-          });
-        }
-      };
-
-      return (
-        <div className="rbc-day-bg" style={{ position: "relative" }}>
-          {children}
-          {eventsForDay.length > 2 && (
-            <div
-              role="button"
-              onClick={handleShowMore}
-              style={{
-                cursor: "pointer",
-                fontSize: "0.8em",
-                padding: "2px 4px",
-                color: "#666",
-                textAlign: "center",
-                backgroundColor: "#f5f5f5",
-                margin: "2px",
-                borderRadius: "4px",
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                right: 0,
-                zIndex: 1,
-              }}
-            >
-              +{eventsForDay.length - 2} more
-            </div>
-          )}
-        </div>
-      );
-    }
-  );
-
-  // Modified MoreEventsDialog component
-  const MoreEventsDialog = React.memo(() => (
-    <Dialog
-      open={moreEventsDialog.open}
-      onClose={() => setMoreEventsDialog((prev) => ({ ...prev, open: false }))}
-      maxWidth="sm"
-      fullWidth
-    >
-      <DialogTitle>
-        Events for{" "}
-        {moreEventsDialog.date
-          ? moment(moreEventsDialog.date).format("MMMM D, YYYY")
-          : ""}
-      </DialogTitle>
-      <DialogContent>
-        {moreEventsDialog.events.map((event, index) => (
-          <Box
-            key={index}
-            sx={{
-              mb: 2,
-              p: 2,
-              borderRadius: 1,
-              bgcolor: "background.paper",
-              "&:hover": {
-                bgcolor: "action.hover",
-                cursor: "pointer",
-              },
-            }}
-            onClick={() => {
-              handleSelectEvent(event);
-              setMoreEventsDialog((prev) => ({ ...prev, open: false }));
-            }}
-          >
-            <Typography variant="body1" fontWeight="medium">
-              {event.title}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {moment(event.start).format("h:mm a")} -{" "}
-              {moment(event.end).format("h:mm a")}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Type: {event.slotType}
-            </Typography>
-          </Box>
-        ))}
-      </DialogContent>
-      <DialogActions>
-        <Button
-          onClick={() =>
-            setMoreEventsDialog((prev) => ({ ...prev, open: false }))
-          }
-        >
-          Close
-        </Button>
-      </DialogActions>
-    </Dialog>
-  ));
-
-  // Modified EventComponent
-  // const EventComponent = React.memo(({ event }: { event: Slot }) => (
-  //   <div style={{ padding: '2px 4px' }}>
-  //     <div style={{ fontWeight: 'bold' }}>{event.title}</div>
-  //   </div>
-  // ));
-
   return (
     <Box sx={{ p: 3 }}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          mb: 2,
-          mr: 5,
-          flexDirection: isSmallScreen ? "column" : "row",
+      <Box sx={{ 
+      display: 'flex', 
+      justifyContent: 'space-between', 
+      alignItems: 'center', 
+      mb: 2,
+      mr: 5,
+      flexDirection: isSmallScreen ? 'column' : 'row'
+    }}>
+      <Typography 
+        variant="h4" 
+        sx={{ 
+          fontSize: {
+            xs: '1.5rem',
+            sm: '1.8rem',
+            md: '2.125rem'
+          }
         }}
       >
-        <Typography
-          variant="h4"
-          sx={{
-            fontSize: {
-              xs: "1.5rem",
-              sm: "1.8rem",
-              md: "2.125rem",
-            },
-          }}
-        >
-          Available Halls
-        </Typography>
-        <Button
-          variant="text"
-          href="/hallbooking/history"
-          sx={{
-            fontSize: {
-              xs: "16px",
-              sm: "18px",
-              md: "20px",
-            },
-            mt: isSmallScreen ? 2 : 0,
-          }}
-        >
-          Booking History
-        </Button>
-      </Box>
+        Available Halls
+      </Typography>
+      <Button 
+        variant="text"  
+        href="/hallbooking/history"
+        sx={{
+          fontSize: {
+            xs: '16px',
+            sm: '18px',
+            md: '20px'
+          },
+          mt: isSmallScreen ? 2 : 0
+        }}
+      >
+        Booking History
+      </Button>
+    </Box>
       <Grid container spacing={3}>
         {halls.map((hall) => (
           <Grid item xs={12} sm={6} md={4} key={hall._id}>
@@ -452,7 +285,6 @@ const HallBookingPage: React.FC = () => {
                 Full Day Price: ${selectedHall.price.fullDay}
               </Typography>
 
-        
               <Box sx={{ mt: 3, height: 500 }}>
                 <Calendar
                   localizer={localizer}
@@ -463,23 +295,7 @@ const HallBookingPage: React.FC = () => {
                   eventPropGetter={eventStyleGetter}
                   onSelectEvent={handleSelectEvent}
                   selectable
-                  components={{
-                    event: EventComponent,
-                   dateCellWrapper: DayCellWrapper as any, // Type assertion needed due to react-big-calendar types
-                  }}
-                  popup={false}
-                  views={["month"]}
-                  defaultView="month"
-                  tooltipAccessor={null}
-                  onShowMore={(events, date) => {
-                    setMoreEventsDialog({
-                      open: true,
-                      events: events as Slot[],
-                      date: date,
-                    });
-                  }}
                 />
-                <MoreEventsDialog />
               </Box>
             </Box>
           )}
@@ -565,85 +381,3 @@ const HallBookingPage: React.FC = () => {
 };
 
 export default HallBookingPage;
-
-
-
-// Modified EventComponent with better visibility
-const EventComponent = React.memo(({ event }: { event: Slot }) => {
-  const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 768);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsSmallScreen(window.innerWidth < 768);
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  const getAbbreviatedTitle = (slotType: string) => {
-    switch (slotType) {
-      case 'HD-morning':
-        return 'M';
-      case 'HD-evening':
-        return 'E';
-      case 'Fullday':
-        return 'FD';
-      default:
-        return '';
-    }
-  };
-
-  return (
-    <div
-      style={{
-        padding: "2px 4px",
-        position: "relative",
-        zIndex: 2,
-        borderRadius: "3px",
-        marginBottom: "1px",
-      }}
-    >
-      <div style={{ fontWeight: "lighter" }}>
-        {isSmallScreen ? getAbbreviatedTitle(event.slotType) : event.title}
-      </div>
-    </div>
-  );
-});
-
-
-// Modified eventStyleGetter for better visibility
-const eventStyleGetter = (event: Slot) => {
-  let style: React.CSSProperties = {
-    borderRadius: "4px",
-    opacity: 1,
-    color: "white",
-    border: "none",
-    display: "block",
-    padding: "2px 4px",
-    fontSize: "12px",
-    fontWeight: "bold",
-    textAlign: "center",
-    whiteSpace: "nowrap",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    zIndex: 2,
-    marginBottom: "2px",
-  };
-
-  switch (event.slotType) {
-    case "HD-morning":
-      style.backgroundColor = "#4CAF50";
-      break;
-    case "HD-evening":
-      style.backgroundColor = "#FFC107";
-      style.color = "black";
-      break;
-    case "Fullday":
-      style.backgroundColor = "#2196F3";
-      break;
-    default:
-      style.backgroundColor = "#3174ad";
-  }
-
-  return { style };
-};

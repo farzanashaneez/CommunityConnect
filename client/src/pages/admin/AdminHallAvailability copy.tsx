@@ -37,7 +37,7 @@ interface Slot {
   end: Date;
   slotType: 'HD-morning' | 'HD-evening' | 'Fullday';
   slotPrice: number;
-  status: 'available' | 'booked' | 'notavailable' | 'cancelled';
+  status: 'available' | 'booked' | 'notavailable' |'cancelled';
   bookingDetails?: {
     userId: string;
     purpose: string;
@@ -62,13 +62,7 @@ const AdminHallAvailabilityPage: React.FC = () => {
         const hallData = await fetchHallDetails(hallid);
         setHall(hallData);
         const slotsData = await fetchAllSlots(hallid);
-        // Ensure proper date objects for all slots
-        const formattedSlots = slotsData.map((slot:any) => ({
-          ...slot,
-          start: new Date(slot.start),
-          end: new Date(slot.end)
-        }));
-        setSlots(formattedSlots);
+        setSlots(slotsData);
       }
     };
     fetchData();
@@ -113,19 +107,15 @@ const AdminHallAvailabilityPage: React.FC = () => {
         style.backgroundColor = '#4CAF50';
         break;
       case 'booked':
-        style.backgroundColor = '#FF9800';
+        style.backgroundColor = 'red';
         break;
       case 'notavailable':
         style.backgroundColor = '#F44336';
-        break;
-      case 'cancelled':
-        style.backgroundColor = '#9E9E9E';
         break;
     }
 
     return { style };
   };
-
   const MoreEventsDialog = React.memo(() => (
     <Dialog
       open={moreEventsDialog.open}
@@ -134,7 +124,7 @@ const AdminHallAvailabilityPage: React.FC = () => {
       fullWidth
     >
       <DialogTitle>
-        {moreEventsDialog.date && moment(moreEventsDialog.date).format("MMMM D, YYYY")}
+        Events for {moreEventsDialog.date ? moment(moreEventsDialog.date).format("MMMM D, YYYY") : ""}
       </DialogTitle>
       <DialogContent>
         {moreEventsDialog.events.map((event, index) => (
@@ -177,7 +167,7 @@ const AdminHallAvailabilityPage: React.FC = () => {
       </DialogActions>
     </Dialog>
   ));
-
+  
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h4" gutterBottom>
@@ -188,13 +178,14 @@ const AdminHallAvailabilityPage: React.FC = () => {
         <Calendar
           localizer={localizer}
           events={slots}
-          startAccessor={(event: Slot) => new Date(event.start)}
-          endAccessor={(event: Slot) => new Date(event.end)}
+          startAccessor="start"
+          endAccessor="end"
           style={{ height: '100%' }}
           eventPropGetter={eventStyleGetter}
           onSelectEvent={handleSelectEvent}
-          popup
+          popup={false}
           onShowMore={(events, date) => {
+            console.log("show more clicked",events,date)
             setMoreEventsDialog({
               open: true,
               events: events as Slot[],
@@ -203,8 +194,8 @@ const AdminHallAvailabilityPage: React.FC = () => {
           }}
           selectable
         />
+         
       </Box>
-      
       <MoreEventsDialog />
 
       <Dialog open={isDetailsOpen} onClose={handleCloseDetails} fullWidth maxWidth="sm">
@@ -225,8 +216,7 @@ const AdminHallAvailabilityPage: React.FC = () => {
               <Typography variant="body1">
                 Status: <Chip label={selectedSlot.status} color={
                   selectedSlot.status === 'available' ? 'success' :
-                  selectedSlot.status === 'booked' ? 'warning' :
-                  selectedSlot.status === 'cancelled' ? 'default' : 'error'
+                  selectedSlot.status === 'booked' ? 'warning' : 'error'
                 } />
               </Typography>
               {selectedSlot.status === 'booked' && selectedSlot.bookingDetails && (
@@ -248,6 +238,11 @@ const AdminHallAvailabilityPage: React.FC = () => {
               Cancel Booking
             </Button>
           )}
+          {/* {selectedSlot?.status !== 'booked' && (
+            <Button onClick={() => handleUpdateSlotStatus(selectedSlot?.status === 'available' ? 'notavailable' : 'available')} color="primary">
+              Mark as {selectedSlot?.status === 'available' ? 'Not Available' : 'Available'}
+            </Button>
+          )} */}
           <Button onClick={handleCloseDetails}>Close</Button>
         </DialogActions>
       </Dialog>

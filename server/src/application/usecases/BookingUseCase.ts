@@ -65,8 +65,8 @@ export class BookingUseCase {
 
       const allSlots = this.generateAllSlots(startDate, forDays, hallId,halldata?.availableSlots,halldata?.price);
       const bookedSlots = await this.bookingRepository.getAllSlots(hallId);
-    console.log('bookedSlots',bookedSlots)
-    return this.updateSlotsWithBookings(allSlots, bookedSlots);
+
+      return this.updateSlotsWithBookings(allSlots, bookedSlots);
   }
 
     async getAvailableSlots(forDays: number, hallId: string): Promise<Slot[]> {
@@ -78,12 +78,11 @@ export class BookingUseCase {
       
     
       const halldata=await this.hallRepository.findById(hallId)
-      // console.log("halldata   ",halldata)
 
       const allSlots = this.generateAllSlots(startDate, forDays, hallId,halldata?.availableSlots,halldata?.price);
       const bookedSlots = await this.bookingRepository.getAvailableSlots(startDate, endDate,hallId);
-    console.log('bookedSlots',bookedSlots)
-      return this.filterAvailableSlots(allSlots, bookedSlots,halldata?.availableSlots);
+
+      return this.filterAvailableSlots(allSlots, bookedSlots);
     }
     
     private generateAllSlots(startDate: Date, numberOfDays: number, hallId: string,availableslot:any,price:Partial<Hall['price']>|undefined): Slot[] {
@@ -128,29 +127,66 @@ export class BookingUseCase {
       };
     }
     
-    private filterAvailableSlots(allSlots: Slot[], bookedSlots: Slot[],availableslot:any): Slot[] {
+    // private filterAvailableSlots(allSlots: Slot[], bookedSlots: Slot[],availableslot:any): Slot[] {
+    //   const bookedSlotMap = new Map(bookedSlots.map(slot => [this.getSlotKey(slot), slot]));
+    // console.log('booked slot map',bookedSlotMap,bookedSlots)
+    //   return allSlots.filter(slot => {
+    //     const bookedSlot = bookedSlotMap.get(this.getSlotKey(slot));
+    //     if (!bookedSlot) return true;
+    
+    //     if (slot.slotType === 'Fullday') {
+    //       return false; // Remove full-day slot if there's any booking
+    //     }
+    
+    //     if (bookedSlot.slotType === 'Fullday') {
+    //       return false; // Remove half-day slot if there's a full-day booking
+    //     }
+    
+    //     return slot.slotType !== bookedSlot.slotType; // Keep the slot if it's not the same type as the booked slot
+    //   });
+    // }
+    
+    private filterAvailableSlots(allSlots: Slot[], bookedSlots: Slot[]): Slot[] {
       const bookedSlotMap = new Map(bookedSlots.map(slot => [this.getSlotKey(slot), slot]));
-    
+      
       return allSlots.filter(slot => {
-        const bookedSlot = bookedSlotMap.get(this.getSlotKey(slot));
-        if (!bookedSlot) return true;
+           
+
+        const date = slot.start.toISOString().split('T')[0];
+        const fulldayKey = `Fullday-${date}`;
+        const morningKey = `HD-morning-${date}`;
+        const eveningKey = `HD-evening-${date}`;
     
-        if (slot.slotType === 'Fullday') {
-          return false; // Remove full-day slot if there's any booking
+        const isFulldayBooked = bookedSlotMap.has(fulldayKey);
+        const isMorningBooked = bookedSlotMap.has(morningKey);
+        const isEveningBooked = bookedSlotMap.has(eveningKey);
+    
+
+        // Remove all slots if both half-day and full-day are booked
+        if ((isMorningBooked && isEveningBooked) || (isFulldayBooked)) {
+          return false;
+        }
+  
+    
+        // Remove half-day morning and full-day when half-day morning is booked
+        if (isMorningBooked && (slot.slotType === 'Fullday' || slot.slotType === 'HD-morning')) {
+          return false;
         }
     
-        if (bookedSlot.slotType === 'Fullday') {
-          return false; // Remove half-day slot if there's a full-day booking
+        // Remove half-day evening and full-day when half-day evening is booked
+        if (isEveningBooked && (slot.slotType === 'Fullday' || slot.slotType === 'HD-evening')) {
+          return false;
         }
     
-        return slot.slotType !== bookedSlot.slotType; // Keep the slot if it's not the same type as the booked slot
+        return true;
       });
     }
     
+
     private getSlotKey(slot: Slot): string {
       return `${slot.slotType}-${slot.start.toISOString().split('T')[0]}`;
     }
-    
+   
     private updateSlotsWithBookings(allSlots: Slot[], bookedSlots: Slot[]): Slot[] {
       const bookedSlotMap = new Map(bookedSlots.map(slot => [this.getSlotKey(slot), slot]));
 
