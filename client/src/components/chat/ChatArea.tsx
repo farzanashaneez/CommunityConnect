@@ -28,7 +28,7 @@ import { useAppSelector } from "../../hooks/reduxStoreHook";
 import { Delete } from "@mui/icons-material";
 import ConfirmationDialog from "../ConfirmationDialogue";
 
-const socket = io(`${import.meta.env.VITE_API_URL}/:5000`, {
+const socket = io(`${import.meta.env.VITE_API_URL}`, {
   path: "/socket.io",
   transports: ["websocket"], // Use WebSocket transport for better performance
 });
