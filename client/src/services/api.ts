@@ -91,7 +91,7 @@ export const fetchUserDetails = async (id:string) => {
   return response.data;
 };
 
-export const addMember = async (token: string,id:string, memberData: { name: string; relation: string; profession: string }) => {
+export const addMember = async (_token: string,id:string, memberData: { name: string; relation: string; profession: string }) => {
   const response = await api.post(`${API_URL}/users/members/${id}`, memberData);
   return response.data;
 };
@@ -105,7 +105,7 @@ return response.data;
 return null;
   }
 
-export const updateName = async (token: string,id:string,firstname:string,lastname:string) => {
+export const updateName = async (_token: string,id:string,firstname:string,lastname:string) => {
   const response = await api.post(`${API_URL}/users/updatename/${id}`, {firstname,lastname});
   return response.data;
 };
@@ -122,7 +122,7 @@ export const addProfileImage = async (id:string, data:object) => {
   );
   return response.data;
 };
-export const addCoverphoto = async (token: string,id:string, data:object) => {
+export const addCoverphoto = async (_token: string,id:string, data:object) => {
   const response = await api.post(`${API_URL}/users/addcoverphoto/${id}`, data);
   return response.data;
 };

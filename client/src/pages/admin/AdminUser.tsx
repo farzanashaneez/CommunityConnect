@@ -47,7 +47,7 @@ const securityValidationSchema = Yup.object().shape({
     .required('Phone number is required'),
 });
 
-const AdminDashboard = () => {
+const AdminDashboard:React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [security, setSecurity] = useState<User[]>([]);
   const [apartments, setApartments] = useState([]);

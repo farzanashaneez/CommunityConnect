@@ -247,6 +247,9 @@ const EventCard: React.FC<EventCardProps> = ({ event, isAdmin = false }) => {
           markers={[{ lat: event.location.lat, lng: event.location.lng }]} 
           onPlaceSelected={handlePlaceSelected} // Pass the handler to MapComponent
         />
+        <Typography variant="body1" >
+            {selectedPlaceName}
+          </Typography>
 
         </DialogContent>
         <DialogActions>

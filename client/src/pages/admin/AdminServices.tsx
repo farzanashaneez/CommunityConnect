@@ -6,19 +6,14 @@ import {
   Tab,
   Button,
   TextField,
-  Card,
-  CardMedia,
-  CardContent,
   Divider,
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
 } from "@mui/material";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import ServiceList from "../../components/ServiceList";
-import TextButton from "../../components/TextButton";
 import ImageCropper from "../../components/ImageCropper";
 import { createService } from "../../services/api";
 import { useSnackbar } from "../../hooks/useSnackbar";
@@ -28,7 +23,7 @@ import { useAppSelector } from "../../hooks/reduxStoreHook";
 
 const AdminServices: React.FC = () => {
   const [tabValue, setTabValue] = useState(0);
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 

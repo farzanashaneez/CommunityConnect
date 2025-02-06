@@ -10,7 +10,6 @@ import SearchIcon from '@mui/icons-material/Search';
 import { alpha, styled } from '@mui/material/styles';
 import CustomSnackbar from '../../components/customSnackbar';
 import { useSnackbar } from '../../hooks/useSnackbar';
-import EventList from '../../components/EventList';
 import AnnouncementList from '../../components/AnnouncementList';
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
@@ -23,7 +22,7 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
 const Announcements:React.FC = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
+  const { snackbar, hideSnackbar } = useSnackbar();
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);

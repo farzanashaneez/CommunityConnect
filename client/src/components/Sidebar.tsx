@@ -1,10 +1,8 @@
-import { useTheme } from '@mui/material';
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
-  const theme=useTheme();
 
   const isActive = (path: string) => {
     return location.pathname.startsWith(path) ? "text-[#8B3A0E] font-bold" : "text-gray-900";

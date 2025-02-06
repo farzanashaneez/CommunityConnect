@@ -6,7 +6,7 @@ import { Box, Typography, CircularProgress } from '@mui/material';
 
 const PostDetails: React.FC = () => {
   const { postid } = useParams<{ postid: string }>();
-  const [post, setPost] = useState<PostProps | null>(null);
+  const [post, setPost] = useState<PostProps['post'] | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {

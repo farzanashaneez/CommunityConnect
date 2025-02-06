@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import { Paper, Button, Typography, CardContent, CardMedia, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { getAllEvents } from '../../services/api';
-import { getEventStatus } from '../EventCard';
 
 interface Event {
   _id: string;

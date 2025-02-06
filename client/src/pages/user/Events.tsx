@@ -3,7 +3,6 @@ import {
   InputBase,
   Box,
   Typography,
-  Button,
   Divider,
   
 } from '@mui/material';import React, { useState } from 'react'
@@ -23,7 +22,7 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
 const Events:React.FC = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
+  const { snackbar, hideSnackbar } = useSnackbar();
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);

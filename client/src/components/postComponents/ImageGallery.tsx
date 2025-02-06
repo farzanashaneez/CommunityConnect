@@ -24,9 +24,7 @@ setActiveStep(initialIndex)
     setActiveStep((prevActiveStep) => Math.max(prevActiveStep - 1, 0))
   }
 
-  const handleStepChange = (step: number) => {
-    setActiveStep(step)
-  }
+ 
 
   // Handle closing the dialog
   const handleClose = () => {

@@ -7,7 +7,6 @@ import {
   DialogActions,
   Button,
   List,
-  ListItem,
   ListItemAvatar,
   Avatar,
   ListItemText,
@@ -59,7 +58,7 @@ const SharePostTo: React.FC<SharePostToProps> = ({ postid, open, onClose }) => {
       // Find or create chat
       const userId = userState?.currentUser.user.id;
       if (!userId) throw new Error("user Id missing");
-      const sharepost = await sharePost(postid, userId, selectedUsers);
+       await sharePost(postid, userId, selectedUsers);
 
       // // Emit socket event
       // socket.emit("sendMessage", {

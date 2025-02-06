@@ -8,13 +8,11 @@ import {
   Divider,
   Dialog,
   DialogTitle,
-  DialogContent,
-  DialogActions,
   TextField,
 } from '@mui/material';
 import { alpha, styled } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
-import { Formik, Form, useFormik } from 'formik';
+import {  useFormik } from 'formik';
 import * as Yup from 'yup';
 import ServiceList from '../../components/ServiceList';
 import ImageCropper from '../../components/ImageCropper'; // Assuming ImageCropper is a separate component

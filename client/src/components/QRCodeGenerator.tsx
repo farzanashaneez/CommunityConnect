@@ -1,19 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import QRCode from "react-qr-code";
-import axios from "axios";
 import html2canvas from "html2canvas";
 import { v4 as uuidv4 } from "uuid";
-import { fetchUserDetails, generateQRcode, getQRData } from "../services/api";
+import { generateQRcode, getQRData } from "../services/api";
 import { useAppSelector } from "../hooks/reduxStoreHook";
 
 const generateUniqueToken = () => {
   return uuidv4();
 };
 
-const QRCodeGenerator = () => {
+const QRCodeGenerator:React.FC = () => {
   const [qrData, setQRData] = useState("");
   const [expiryTime, setExpiryTime] = useState<Date | null>(null);
-  const [QRToken, setQRToken] = useState('');
 
   const qrCodeRef = useRef<HTMLDivElement>(null);
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -28,10 +26,8 @@ console.log('qrdata',qrData)
 },[qrData])
   const fetchUserDataAndGenerateQR = async () => {
     try {
-      // const response = await fetchUserDetails(id)
       const resp=await getQRData(id);
       if(resp){
-        // setQRToken(resp.token)
         console.log("response ",resp)
         setQRData(`${import.meta.env.VITE_FRONTEND_URL}/security/verifyQRCode/${resp.token}`);
         // setExpiryTime(resp.expiry)

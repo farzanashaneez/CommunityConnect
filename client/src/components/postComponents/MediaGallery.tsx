@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import { Paper, Button, ImageList, ImageListItem, Typography, Dialog } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { Post, PostProps } from './Post';

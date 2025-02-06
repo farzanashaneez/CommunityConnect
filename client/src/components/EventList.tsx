@@ -8,8 +8,7 @@ import { socket } from "../services/socketConnection";
 
 const EventList: React.FC<EventListProps> = ({
   isAdmin = false,
-  searchTerm = "",
-  update,
+ 
 }) => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);

@@ -61,7 +61,7 @@ const ChatApp: React.FC = () => {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [chats, setChats] = useState<Chat[]>([]);
   const [updatechat,setupdateChat]=useState(0);
-  // getuser from redux
+  // getuser from redux updatechat
   const userState = useAppSelector((state) => state.user);
   const id = userState.currentUser.user.id;
   const userId = userState.currentUser.user.id;
@@ -91,6 +91,7 @@ const updatechatlist=(async ()=>{
  
   await fetchChats()
   setupdateChat(s=>s+1)
+  console.log(updatechat)
 
 })
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,7 +103,6 @@ const ondeletechat=()=>{
     prevChats.filter(chat=>chat._id!==selectedChat._id)
     )
   setSelectedChat(null)
- // window.location.reload();
 }
   const handleUserSelect = (userId: string) => {
     if (!isCreatingPersonal) {
@@ -229,14 +229,15 @@ setselectedFromQuery(selected)
 
   const handleCreatePersonalChat = () => {
     setIsCreatingPersonal(true);
+    setIsCreatingGroup(false)
     setDialogOpen(true); // Open the dialog for user selection
     setSelectedUsers([]); // Reset selected users
 
-    console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", selectedChat);
   };
 
   const handleCreateGroupChat = () => {
     setIsCreatingPersonal(false);
+    setIsCreatingGroup(true)
     setDialogOpen(true); // Open the dialog for user selection
     setSelectedUsers([]); // Reset selected users
   };

@@ -16,18 +16,7 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import { useLocation } from 'react-router-dom';
 import { confirmBooking, getAllBookingOfUser } from '../../services/api';
 import { useAppSelector } from '../../hooks/reduxStoreHook';
-interface Slot {
-    _id?:string;
-    id: string;
-    title: string;
-    start: Date;
-    end: Date;
-    slotType: 'HD-morning' | 'HD-evening' | 'Fullday';
-    slotPrice:number;
-    status:'available'| 'booked'|'cancelled'|'notavailable';
-    hallId: any;
-  }
-// entities/Booking.ts
+
  interface Booking {
     _id?: string;
     hallId: string;

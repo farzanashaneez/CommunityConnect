@@ -3,13 +3,11 @@ import {
   AppBar,
   Toolbar,
   IconButton,
-  InputBase,
   Avatar,
   Box,
   Badge,
   Drawer,
   List,
-  ListItem,
   ListItemText,
   ListItemIcon,
   useTheme,
@@ -25,7 +23,6 @@ import {
   DialogContent,
 } from "@mui/material";
 import {
-  Search as SearchIcon,
   Notifications as NotificationsIcon,
   Chat as ChatIcon,
   Menu as MenuIcon,
@@ -59,53 +56,6 @@ const StyledToolbar = styled(Toolbar)({
   padding: "0 24px",
 });
 
-const SearchWrapper = styled("div")(({ theme }) => ({
-  position: "relative",
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor:
-    theme.palette.mode === "light"
-      ? "rgba(0, 0, 0, 0.04)"
-      : "rgba(255, 255, 255, 0.04)",
-  "&:hover": {
-    backgroundColor:
-      theme.palette.mode === "light"
-        ? "rgba(0, 0, 0, 0.08)"
-        : "rgba(255, 255, 255, 0.08)",
-  },
-  marginRight: theme.spacing(2),
-  marginLeft: 0,
-  width: "100%",
-  [theme.breakpoints.up("sm")]: {
-    marginLeft: theme.spacing(3),
-    width: "auto",
-  },
-}));
-
-const SearchIconWrapper = styled("div")(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: "100%",
-  position: "absolute",
-  pointerEvents: "none",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: "inherit",
-  "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 1, 1, 0),
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create("width"),
-    width: "100%",
-    [theme.breakpoints.up("md")]: {
-      width: "20ch",
-      "&:focus": {
-        width: "30ch",
-      },
-    },
-  },
-}));
 
 const NavLink = styled(Link)(({ theme }) => ({
   color: theme.palette.text.primary,
@@ -139,7 +89,6 @@ interface NavItem {
 const NavBar: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [notifCount,setNotifCount] = useState(null)
@@ -430,8 +379,6 @@ const NavBar: React.FC = () => {
         >
           Profile
         </MenuItem>
-        {/* <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
-        <MenuItem onClick={handleMenuClose}>Logout</MenuItem> */}
       </Menu>
       <Dialog
       

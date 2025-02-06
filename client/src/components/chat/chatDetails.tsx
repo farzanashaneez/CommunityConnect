@@ -27,7 +27,7 @@ const ChatDetails: React.FC<ChatDetailsProps> = ({ selectedChat, isTablet, detai
   const id = userState.currentUser.user.id;
   const [userIndex,setUserIndex]=useState(0)
 useEffect(()=>{
-  setUserIndex(s=>selectedChat?.participants[userIndex]._id===id? 1 : 0 )
+  setUserIndex(_s=>selectedChat?.participants[userIndex]._id===id? 1 : 0 )
 },[selectedChat])
   const content = (
     <Box sx={{ 

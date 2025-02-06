@@ -1,12 +1,10 @@
-// src/pages/UserProfile.tsx
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Button, IconButton, Avatar, Modal, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Grid, Grid2, Divider, Card } from '@mui/material';
+import { Box, Typography, Button, IconButton, Avatar, Modal, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Grid, Divider } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import { fetchUserDetails, addMember, updateName, addProfileImage } from '../../services/api';
 import { useAppSelector } from '../../hooks/reduxStoreHook';
 import ImageCropper from '../../components/ImageCropper';
 import PostList from '../../components/postComponents/PostList';
-import ServiceList from '../../components/ServiceList';
 import UserServices from '../../components/home/UserServices';
 import Logout from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';

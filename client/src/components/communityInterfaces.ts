@@ -24,8 +24,7 @@ export interface Service {
   }
   
  export  interface EventListProps {
-    searchTerm?: string;
-    update?:number;
+  
     isAdmin:boolean;
   }
 
@@ -41,7 +40,5 @@ export interface Service {
   }
   
  export  interface AnnouncementListProps {
-    searchTerm?: string;
-    update?:number;
     isAdmin:boolean;
   }

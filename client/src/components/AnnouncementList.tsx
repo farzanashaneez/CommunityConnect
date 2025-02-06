@@ -7,7 +7,7 @@ import { useCommunityContext } from "../context/communityContext";
 import { socket } from "../services/socketConnection";
 
 
-const AnnouncementList: React.FC<AnnouncementListProps> = ({isAdmin=false,searchTerm='',update}) => {
+const AnnouncementList: React.FC<AnnouncementListProps> = ({isAdmin=false}) => {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
   const { completed, setCompleted } = useCommunityContext();

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { Drawer, List, ListItem, ListItemButton, ListItemText } from "@mui/material";
+import { Drawer, List, ListItemButton, ListItemText } from "@mui/material";
 import { alpha, styled } from "@mui/material/styles";
 import { socket } from "../../services/socketConnection";
 import { useAppSelector } from "../../hooks/reduxStoreHook";

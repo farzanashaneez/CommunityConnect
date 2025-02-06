@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import { Box } from '@mui/material';
 import PageNotFound from '../pages/PageNotFound';
 import NavBar from '../components/Navbar';
@@ -16,7 +16,6 @@ import HallBookingCalendar from '../pages/user/HallBooking';
 import BookingHistory from '../pages/user/BookingHistory';
 
 const UserRoutes: React.FC = () => {
-    const location = useLocation();
 
     return (
         <Box sx={{ 

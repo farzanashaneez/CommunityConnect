@@ -24,10 +24,6 @@ const ProfileImage = styled(Avatar)({
   left: "24px",
 });
 
-const ProfileInfo = styled(Box)({
-  marginTop: "70px",
-  marginBottom: "20px",
-});
 
 interface User {
   firstName: string;

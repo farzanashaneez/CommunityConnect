@@ -3,12 +3,10 @@ import {
   Calendar,
   DateCellWrapperProps,
   momentLocalizer,
-  SlotInfo,
 } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import {
-  bookAHall,
   fetchUserDetails,
   getAllHall,
   getAllavailableSlot,
@@ -91,7 +89,6 @@ const HallBookingPage: React.FC = () => {
   const userState = useAppSelector((state) => state.user);
   const id = userState?.currentUser?.user?.id;
   const theme = useTheme();
-  const isMediumScreen = useMediaQuery(theme.breakpoints.down("md"));
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
@@ -610,40 +607,3 @@ const EventComponent = React.memo(({ event }: { event: Slot }) => {
   );
 });
 
-
-// Modified eventStyleGetter for better visibility
-const eventStyleGetter = (event: Slot) => {
-  let style: React.CSSProperties = {
-    borderRadius: "4px",
-    opacity: 1,
-    color: "white",
-    border: "none",
-    display: "block",
-    padding: "2px 4px",
-    fontSize: "12px",
-    fontWeight: "bold",
-    textAlign: "center",
-    whiteSpace: "nowrap",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    zIndex: 2,
-    marginBottom: "2px",
-  };
-
-  switch (event.slotType) {
-    case "HD-morning":
-      style.backgroundColor = "#4CAF50";
-      break;
-    case "HD-evening":
-      style.backgroundColor = "#FFC107";
-      style.color = "black";
-      break;
-    case "Fullday":
-      style.backgroundColor = "#2196F3";
-      break;
-    default:
-      style.backgroundColor = "#3174ad";
-  }
-
-  return { style };
-};

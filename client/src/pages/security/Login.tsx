@@ -49,7 +49,7 @@ const Login: React.FC = () => {
   const dispatch = useAppDispatch();
   const securityState = useAppSelector((state) => state.security);
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
-  const [resetPasswordOpen, setResetPasswordOpen] = useState(false);
+  // const [resetPasswordOpen, setResetPasswordOpen] = useState(false);
   const [emailVerified, setEmailVerified] = useState(false);
   const [verifiedId,setverifiedId]=useState('')
   const [snackbar, setSnackbar] = useState<{
@@ -135,7 +135,7 @@ const Login: React.FC = () => {
           message: 'Password has been successfully reset',
           severity: 'success'
         });
-        setResetPasswordOpen(false);
+        // setResetPasswordOpen(false);
         setForgotPasswordOpen(false);
         setEmailVerified(false);
       } catch (error) {

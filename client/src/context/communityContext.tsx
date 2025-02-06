@@ -61,7 +61,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
   const handlepostUpdated= (status: boolean) => {
     setPostUpdated(status);
   };
-  const deleteService = (id: string,type?:string) => {
+  const deleteService = (_id: string,type?:string) => {
     if(type==='event'){
       socket.emit("update",'event');
 
@@ -81,7 +81,7 @@ export const CommunityProvider: React.FC<{ children: ReactNode }> = ({ children 
     handleCompleted(true); 
   };
 
-  const updateService = (updatedService: Service,type?:string) => {
+  const updateService = (_updatedService: Service,type?:string) => {
  if(type==='event'){
       openSnackbar("Event updated successfully", "success");
       socket.emit("update",'event');

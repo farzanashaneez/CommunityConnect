@@ -26,7 +26,7 @@ const ImageUploadAndCrop: React.FC<ImageUploadAndCropProps> = ({ onImageCropped 
     }
   };
 
-  const handleCropComplete = async (croppedArea: any, croppedAreaPixels: any) => {
+  const handleCropComplete = async (_croppedArea: any, croppedAreaPixels: any) => {
     const croppedImage = await getCroppedImage(imageSrc!, croppedAreaPixels);
     onImageCropped(croppedImage);
     setShowCropper(false);

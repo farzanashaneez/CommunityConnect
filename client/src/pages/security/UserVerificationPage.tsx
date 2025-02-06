@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Card, CardContent, Typography, CircularProgress, Box } from "@mui/material";
-import { fetchUserDetails, getQRData, verifyQRcode } from "../../services/api";
+import { verifyQRcode } from "../../services/api";
 import { User } from "../../types/User";
-
-// Define the User type
 
 
 const UserVerificationPage: React.FC = () => {
-  // Get the `id` parameter from the URL
   const { id } = useParams<{ id: string }>();
 
   // State to store user data and loading/error status

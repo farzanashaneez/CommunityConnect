@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
-import parse from "html-react-parser";
+// import parse from "html-react-parser";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 
 import {
@@ -28,7 +28,7 @@ import { useAppSelector } from "../../hooks/reduxStoreHook";
 import { Delete } from "@mui/icons-material";
 import ConfirmationDialog from "../ConfirmationDialogue";
 
-const socket = io("http://192.168.0.104:5000", {
+const socket = io(`${import.meta.env.VITE_API_URL}/:5000`, {
   path: "/socket.io",
   transports: ["websocket"], // Use WebSocket transport for better performance
 });
@@ -92,10 +92,9 @@ const ChatArea: React.FC<ChatAreaProps> = ({
     unreadMessageIds: string[],
     status: string
   ) => {
-    console.log(">>>>>>>>>>", unreadMessageIds);
 
     try {
-      const response = await updateMessageStatus(
+     await updateMessageStatus(
         selectedChat._id,
         unreadMessageIds,
         status
@@ -112,7 +111,6 @@ const ChatArea: React.FC<ChatAreaProps> = ({
     }
 
     socket.on("newMessage", (newMessage: Message) => {
-      console.log("--->", newMessage);
       setMessages((prevMessages) => {
         if (!prevMessages.some((msg) => msg._id === newMessage._id)) {
           return [...prevMessages, newMessage];

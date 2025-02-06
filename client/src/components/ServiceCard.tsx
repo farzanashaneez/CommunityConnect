@@ -123,7 +123,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
   const handleDetailsOpen = () => setDetailsDialogOpen(true);
   const handleDetailsClose = () => setDetailsDialogOpen(false);
 
-  const handleContactProvider=async(serviceData: any, provider: string, requestby: string, shareMessage: string)=>{
+  const handleContactProvider=async(serviceData: any, provider: string, requestby: string)=>{
 try{
   const message=`I would like to know more about the service- ${serviceData.name} you provided `
 const chatdata=await contactServiceProvider(serviceData,provider,requestby,message)
@@ -284,7 +284,7 @@ console.log('cannot contact',err)
             e.preventDefault(); // Prevent default behavior
             e.stopPropagation();
 
-            handleContactProvider(service,service.provider._id,id,'message'); // Call the function to open details
+            handleContactProvider(service,service.provider._id,id); // Call the function to open details
           }}
          >
            contact

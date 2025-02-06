@@ -119,7 +119,6 @@ const App: React.FC = () => {
             icon: '/firebase-logo.png',
             badge: '/badge-icon.png',
             tag: 'new-message',
-            renotify: true,
             requireInteraction: true
           });
         });

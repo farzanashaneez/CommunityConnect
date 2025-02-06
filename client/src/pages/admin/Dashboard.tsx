@@ -23,7 +23,7 @@ import { useNavigate } from "react-router-dom";
 import { Event } from "../../components/communityInterfaces";
 
 // Mock data for the line charts
-const mockChartData = Array.from({ length: 10 }, (_, i) => ({
+const mockChartData = Array.from({ length: 10 }, (_,_i) => ({
   value: Math.random() * 100,
 }));
 interface DashboardData {

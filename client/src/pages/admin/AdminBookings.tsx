@@ -82,7 +82,7 @@ const AdminBookings: React.FC = () => {
     fetchBookings();
   }, []);
 
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
 

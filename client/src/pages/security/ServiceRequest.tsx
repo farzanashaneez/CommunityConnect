@@ -9,26 +9,21 @@ import {
   CardContent,
   Divider,
   Grid,
-  Button,
 } from "@mui/material";
 import TextButton from "../../components/TextButton";
 import { useCommunityContext } from "../../context/communityContext";
 import {
   getAllRequestedServices,
-  getFilteredServices,
-  grantServiceApi,
   markAsCompleted,
-  rejectServiceApi,
 } from "../../services/api";
 import { Service } from "../../interfaces/communityInterfaces";
-import ConfirmationDialog from "../../components/ConfirmationDialogue";
 import { socket } from "../../services/socketConnection";
 
 const ServiceRequest: React.FC = () => {
   const [tabValue, setTabValue] = useState(0);
  
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 

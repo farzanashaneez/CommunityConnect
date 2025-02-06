@@ -110,12 +110,6 @@ const AdminHalls: React.FC = () => {
     },
     validationSchema: hallValidationSchema,
     onSubmit: async (values: any) => {
-      const hallWithImages: Hall = {
-        ...values,
-        id: selectedHall?._id || Date.now().toString(),
-        images: imageFiles.map((file) => URL.createObjectURL(file)),
-      };
-
       if (selectedHall) {
        try{
         const id=selectedHall?._id || ''
@@ -160,7 +154,7 @@ const AdminHalls: React.FC = () => {
           flattenObject(values);
 
           // Append files
-          imageFiles.forEach((file, index) => {
+          imageFiles.forEach((file) => {
             formData.append(`images`, file);
           });
           console.log("formdata", formData);
@@ -192,7 +186,7 @@ const AdminHalls: React.FC = () => {
 
   const handleDeleteHall = async (hallId: string) => {
     try {
-      const res = await deleteHall(hallId);
+      await deleteHall(hallId);
       showSnackbar("Hall deleted successfully", "success");
     } catch (err) {
       showSnackbar("error happens while deleting ", "error");
