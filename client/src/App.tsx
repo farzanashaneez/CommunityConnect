@@ -40,49 +40,83 @@ const App: React.FC = () => {
   };
 
   const checkNotificationPermission = () => {
-    if (Notification?.permission === 'default') {
-      setShowNotificationPrompt(true);
-    } else if (Notification?.permission === 'granted') {
-      setupFCM();
+    if (typeof window !== "undefined" && "Notification" in window) {
+      if (Notification.permission === "default") {
+        setShowNotificationPrompt(true);
+      } else if (Notification.permission === "granted") {
+        setupFCM();
+      } else {
+        console.error("Notification permission denied");
+      }
+    } else {
+      console.warn("Notifications are not supported on this browser.");
     }
   };
+  
 
-  const requestNotificationPermission = async () => {
+ const requestNotificationPermission = async () => {
+  if (typeof window !== "undefined" && "Notification" in window) {
     try {
-      const permission = await Notification?.requestPermission();
-      if (permission === 'granted') {
+      const permission = await Notification.requestPermission();
+      if (permission === "granted") {
         setShowNotificationPrompt(false);
         setupFCM();
       } else {
-        console.log('Notification permission denied');
+        console.log("Notification permission denied");
       }
     } catch (error) {
-      console.error('An error occurred while requesting permission:', error);
+      console.error("An error occurred while requesting permission:", error);
     }
-  };
+  } else {
+    console.warn("Notifications are not supported on this device/browser.");
+  }
+};
 
+  // const setupFCM = async () => {
+  //   const currentPath = window.location.pathname;
+  //   const isRestrictedRoute = currentPath.startsWith('/admin') || 
+  //                           (currentPath.startsWith('/security') && !userState.currentUser);
+
+  //   if (!isRestrictedRoute) {
+  //     try {
+  //       // Initialize messaging first
+  //       await initializeMessaging();
+        
+  //       // Get the FCM token using the new function
+  //       const token = await getMessagingToken(VAPID_KEY);
+        
+  //       if (token) {
+  //         console.log('FCM Token:', token);
+  //         await sendTokenToServer(token);
+  //       }
+  //     } catch (error) {
+  //       console.error('An error occurred while setting up FCM:', error);
+  //     }
+  //   }
+  // };
   const setupFCM = async () => {
-    const currentPath = window.location.pathname;
-    const isRestrictedRoute = currentPath.startsWith('/admin') || 
-                            (currentPath.startsWith('/security') && !userState.currentUser);
-
-    if (!isRestrictedRoute) {
-      try {
-        // Initialize messaging first
-        await initializeMessaging();
-        
-        // Get the FCM token using the new function
-        const token = await getMessagingToken(VAPID_KEY);
-        
-        if (token) {
-          console.log('FCM Token:', token);
-          await sendTokenToServer(token);
+    if (typeof window !== "undefined" && "Notification" in window) {
+      const currentPath = window.location.pathname;
+      const isRestrictedRoute = currentPath.startsWith("/admin") || 
+                                (currentPath.startsWith("/security") && !userState.currentUser);
+  
+      if (!isRestrictedRoute) {
+        try {
+          await initializeMessaging();
+          const token = await getMessagingToken(VAPID_KEY);
+          if (token) {
+            console.log("FCM Token:", token);
+            await sendTokenToServer(token);
+          }
+        } catch (error) {
+          console.error("An error occurred while setting up FCM:", error);
         }
-      } catch (error) {
-        console.error('An error occurred while setting up FCM:', error);
       }
+    } else {
+      console.warn("FCM setup skipped: Notifications are not supported on this device/browser.");
     }
   };
+  
 
   const sendTokenToServer = async (token: string) => {
     console.log('Sending token to server:', token);
