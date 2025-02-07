@@ -30,8 +30,7 @@ export class ServiceController {
         category: req.body.category || "common",
         imageUrl: req.imageUrl || "",
       };
-      console.log(serviceData, "===========file", serviceData, req.body);
-
+     
       const newService = await this.serviceUseCase.createService(serviceData);
       const notificationMessage = `New service created: ${newService.name}`;
 
@@ -166,7 +165,7 @@ export class ServiceController {
       console.log("service id, userid",newreqService)
 
       const tokensFCM=await UserService.getFCMTokensOfSecurities();
-      console.log("token FCM =============xxxxxxx=============>",tokensFCM)
+      
       if(tokensFCM){
         await sendMulticastNotification(tokensFCM,"Service Request..!",'You have new Service Request')
 

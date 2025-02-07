@@ -21,6 +21,7 @@ import CustomSnackbar from "./customSnackbar";
 import { useCommunityContext } from "../context/communityContext";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
+import ConfirmationDialog from "./ConfirmationDialogue";
 
 interface Announcement {
   _id: string;
@@ -45,12 +46,16 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
 
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  const [confirmAction,setConfirmAction]=useState(false);
+  const [selectedId,setselectedId]=useState<string>('');
 
-  const handleDelete = async (id: string) => {
+
+  const handleDelete = async () => {
+    console.log(selectedId)
     try {
-      await deleteAnnouncementApi(id);
+      await deleteAnnouncementApi(selectedId);
       showSnackbar("Announcement deleted successfully", "success");
-      deleteService(id, "announcement");
+      deleteService(selectedId, "announcement");
     } catch (error) {
       console.error("Error deleting announcement:", error);
       showSnackbar("Failed to delete announcement.", "error");
@@ -119,7 +124,8 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
               color="error"
               onClick={(e) => {
                 e.stopPropagation();
-                handleDelete(announcement._id);
+                setselectedId(announcement._id);
+                setConfirmAction(true)
               }}
             >
               <DeleteIcon fontSize="small" />
@@ -186,7 +192,13 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
           onClose={hideSnackbar}
         />
       </Card>
-
+      <ConfirmationDialog
+        open={confirmAction}
+        onClose={() => setConfirmAction(false)}
+        onConfirm={handleDelete}
+        title="Confirm Delete"
+        message="Do you want to continue?"
+      />
       {/* Details Dialog */}
       <Dialog open={isDetailsDialogOpen} onClose={handleDetailsClose}>
         <DialogTitle>{announcement.title}</DialogTitle>

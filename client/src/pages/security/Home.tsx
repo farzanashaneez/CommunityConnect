@@ -62,7 +62,8 @@ const Home: React.FC = () => {
         secondary={`${resident?.apartmentId?.buildingSection}${resident?.apartmentId?.apartmentNumber}`} 
       />
       <ListItemSecondaryAction>
-        <IconButton edge="end" aria-label="call" onClick={() => window.location.href = `tel:${resident.phoneNumber}`}>
+        <IconButton edge="end" aria-label="call" onClick={() =>{ console.log('call clicked',resident.mobileNumber)
+         window.location.href = `tel:${resident.mobileNumber}`}}>
 
           <PhoneIcon />
         </IconButton>

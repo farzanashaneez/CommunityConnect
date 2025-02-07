@@ -30,12 +30,11 @@ const ServiceRequest: React.FC = () => {
   return (
     <Box sx={{ padding: 2 }}>
       <Typography variant="h4" sx={{ textAlign: "center", mb: 2 }}>
-        Admin Service Requests
+       Service Requests
       </Typography>
       <Divider />
       <Tabs value={tabValue} onChange={handleTabChange} sx={{ mb: 2 }}>
         <Tab label="Local Service Request" />
-        <Tab label="Residential Service Request" />
       </Tabs>
       <Divider sx={{ my: 1 }} />
       {tabValue === 0 && <LocalServicesTab />}
@@ -100,9 +99,7 @@ const LocalServicesTab = () => {
       }}
     >
       <Box sx={{ flex: 1 }}>
-        <Typography variant="h6" sx={{ mb: 2 }}>
-          Local Service Requests
-        </Typography>
+      
         <Box
           sx={{
             height: "auto",
@@ -112,7 +109,7 @@ const LocalServicesTab = () => {
             mb: 5,
             boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.3)",
             borderRadius: "4px",
-            maxHeight:'100vh'
+            maxHeight:'70vh'
           }}
         >
            {serviceRequstArray.length>0?(<Grid container spacing={2}>
@@ -216,14 +213,13 @@ const LocalServicesTab = () => {
             {serviceRequstCompletedArray.map((item: any, index) => (
               <Grid item xs={12} sm={6} md={6} lg={12} xl={6} key={index}>
                 <Card
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    bgcolor: "#E5E4E2",
-                    height: { md: "60px" },
-                    paddingLeft: "5px",
-                  }}
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      bgcolor: "#E5E4E2",
+                      height: { md: "80px" },
+                    }}
                 >
                   <CardMedia
                     component="img"
@@ -238,7 +234,7 @@ const LocalServicesTab = () => {
                   />
                   <CardContent
                     sx={{
-                      flex: 2,
+                      flex: 1,
                       display: "flex",
                       flexDirection: "column",
                       justifyContent: "space-between",
@@ -246,26 +242,27 @@ const LocalServicesTab = () => {
                     }}
                   >
                     <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-evenly",
-                        alignItems: "center",
-                      }}
+                     sx={{
+                      display: "flex",
+                      justifyContent: "between",
+                      flexDirection: "column",
+                    }}
                     >
-                      <Typography variant="body1">
+                      <Typography variant="body2" noWrap>
                         {item.serviceId.name}
                       </Typography>
+                      <Typography variant="caption" sx={{ fontWeight: "400" }}>
+                        Requested by
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontWeight: "600" }}>
+                        {item.requestId.apartmentId.buildingSection}-
+                        {item.requestId.apartmentId.apartmentNumber || "NA"}
+                      </Typography>
+
                       <Box
                         sx={{ display: "flex", flexDirection: "column", ml: 1 }}
                       >
-                        <Typography variant="body2" sx={{ fontWeight: "400" }}>
-                          requested by
-                        </Typography>
-                        <Typography variant="body1" sx={{ fontWeight: "800" }}>
-                          {item.requestId.apartmentId.buildingSection +
-                            -+item.requestId.apartmentId.apartmentNumber ||
-                            "NA"}
-                        </Typography>
+                          
                       </Box>
                     </Box>
                   </CardContent>
@@ -277,12 +274,6 @@ const LocalServicesTab = () => {
           
         </Box>
       </Box>
-      {/* <CustomSnackbar
-        open={snackbar.open}
-        message={snackbar.message}
-        severity={snackbar.severity}
-        onClose={hideSnackbar}
-      /> */}
     </Box>
   );
 };

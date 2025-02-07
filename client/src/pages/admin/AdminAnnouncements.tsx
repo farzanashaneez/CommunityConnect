@@ -152,124 +152,114 @@ const AdminAnnouncements: React.FC = () => {
 
       {/* Dialog for adding a new announcement */}
       <Dialog open={isAddDialogOpen} onClose={() => setAddDialogOpen(false)}>
-        <DialogTitle>Add New Announcement</DialogTitle>
-        <form onSubmit={formik.handleSubmit}>
-          <TextField
-            label="Title"
-            variant="outlined"
-            fullWidth
-            {...formik.getFieldProps("title")}
-            error={formik.touched.title && Boolean(formik.errors.title)}
-            helperText={formik.touched.title && formik.errors.title}
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            fullWidth
-            label="Description"
-            variant="outlined"
-            multiline
-            rows={3}
-            sx={{ mb: 2 }}
-            {...formik.getFieldProps("description")}
-            error={
-              formik.touched.description && Boolean(formik.errors.description)
-            }
-            helperText={formik.touched.description && formik.errors.description}
-          />
-          {/* <TextField
-            label="Date"
-            type="date"
-            fullWidth
-            InputLabelProps={{ shrink: true }}
-            {...formik.getFieldProps("date")}
-            error={formik.touched.date && Boolean(formik.errors.date)}
-            helperText={formik.touched.date && formik.errors.date}
-            sx={{ mb: 2 }}
-          /> */}
+  <DialogTitle>Add New Announcement</DialogTitle>
+  <Box sx={{ p: 3 }}> {/* Added padding here */}
+    <form onSubmit={formik.handleSubmit}>
+      <TextField
+        label="Title"
+        variant="outlined"
+        fullWidth
+        {...formik.getFieldProps("title")}
+        error={formik.touched.title && Boolean(formik.errors.title)}
+        helperText={formik.touched.title && formik.errors.title}
+        sx={{ mb: 2 }}
+      />
+      <TextField
+        fullWidth
+        label="Description"
+        variant="outlined"
+        multiline
+        rows={3}
+        sx={{ mb: 2 }}
+        {...formik.getFieldProps("description")}
+        error={formik.touched.description && Boolean(formik.errors.description)}
+        helperText={formik.touched.description && formik.errors.description}
+      />
 
-          {/* Announcement type dropdown */}
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel id="announcement-type-label">Announcement Type</InputLabel>
-            <Select
-              labelId="announcement-type-label"
-              value={formik.values.announcementtype}
-              onChange={(e) =>
-                formik.setFieldValue("announcementtype", e.target.value)
-              }
-              error={
-                formik.touched.announcementtype &&
-                Boolean(formik.errors.announcementtype)
-              }
-            >
-              <MenuItem value="general">General</MenuItem>
-              <MenuItem value="urgent">Urgent</MenuItem>
-             
-            </Select>
-            {formik.touched.announcementtype &&
-              formik.errors.announcementtype && (
-                <Typography color="error">
-                  {formik.errors.announcementtype}
-                </Typography>
-              )}
-          </FormControl>
+      {/* Announcement type dropdown */}
+      <FormControl fullWidth sx={{ mb: 2 }}>
+        <InputLabel id="announcement-type-label">Announcement Type</InputLabel>
+        <Select
+          labelId="announcement-type-label"
+          value={formik.values.announcementtype}
+          onChange={(e) =>
+            formik.setFieldValue("announcementtype", e.target.value)
+          }
+          error={
+            formik.touched.announcementtype &&
+            Boolean(formik.errors.announcementtype)
+          }
+        >
+          <MenuItem value="general">General</MenuItem>
+          <MenuItem value="urgent">Urgent</MenuItem>
+        </Select>
+        {formik.touched.announcementtype &&
+          formik.errors.announcementtype && (
+            <Typography color="error">
+              {formik.errors.announcementtype}
+            </Typography>
+          )}
+      </FormControl>
 
-          {/* Image upload and crop */}
-          <Box sx={{ padding: 4, textAlign: "center" }}>
-            {!isCropping ? (
-              <>
-                {!croppedImage && (
-                  <Typography variant="h5" sx={{ marginBottom: 2 }}>
-                    Upload and Crop an Image
-                  </Typography>
-                )}
-                {croppedImage && (
-                  <Box sx={{ marginTop: 0 }}>
-                    <Typography variant="h6" sx={{ marginBottom: 2 }}>
-                      Cropped Image Preview:
-                    </Typography>
-                    <img
-                      src={croppedImage}
-                      alt="Cropped"
-                      style={{
-                        maxWidth: "30%",
-                        display: "block",
-                        margin: "0 auto",
-                        border: "1px solid #ccc",
-                        borderRadius: "8px",
-                      }}
-                    />
-                  </Box>
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="mt-2"
-                />
-                {formik.touched.imageUrl && formik.errors.imageUrl && (
-                  <Typography color="error">
-                    {formik.errors.imageUrl as string}
-                  </Typography>
-                )}
-              </>
-            ) : (
-              <ImageCropper
-                imageSrc={imageSrc!}
-                onCropComplete={handleCropComplete}
-                onCancel={handleCancelCrop}
-              />
+      {/* Image upload and crop */}
+      <Box sx={{ padding: 4, textAlign: "center" }}>
+        {!isCropping ? (
+          <>
+            {!croppedImage && (
+              <Typography variant="h5" sx={{ marginBottom: 2 }}>
+                Upload and Crop an Image
+              </Typography>
             )}
-          </Box>
+            {croppedImage && (
+              <Box sx={{ marginTop: 0 }}>
+                <Typography variant="h6" sx={{ marginBottom: 2 }}>
+                  Cropped Image Preview:
+                </Typography>
+                <img
+                  src={croppedImage}
+                  alt="Cropped"
+                  style={{
+                    maxWidth: "30%",
+                    display: "block",
+                    margin: "0 auto",
+                    border: "1px solid #ccc",
+                    borderRadius: "8px",
+                  }}
+                />
+              </Box>
+            )}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="mt-2"
+            />
+            {formik.touched.imageUrl && formik.errors.imageUrl && (
+              <Typography color="error">
+                {formik.errors.imageUrl as string}
+              </Typography>
+            )}
+          </>
+        ) : (
+          <ImageCropper
+            imageSrc={imageSrc!}
+            onCropComplete={handleCropComplete}
+            onCancel={handleCancelCrop}
+          />
+        )}
+      </Box>
 
-          {/* Dialog actions */}
-          <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
-            <Button onClick={() => setAddDialogOpen(false)}>Cancel</Button>
-            <Button type="submit" variant="contained" color="primary">
-              Add Announcement
-            </Button>
-          </Box>
-        </form>
-      </Dialog>
+      {/* Dialog actions */}
+      <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
+        <Button onClick={() => setAddDialogOpen(false)}>Cancel</Button>
+        <Button type="submit" variant="contained" color="primary">
+          Add Announcement
+        </Button>
+      </Box>
+    </form>
+  </Box>
+</Dialog>
+
     </Box>
   );
 };
