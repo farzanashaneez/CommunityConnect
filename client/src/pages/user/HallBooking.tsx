@@ -134,7 +134,6 @@ const HallBookingPage: React.FC = () => {
   };
 
   const handleSelectEvent = (event: Slot) => {
-    console.log("you have selected an event ============");
     setSelectedSlot(event);
     setIsBookingFormOpen(true);
   };
@@ -236,57 +235,57 @@ const HallBookingPage: React.FC = () => {
     return { style };
   };
 
-  const DayCellWrapper: React.FC<CustomDayCellWrapperProps> = React.memo(
-    ({ children, value }) => {
-      const eventsForDay = events.filter((event) =>
-        moment(new Date(event.start))
-          .startOf("day")
-          .isSame(moment(value).startOf("day"))
-      );
+  // const DayCellWrapper: React.FC<CustomDayCellWrapperProps> = React.memo(
+  //   ({ children, value }) => {
+  //     const eventsForDay = events.filter((event) =>
+  //       moment(new Date(event.start))
+  //         .startOf("day")
+  //         .isSame(moment(value).startOf("day"))
+  //     );
 
-      const handleShowMore = (e: React.MouseEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log("Events for day:", eventsForDay); // Debug log
-        if (eventsForDay.length > 0) {
-          setMoreEventsDialog({
-            open: true,
-            events: eventsForDay,
-            date: value,
-          });
-        }
-      };
+  //     const handleShowMore = (e: React.MouseEvent<HTMLDivElement>) => {
+  //       e.preventDefault();
+  //       e.stopPropagation();
+  //       console.log("Events for day:", eventsForDay); // Debug log
+  //       if (eventsForDay.length > 0) {
+  //         setMoreEventsDialog({
+  //           open: true,
+  //           events: eventsForDay,
+  //           date: value,
+  //         });
+  //       }
+  //     };
 
-      return (
-        <div className="rbc-day-bg" style={{ position: "relative" }}>
-          {children}
-          {eventsForDay.length > 2 && (
-            <div
-              role="button"
-              onClick={handleShowMore}
-              style={{
-                cursor: "pointer",
-                fontSize: "0.8em",
-                padding: "2px 4px",
-                color: "#666",
-                textAlign: "center",
-                backgroundColor: "#f5f5f5",
-                margin: "2px",
-                borderRadius: "4px",
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                right: 0,
-                zIndex: 1,
-              }}
-            >
-              +{eventsForDay.length - 2} more
-            </div>
-          )}
-        </div>
-      );
-    }
-  );
+  //     return (
+  //       <div className="rbc-day-bg" style={{ position: "relative" }}>
+  //         {children}
+  //         {eventsForDay.length > 2 && (
+  //           <div
+  //             role="button"
+  //             onClick={handleShowMore}
+  //             style={{
+  //               cursor: "pointer",
+  //               fontSize: "0.8em",
+  //               padding: "2px 4px",
+  //               color: "#666",
+  //               textAlign: "center",
+  //               backgroundColor: "#f5f5f5",
+  //               margin: "2px",
+  //               borderRadius: "4px",
+  //               position: "absolute",
+  //               bottom: 0,
+  //               left: 0,
+  //               right: 0,
+  //               zIndex: 1,
+  //             }}
+  //           >
+  //             +{eventsForDay.length - 2} more
+  //           </div>
+  //         )}
+  //       </div>
+  //     );
+  //   }
+  // );
 
   // Modified MoreEventsDialog component
   const MoreEventsDialog = React.memo(() => (
@@ -462,19 +461,24 @@ const HallBookingPage: React.FC = () => {
                   selectable
                   components={{
                     event: EventComponent,
-                   dateCellWrapper: DayCellWrapper as any, // Type assertion needed due to react-big-calendar types
+                  //  dateCellWrapper: DayCellWrapper as any, // Type assertion needed due to react-big-calendar types
                   }}
                   popup={false}
                   views={["month"]}
                   defaultView="month"
                   tooltipAccessor={null}
+                  messages={{
+                    showMore: (total) => ` +${total}`
+                  }}
                   onShowMore={(events, date) => {
                     setMoreEventsDialog({
                       open: true,
                       events: events as Slot[],
                       date: date,
                     });
+                    
                   }}
+                  
                 />
                 <MoreEventsDialog />
               </Box>
