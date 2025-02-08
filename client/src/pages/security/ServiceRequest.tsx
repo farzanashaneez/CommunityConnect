@@ -20,24 +20,15 @@ import { Service } from "../../interfaces/communityInterfaces";
 import { socket } from "../../services/socketConnection";
 
 const ServiceRequest: React.FC = () => {
-  const [tabValue, setTabValue] = useState(0);
- 
-
-  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
-    setTabValue(newValue);
-  };
 
   return (
     <Box sx={{ padding: 2 }}>
       <Typography variant="h4" sx={{ textAlign: "center", mb: 2 }}>
        Service Requests
       </Typography>
-      <Divider />
-      <Tabs value={tabValue} onChange={handleTabChange} sx={{ mb: 2 }}>
-        <Tab label="Local Service Request" />
-      </Tabs>
+    
       <Divider sx={{ my: 1 }} />
-      {tabValue === 0 && <LocalServicesTab />}
+     <LocalServicesTab />
     </Box>
   );
 };
@@ -99,7 +90,9 @@ const LocalServicesTab = () => {
       }}
     >
       <Box sx={{ flex: 1 }}>
-      
+      <Typography variant="h6" sx={{ mb: 2 }}>
+          Local Service Request
+        </Typography>
         <Box
           sx={{
             height: "auto",
