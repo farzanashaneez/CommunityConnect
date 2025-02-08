@@ -62,10 +62,7 @@ interface BookingFormData {
   email: string;
   purpose: string;
 }
-interface CustomDayCellWrapperProps extends DateCellWrapperProps {
-  value: Date;
-  // children?:  React.ReactElement;
-}
+
 const HallBookingPage: React.FC = () => {
   const [halls, setHalls] = useState<Hall[]>([]);
   const [selectedHall, setSelectedHall] = useState<Hall | null>(null);
