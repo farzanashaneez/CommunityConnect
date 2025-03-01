@@ -21,24 +21,20 @@ api.interceptors.request.use(
     const currenttoken = state.user?.currentUser?.token;
     const securitytoken = state.security?.currentSecurity?.token;
 
-    var tokenUsed = null;
-    var reason = "";
+   
 
     if (window.location.pathname.startsWith("/admin") && admintoken) {
       config.headers["Authorization"] = `Bearer ${admintoken}`;
-      tokenUsed = "admin";
-      reason = "Path starts with /admin and admin token exists";
+      
     } else if (
       window.location.pathname.startsWith("/security") &&
       securitytoken
     ) {
       config.headers["Authorization"] = `Bearer ${securitytoken}`;
-      tokenUsed = "security";
-      reason = "Path starts with /security and security token exists";
+      
     } else if (currenttoken) {
       config.headers["Authorization"] = `Bearer ${currenttoken}`;
-      tokenUsed = "current";
-      reason = "Falling back to current token";
+     
     }
 
     return config;
