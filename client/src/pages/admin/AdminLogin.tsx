@@ -14,7 +14,6 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxStoreHook";
 import { loggedin, loginfailure } from "../../redux-store/user/adminSlice";
-import { fontStyle } from "html2canvas/dist/types/css/property-descriptors/font-style";
 
 const AdminLogin: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
