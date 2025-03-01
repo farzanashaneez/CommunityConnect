@@ -30,7 +30,7 @@ const NotificationSidebar: React.FC<NavSidebarProps> = ({
   const userState = useAppSelector((s) => s.user);
 
   useEffect(() => {
-    socket.on("notificationUpdate", (newNotification) => {
+    socket.on("notificationUpdate", (_) => {
     });
 
     return () => {

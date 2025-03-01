@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
-  Tabs,
-  Tab,
   Card,
   CardMedia,
   CardContent,

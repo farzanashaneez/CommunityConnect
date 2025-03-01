@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
   Calendar,
-  DateCellWrapperProps,
   momentLocalizer,
 } from "react-big-calendar";
 import moment from "moment";

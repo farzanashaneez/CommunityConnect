@@ -8,8 +8,7 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await login(email, password);
-      // Handle successful login (e.g., store token, redirect)
+      await login(email, password);
     } catch (error) {
       console.error('Login failed:', error);
     }
