@@ -30,7 +30,6 @@ const EventModel = mongoose.model<Event>("Event", eventSchema);
 
 export class MongoEventRepository implements EventRepository {
   async createEvent(event: Partial<Event>): Promise<Event> {
-    console.log("mongo event,",event)
     const newEvent = new EventModel(event);
     return newEvent.save();
   }

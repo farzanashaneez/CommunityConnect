@@ -39,7 +39,6 @@ const bookingSchema = new Schema<Booking>({
     async createBooking(booking: Booking, slot: Slot): Promise<Booking> {
       const session = await mongoose.startSession();
       session.startTransaction();
-      console.log('slot created before',booking,slot)
 
       try {
         const newSlot = new SlotModel({ ...slot });
@@ -108,7 +107,6 @@ const bookingSchema = new Schema<Booking>({
     }
   
     async findByUserId(userId: string): Promise<Booking[]> {
-      console.log("userid===#######>>>>",userId)
       return BookingModel.find({ userId })
       
       .populate({

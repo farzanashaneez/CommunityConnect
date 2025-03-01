@@ -30,8 +30,7 @@ import {
 import { useAppSelector } from "../../hooks/reduxStoreHook";
 import { socket } from "../../services/socketConnection";
 import { MenuIcon } from "lucide-react";
-import { useParams } from 'react-router-dom';
-
+import { useParams } from "react-router-dom";
 
 interface Chat {
   _id: string;
@@ -60,7 +59,7 @@ const ChatApp: React.FC = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [chats, setChats] = useState<Chat[]>([]);
-  const [updatechat,setupdateChat]=useState(0);
+  const [updatechat, setupdateChat] = useState(0);
   // getuser from redux updatechat
   const userState = useAppSelector((state) => state.user);
   const id = userState.currentUser.user.id;
@@ -78,32 +77,28 @@ const ChatApp: React.FC = () => {
   const [chatsadded, setChatsadded] = useState(false);
   const [selectedFromQuery, setselectedFromQuery] = useState<Chat | null>(null);
 
-
-
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
   const [formData, setFormData] = useState({
     groupName: "",
   });
-  const {chatid}=useParams();
-const updatechatlist=(async ()=>{
- 
-  await fetchChats()
-  setupdateChat(s=>s+1)
-  console.log(updatechat)
-
-})
+  const { chatid } = useParams();
+  const updatechatlist = async () => {
+    await fetchChats();
+    setupdateChat((s) => s + 1);
+    console.log(updatechat);
+  };
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-const ondeletechat=()=>{
-  setChats(prevChats=>
-    prevChats.filter(chat=>chat._id!==selectedChat._id)
-    )
-  setSelectedChat(null)
-}
+  const ondeletechat = () => {
+    setChats((prevChats) =>
+      prevChats.filter((chat) => chat._id !== selectedChat._id)
+    );
+    setSelectedChat(null);
+  };
   const handleUserSelect = (userId: string) => {
     if (!isCreatingPersonal) {
       // Allow multiple selections for group chat
@@ -117,7 +112,7 @@ const ondeletechat=()=>{
       setSelectedUsers([userId]); // Replace with the newly selected user
     }
   };
- 
+
   useEffect(() => {
     fetchChats();
     fetchChatsGroup();
@@ -125,43 +120,35 @@ const ondeletechat=()=>{
       fetchUsers();
     }
   }, [chatsadded, !dialogOpen]);
-    useEffect(()=>{
-      if(selectedFromQuery){
-        setSelectedChat(selectedFromQuery)
-      }
-      console.log("Chat ID from query:", selectedFromQuery);
+  useEffect(() => {
+    if (selectedFromQuery) {
+      setSelectedChat(selectedFromQuery);
+    }
+  }, [selectedFromQuery]);
 
-    },[selectedFromQuery])
-
-    useEffect(()=>{
-          socket.emit('userConnected',id)
-      return(()=>{
-          socket.off('userConnected')
-          socket.emit('beoffline',id)
-      })
-    })
+  useEffect(() => {
+    socket.emit("userConnected", id);
+    return () => {
+      socket.off("userConnected");
+      socket.emit("beoffline", id);
+    };
+  });
   const fetchChats = async () => {
     try {
       const response = await getChatsForUserApi(id, "personal");
-      console.log("chat response", response);
       setChats(Array.isArray(response) ? response : []);
       setChatsadded(true);
-      const selected=chats?.find(chat=>chat._id===chatid)
-if (selected && (selectedFromQuery?._id !== selected._id))
-setselectedFromQuery(selected)
-     
-
+      const selected = chats?.find((chat) => chat._id === chatid);
+      if (selected && selectedFromQuery?._id !== selected._id)
+        setselectedFromQuery(selected);
     } catch (error) {
-      console.error("Error fetching chats:", error);
     }
   };
   const fetchChatsGroup = async () => {
     try {
       const response = await getChatsForUserApi(id, "group");
-      console.log("chat response", response);
       setChats(Array.isArray(response) ? response : []);
     } catch (error) {
-      console.error("Error fetching chats:", error);
     }
   };
 
@@ -187,8 +174,6 @@ setselectedFromQuery(selected)
         (user: any) => !otherUserIds?.includes(user._id)
       );
 
-      console.log(response, otherUserIds, filteredUsers, "==>");
-
       isCreatingPersonal ? setUsers(filteredUsers) : setUsers(response);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -206,38 +191,34 @@ setselectedFromQuery(selected)
           isgroup: true,
           createdBy: id,
         };
-        console.log("group data", groupData);
+
         const res = await createChatApi(groupData, "group");
         setSelectedChat(res);
-        console.log("selected group chat   ", res);
       } else {
         // Submit personal chat data
         const personalChatData = {
           participants: [id, ...selectedUsers],
         };
-        console.log("personal data", personalChatData);
+
         const res = await createChatApi(personalChatData, "personal");
-        console.log("selected chat   ", res);
+
         setSelectedChat(res);
       }
-    } catch (err) {
-      console.log("error", err);
-    }
+    } catch (err) {}
 
     setDialogOpen(false);
   };
 
   const handleCreatePersonalChat = () => {
     setIsCreatingPersonal(true);
-    setIsCreatingGroup(false)
+    setIsCreatingGroup(false);
     setDialogOpen(true); // Open the dialog for user selection
     setSelectedUsers([]); // Reset selected users
-
   };
 
   const handleCreateGroupChat = () => {
     setIsCreatingPersonal(false);
-    setIsCreatingGroup(true)
+    setIsCreatingGroup(true);
     setDialogOpen(true); // Open the dialog for user selection
     setSelectedUsers([]); // Reset selected users
   };
@@ -445,22 +426,27 @@ setselectedFromQuery(selected)
           ondeleteChat={ondeletechat}
         />
       ) : (
-      <> 
-      {isMobile && <IconButton edge="start" color="inherit" onClick={()=>setDrawerOpen(!drawerOpen)} >
-        <MenuIcon />
-      </IconButton>
-      }
-        <Box
-          sx={{
-            display: "flex",
-            height: `91vh`,
-            width: "100%",
-            bgcolor: "background.default",
-            p: 1,
-          }}
-        >
-          <h1 className="text-center m-auto text-3xl">No Chat Selected</h1>
-        </Box>
+        <>
+          {isMobile && (
+            <IconButton
+              edge="start"
+              color="inherit"
+              onClick={() => setDrawerOpen(!drawerOpen)}
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
+          <Box
+            sx={{
+              display: "flex",
+              height: `91vh`,
+              width: "100%",
+              bgcolor: "background.default",
+              p: 1,
+            }}
+          >
+            <h1 className="text-center m-auto text-3xl">No Chat Selected</h1>
+          </Box>
         </>
       )}
 

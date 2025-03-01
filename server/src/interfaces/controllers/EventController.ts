@@ -9,7 +9,6 @@ export class EventController {
   constructor(private eventUseCase: EventUseCase) {}
 
   async createEvent(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
-    console.log("req body :",req.body,req.imageUrl)
     try {
       const eventData = {
         name: req.body.name,
@@ -32,7 +31,6 @@ export class EventController {
       res.status(201).json(newEvent);
 
     } catch (error: any) {
-      console.log(error)
       res.status(400).json({ message: 'Error creating event', error: error?.message });
     }
   }
@@ -55,7 +53,6 @@ export class EventController {
     try {
       const { id } = req.params;
       const eventData = req.body;
-      console.log("event to be updated",eventData)
       const updatedEvent = await this.eventUseCase.updateEvent(id, eventData);
       res.json(updatedEvent);
     } catch (error: any) {

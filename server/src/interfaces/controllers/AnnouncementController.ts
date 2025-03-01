@@ -17,7 +17,6 @@ export class AnnouncementController {
     res: Response,
     next: NextFunction
   ): Promise<void> {
-    console.log("in announcement controller");
     try {
       const announcementData = {
         title: req.body.title,

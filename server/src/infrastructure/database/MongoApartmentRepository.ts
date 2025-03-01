@@ -36,6 +36,5 @@ export class MongoApartmentRepository implements ApartmentRepository {
   async markFilled(id:string,doFill:boolean){
    
     const aprtmnt=await ApartmentModel.findByIdAndUpdate(id, { isfilled:doFill }, { new: true });
-    console.log("updated apartment",aprtmnt)
   }
 }

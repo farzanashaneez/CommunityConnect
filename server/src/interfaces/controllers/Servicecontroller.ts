@@ -9,7 +9,10 @@ import notificationServices from "../../application/services/notificationService
 //   emitNotificationUpdatetoId,
 // } from "../../infrastructure/services/socketIOServices";
 import { getIO } from "../../infrastructure/services/socket";
-import { sendMulticastNotification, sendNotification } from "../../infrastructure/services/fcm";
+import {
+  sendMulticastNotification,
+  sendNotification,
+} from "../../infrastructure/services/fcm";
 import UserService from "../../application/services/UserService";
 
 export class ServiceController {
@@ -30,7 +33,7 @@ export class ServiceController {
         category: req.body.category || "common",
         imageUrl: req.imageUrl || "",
       };
-     
+
       const newService = await this.serviceUseCase.createService(serviceData);
       const notificationMessage = `New service created: ${newService.name}`;
 
@@ -40,12 +43,11 @@ export class ServiceController {
           notificationMessage,
           [newService.provider],
           true
-        )
-        const io=getIO();
+        );
+        const io = getIO();
         io.to(newService.provider).emit("notificationUpdate", {
           message: notificationMessage,
         }); // Notify all clients about the new/updated notification
-
       });
 
       res.status(201).json(newService);
@@ -103,7 +105,6 @@ export class ServiceController {
   ): Promise<void> {
     try {
       const { id, action } = req.params;
-      console.log("id==>", id);
       let updatedService: any;
       if (action === "grantservice") {
         updatedService = await this.serviceUseCase.grantservice(id, "granted");
@@ -119,9 +120,8 @@ export class ServiceController {
             [id],
             false
           ); // Send to all users
-          const io=getIO();
+          const io = getIO();
           io.emit("notificationUpdate", { message: notificationMessage }); // Notify all clients about the new/updated notification
-     
         });
       }
       res.json(updatedService);
@@ -162,13 +162,15 @@ export class ServiceController {
         serviceId,
         userId
       );
-      console.log("service id, userid",newreqService)
 
-      const tokensFCM=await UserService.getFCMTokensOfSecurities();
-      
-      if(tokensFCM){
-        await sendMulticastNotification(tokensFCM,"Service Request..!",'You have new Service Request')
+      const tokensFCM = await UserService.getFCMTokensOfSecurities();
 
+      if (tokensFCM) {
+        await sendMulticastNotification(
+          tokensFCM,
+          "Service Request..!",
+          "You have new Service Request"
+        );
       }
       res.json(newreqService);
     } catch (err: any) {
@@ -177,43 +179,45 @@ export class ServiceController {
         .json({ message: "Error requesting a service", error: err?.message });
     }
   }
-async getAllServiceRequst( 
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> {
-  try {
-    const status = req.params.status;
-    console.log("status===>", status);
+  async getAllServiceRequst(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const status = req.params.status;
 
-    const requestedServices = await this.serviceUseCase.getAllRequestedServices(status);
-    // await sendNotification('cn2LXkcEISeuc-VTx_4bQL:APA91bEiNe3xCFMqFj-SRPjsuowYuh26K6cJOjAEXopXwHyITYDXahkruPnaAZzcdqrB213998bRI3gtuyD4cjDe-1XoRq1TkPzsLapkTsFk0qwjDaZVxXc','title','checking notification is working')
+      const requestedServices =
+        await this.serviceUseCase.getAllRequestedServices(status);
+      // await sendNotification('cn2LXkcEISeuc-VTx_4bQL:APA91bEiNe3xCFMqFj-SRPjsuowYuh26K6cJOjAEXopXwHyITYDXahkruPnaAZzcdqrB213998bRI3gtuyD4cjDe-1XoRq1TkPzsLapkTsFk0qwjDaZVxXc','title','checking notification is working')
 
-    res.json(requestedServices);
-  } catch (error: any) {
-    res
-      .status(400)
-      .json({ message: "Error fetching services", error: error?.message });
+      res.json(requestedServices);
+    } catch (error: any) {
+      res
+        .status(400)
+        .json({ message: "Error fetching services", error: error?.message });
+    }
   }
-}
 
-async getAllServicesOfUser(
-  req: Request,
-  res: Response,
-  next: NextFunction
-):Promise<void> {
-  try {
-    const userId = req.params.userId;
+  async getAllServicesOfUser(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.params.userId;
 
-    const requestedServices = await this.serviceUseCase.getAllServicesOfUser(userId);
-    console.log("+++++++",requestedServices)
-    res.json(requestedServices);
-  } catch (error: any) {
-    res
-      .status(400)
-      .json({ message: "Error fetching services", error: error?.message });
+      const requestedServices = await this.serviceUseCase.getAllServicesOfUser(
+        userId
+      );
+
+      res.json(requestedServices);
+    } catch (error: any) {
+      res
+        .status(400)
+        .json({ message: "Error fetching services", error: error?.message });
+    }
   }
-}
 
   async deleteService(
     req: Request,
@@ -238,7 +242,7 @@ async getAllServicesOfUser(
   ): Promise<void> {
     try {
       const type = req.params.type;
-      console.log("type===>", type);
+
       const services = await this.serviceUseCase.getAllServices(type);
       res.json(services);
     } catch (error: any) {
@@ -254,7 +258,7 @@ async getAllServicesOfUser(
   ): Promise<void> {
     try {
       const { status, type } = req.params;
-      console.log("status===>", status);
+
       const services = await this.serviceUseCase.getServicesByStatus(
         status,
         type
@@ -266,19 +270,28 @@ async getAllServicesOfUser(
         .json({ message: "Error fetching services", error: error?.message });
     }
   }
-  async contactserviceProvider(  req: Request,
+  async contactserviceProvider(
+    req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<void>{
+  ): Promise<void> {
+    try {
+      const { serviceData, provider, requestby, shareMessage } = req.body;
 
-    try{
-      const {serviceData,provider,requestby,shareMessage}=req.body;
-     console.log("--------------------->",serviceData,provider,requestby,shareMessage)
-const chat=await this.serviceUseCase.contactServiceProvider(serviceData,provider,requestby,shareMessage)
-res.json(chat)
-    }
-    catch(err:any){
-res.status(400).json({message:'error contacting service provider',error:err?.message})
+      const chat = await this.serviceUseCase.contactServiceProvider(
+        serviceData,
+        provider,
+        requestby,
+        shareMessage
+      );
+      res.json(chat);
+    } catch (err: any) {
+      res
+        .status(400)
+        .json({
+          message: "error contacting service provider",
+          error: err?.message,
+        });
     }
   }
 }

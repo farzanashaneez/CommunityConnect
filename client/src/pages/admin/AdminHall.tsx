@@ -157,14 +157,11 @@ const AdminHalls: React.FC = () => {
           imageFiles.forEach((file) => {
             formData.append(`images`, file);
           });
-          console.log("formdata", formData);
 
           const response = await createHall(formData);
           setHalls([...halls, response]);
         } catch (err) {
-          console.log(err);
         }
-        // setHalls([...halls, hallWithImages]);
         showSnackbar("Hall added successfully", "success");
       }
 
@@ -197,7 +194,6 @@ const AdminHalls: React.FC = () => {
   const handleEditHall = (hall: Hall) => {
 const item=halls.find((item)=>hall._id===item._id)
 if(item){
-console.log("item",item)
     setSelectedHall(item);
     setavailableSlots(item.availableSlots);
     formik.setValues(item);

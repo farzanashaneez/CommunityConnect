@@ -135,7 +135,6 @@ const ChatArea: React.FC<ChatAreaProps> = ({
 
     socket.on("onlineStatusUpdate", (onlineStatus) => {
       setOnlineUsers(onlineStatus);
-      console.log("Online users ", onlineUsers);
     });
 
     return () => {
@@ -153,8 +152,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
   useEffect(() => {
     onUpdateMessage();
 
-    socket.on("messageStatusUpdate", (messageids) => {
-      console.log("messageStatusUpdate called", messageids);
+    socket.on("messageStatusUpdate", (_) => {
       setMessages((prevMessages) =>
         prevMessages.map((message) =>
           message.status !== "sending"
@@ -169,7 +167,6 @@ const ChatArea: React.FC<ChatAreaProps> = ({
   }, [messages]);
   useEffect(() => {
     if (messages.length > 0 && isMessageRecieved) {
-      console.log("in useefect", messages);
       const unreadMessageIdsfromsocket = messages
         .filter(
           (msg) =>
@@ -180,11 +177,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         .map((msg) => msg._id);
 
       if (unreadMessageIdsfromsocket.length > 0) {
-        console.log(
-          "in useefect unreadMessageIds=",
-          selectedChat?._id,
-          unreadMessageIdsfromsocket
-        );
+       
 
         //  updatemessagestatusHelper(unreadMessageIds);
         socket.emit("statusUpdatedFromFrontent", {
@@ -204,7 +197,6 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         .map((msg) => msg._id);
 
       if (unreadMessageIds.length > 0) {
-        console.log("in useefect unreadMessageIds=", unreadMessageIds);
 
         updatemessagestatusHelper(unreadMessageIds, "read");
       }
@@ -223,7 +215,6 @@ const ChatArea: React.FC<ChatAreaProps> = ({
             !msg._id.startsWith("socket")
         )
         .map((msg: any) => msg._id);
-      console.log("selected chat", selectedChat, unreadMessageIds);
 
       if (unreadMessageIds.length > 0) {
         updatemessagestatusHelper(unreadMessageIds, "read");
@@ -264,7 +255,6 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         status: "delivered",
       });
       //updatemessagestatusHelper([response._id])
-      console.log(messages);
       onUpdateMessage();
       setMessages((prevMessages) =>
         prevMessages
@@ -310,10 +300,8 @@ const ChatArea: React.FC<ChatAreaProps> = ({
   const handleDeleteChat = async (chatid: string) => {
     try {
       deleteChatApi(chatid);
-      console.log("chat deleted");
       ondeleteChat();
     } catch (err) {
-      console.log(err);
     }
   };
 
@@ -328,7 +316,6 @@ const ChatArea: React.FC<ChatAreaProps> = ({
       handleDeleteChat(selectedChat._id);
       handleCloseDialog();
     } catch (err) {
-      console.log(err);
     }
   };
 

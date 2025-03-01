@@ -130,13 +130,11 @@ export class MongoUserRepository implements UserRepository {
   ).exec();
   }
   async getAllFCMTokens():Promise<string[]>{
-    console.log("getallfcm")
     const users = await UserModel.aggregate([
       { $match: { isSecurity: false } },
       { $unwind: '$fcmTokens' },
       { $project: { _id: 0, token: '$fcmTokens.token' } }
     ]);
-    console.log("getallfcm",users)
 
 return users.map(user=>user.token);
   }
@@ -148,7 +146,6 @@ return users.map(user=>user.token);
       { $unwind: '$fcmTokens' },
       { $project: { _id: 0, token: '$fcmTokens.token' } }
     ]);
-    console.log("getallfcm",users)
 
 return users.map(user=>user.token);
   }

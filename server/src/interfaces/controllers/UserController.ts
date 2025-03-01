@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import { sendOTPToEmail, sendWelcomeEmail } from "../../infrastructure/services/emailServices";
+import {
+  sendOTPToEmail,
+  sendWelcomeEmail,
+} from "../../infrastructure/services/emailServices";
 import { UserUseCases } from "../../application/usecases/userUseCases";
 import { CustomRequest } from "../../infrastructure/middlewares/uploadImageToCloudinary";
 import ApartmentService from "../../application/services/ApartmentService";
@@ -27,14 +30,18 @@ export class UserController {
     next: NextFunction
   ): Promise<void> {
     try {
-      console.log("security registration",req.body)
-      const aprtmntServc=new ApartmentService();
-      const aprtmnt=await aprtmntServc.createApartmentForSecurity();
-        const security=req.body;
-      const { user, password } = await this.userUseCases.registerUser({...security,apartmentId:aprtmnt._id,isSecurity:true,isFilled:true});
+      const aprtmntServc = new ApartmentService();
+      const aprtmnt = await aprtmntServc.createApartmentForSecurity();
+      const security = req.body;
+      const { user, password } = await this.userUseCases.registerUser({
+        ...security,
+        apartmentId: aprtmnt._id,
+        isSecurity: true,
+        isFilled: true,
+      });
       await sendWelcomeEmail(user.email, user.firstName, password);
 
-      res.status(201).json({ message: "User registered successfully",  });
+      res.status(201).json({ message: "User registered successfully" });
     } catch (error) {
       next(error);
     }
@@ -51,11 +58,14 @@ export class UserController {
       }
       res.json({ message: "Login successful", data });
     } catch (error) {
-      console.log("Login error:", error);
       next(error);
     }
   }
-  async loginAsSecurity(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async loginAsSecurity(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     try {
       const { email, password } = req.body;
       const data = await this.userUseCases.loginAsSeccurity(email, password);
@@ -66,7 +76,6 @@ export class UserController {
       }
       res.json({ message: "Login successful", data });
     } catch (error) {
-      console.log("Login error:", error);
       next(error);
     }
   }
@@ -80,7 +89,6 @@ export class UserController {
       const users = await this.userUseCases.getAllUsers();
       res.json(users);
     } catch (error) {
-      console.log("Get users error:", error);
       next(error);
     }
   }
@@ -93,7 +101,6 @@ export class UserController {
       const users = await this.userUseCases.getAllsecurities();
       res.json(users);
     } catch (error) {
-      console.log("Get users error:", error);
       next(error);
     }
   }
@@ -113,7 +120,6 @@ export class UserController {
       }
       res.json(user);
     } catch (error) {
-      console.log("Get user by ID error:", error);
       next(error);
     }
   }
@@ -124,7 +130,7 @@ export class UserController {
   ): Promise<void> {
     try {
       const userEmail = req.params.email;
-      console.log(userEmail)
+
       const user = await this.userUseCases.getUserByEmail(userEmail);
       if (!user) {
         const error = new Error("User not found");
@@ -133,7 +139,6 @@ export class UserController {
       }
       res.json(user);
     } catch (error) {
-      console.log("Get user by ID error:", error);
       next(error);
     }
   }
@@ -156,19 +161,22 @@ export class UserController {
       next(error);
     }
   }
-  
+
   async updatePassword(
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = req.params.id; 
-      console.log("---------xxx--------------",req.body)
-      const updatedUser = await this.userUseCases.updateUserPassword(userId, req.body.password);
+      const userId = req.params.id;
+
+      const updatedUser = await this.userUseCases.updateUserPassword(
+        userId,
+        req.body.password
+      );
       if (!updatedUser) {
         const error = new Error("User not found");
-        (error as any).statusCode = 404; 
+        (error as any).statusCode = 404;
         throw error;
       }
       res.json({ message: "User updated successfully", updatedUser });
@@ -183,7 +191,6 @@ export class UserController {
     next: NextFunction
   ): Promise<void> {
     try {
-      console.log("add member called");
       const userId = req.params.id;
       const { name, relation, profession } = req.body;
 
@@ -207,7 +214,6 @@ export class UserController {
       const members = updatedUser?.members || [];
       res.json({ message: "Member added successfully", members });
     } catch (error) {
-      console.log("Add member error:", error);
       next(error);
     }
   }
@@ -218,7 +224,6 @@ export class UserController {
     next: NextFunction
   ): Promise<void> {
     try {
-      console.log("add addFcmToken called");
       const userId = req.params.id;
       const { token, deviceInfo, lastUsed } = req.body;
 
@@ -242,7 +247,6 @@ export class UserController {
       const fcmTokens = updatedUser?.fcmTokens || [];
       res.json({ message: "Member added successfully", fcmTokens });
     } catch (error) {
-      console.log("Add member error:", error);
       next(error);
     }
   }
@@ -274,7 +278,6 @@ export class UserController {
       const userId = req.params.id;
       const url = req.imageUrl || "";
 
-      console.log(userId, "+++++", req.imageUrl);
       const updatedUser = await this.userUseCases.updateImage(userId, url);
 
       res.json({ message: "Member added successfully", updatedUser });
@@ -298,118 +301,116 @@ export class UserController {
         .json({ message: "Error deleting service", error: error?.message });
     }
   }
-  async getAllFCMTokens(req: Request,
+  async getAllFCMTokens(
+    req: Request,
     res: Response,
-    next: NextFunction):Promise<void>{
-try{
-const tokens=await this.userUseCases.getAllFCMTokens();
-res.json(tokens)
-}
-catch(err){
-next(err)
-}
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const tokens = await this.userUseCases.getAllFCMTokens();
+      res.json(tokens);
+    } catch (err) {
+      next(err);
+    }
   }
 
- 
-async sendOtp(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> {
-  try {
-    console.log('----------------------->')
+  async sendOtp(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.params.userId;
 
-    const userId = req.params.userId;
-    
-    // Find the user
-    const user = await this.userUseCases.getUserById(userId);
-    if (!user) {
-      const error = new Error("User not found");
-      (error as any).statusCode = 404;
-      throw error;
-    }
-    
-    // Generate a 6-digit OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    
-    // Set expiry time (e.g., 10 minutes from now)
-    const expiryTime = new Date();
-    expiryTime.setMinutes(expiryTime.getMinutes() + 10);
-    console.log('----------------------->')
-    // Store OTP in the database
-    await this.userUseCases.storeOtp(userId, otp, expiryTime);
-    
-    // Send OTP to user's email
-    await sendOTPToEmail(user.email, otp);
-    
-    res.status(200).json({ 
-      message: "OTP sent successfully",
-      userId: userId
-    });
-  } catch (error) {
-    console.log("Send OTP error:", error);
-    next(error);
-  }
-}
+      // Find the user
+      const user = await this.userUseCases.getUserById(userId);
+      if (!user) {
+        const error = new Error("User not found");
+        (error as any).statusCode = 404;
+        throw error;
+      }
 
-async verifyOtp(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> {
-  try {
-    const userId = req.params.userId;
-    const { otp } = req.body;
-    
-    if (!otp) {
-      const error = new Error("OTP is required");
-      (error as any).statusCode = 400;
-      throw error;
+      // Generate a 6-digit OTP
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+      // Set expiry time (e.g., 10 minutes from now)
+      const expiryTime = new Date();
+      expiryTime.setMinutes(expiryTime.getMinutes() + 10);
+
+      // Store OTP in the database
+      await this.userUseCases.storeOtp(userId, otp, expiryTime);
+
+      // Send OTP to user's email
+      await sendOTPToEmail(user.email, otp);
+
+      res.status(200).json({
+        message: "OTP sent successfully",
+        userId: userId,
+      });
+    } catch (error) {
+      next(error);
     }
-    
-    // Find the user
-    const user = await this.userUseCases.getUserById(userId);
-    if (!user) {
-      const error = new Error("User not found");
-      (error as any).statusCode = 404;
-      throw error;
-    }
-    
-    // Get stored OTP details
-    const otpDetails = await this.userUseCases.getOtpDetails(userId);
-    
-    if (!otpDetails) {
-      const error = new Error("OTP not found or expired. Please request a new OTP");
-      (error as any).statusCode = 400;
-      throw error;
-    }
-    
-    // Check if OTP is expired
-    const currentTime = new Date();
-    if (currentTime > otpDetails.expiryTime) {
-      const error = new Error("OTP has expired. Please request a new OTP");
-      (error as any).statusCode = 400;
-      throw error;
-    }
-    
-    // Verify OTP
-    if (otpDetails.otp !== otp) {
-      const error = new Error("Invalid OTP");
-      (error as any).statusCode = 400;
-      throw error;
-    }
-    
-    // Mark OTP as verified
-    await this.userUseCases.markOtpAsVerified(userId);
-    
-    res.status(200).json({ 
-      message: "OTP verified successfully",
-      userId: userId,
-      verified: true
-    });
-  } catch (error) {
-    console.log("Verify OTP error:", error);
-    next(error);
   }
-}
+
+  async verifyOtp(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.params.userId;
+      const { otp } = req.body;
+
+      if (!otp) {
+        const error = new Error("OTP is required");
+        (error as any).statusCode = 400;
+        throw error;
+      }
+
+      // Find the user
+      const user = await this.userUseCases.getUserById(userId);
+      if (!user) {
+        const error = new Error("User not found");
+        (error as any).statusCode = 404;
+        throw error;
+      }
+
+      // Get stored OTP details
+      const otpDetails = await this.userUseCases.getOtpDetails(userId);
+
+      if (!otpDetails) {
+        const error = new Error(
+          "OTP not found or expired. Please request a new OTP"
+        );
+        (error as any).statusCode = 400;
+        throw error;
+      }
+
+      // Check if OTP is expired
+      const currentTime = new Date();
+      if (currentTime > otpDetails.expiryTime) {
+        const error = new Error("OTP has expired. Please request a new OTP");
+        (error as any).statusCode = 400;
+        throw error;
+      }
+
+      // Verify OTP
+      if (otpDetails.otp !== otp) {
+        const error = new Error("Invalid OTP");
+        (error as any).statusCode = 400;
+        throw error;
+      }
+
+      // Mark OTP as verified
+      await this.userUseCases.markOtpAsVerified(userId);
+
+      res.status(200).json({
+        message: "OTP verified successfully",
+        userId: userId,
+        verified: true,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

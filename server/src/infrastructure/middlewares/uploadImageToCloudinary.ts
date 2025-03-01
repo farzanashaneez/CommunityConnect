@@ -12,7 +12,6 @@ cloudinary.config({
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    console.log("in multer")
     cb(null, 'uploads/'); 
   },
   filename: function (req, file, cb) {
@@ -33,7 +32,6 @@ export interface CustomRequestWithImageArray extends Request {
   imageUrls?: string[];
 }
 const uploadImageToCloudinary = async (req: CustomRequest, res: Response, next: NextFunction) => {
-  console.log("**********************",req.file)
   if (req.file) {
     try {
       const result = await cloudinary.uploader.upload(req.file.path, {
@@ -41,13 +39,7 @@ const uploadImageToCloudinary = async (req: CustomRequest, res: Response, next: 
       });
 
       req.imageUrl = result.secure_url;
-      console.log("result url",result.secure_url)
       fs.unlink(req.file.path, (err) => {
-        if (err) {
-          console.error('Error deleting the file:', err);
-        } else {
-          console.log('Temporary file deleted successfully');
-        }
       });
       next();
     } catch (error) {
@@ -58,7 +50,6 @@ const uploadImageToCloudinary = async (req: CustomRequest, res: Response, next: 
   }
 };
 const uploadImageArrayToCloudinary = async (req: CustomRequestWithImageArray, res: Response, next: NextFunction) => {
-  console.log("in uploadimages cloudinary multer",req.files)
   if (req.files && Array.isArray(req.files)) {
     try {
       const uploadPromises = (req.files as Express.Multer.File[]).map(file =>

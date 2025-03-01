@@ -21,17 +21,23 @@ const serviceSchema = new Schema<Service>({
   createdAt: { type: Date, default: Date.now },
 });
 
-const serviceRequestSchema = new Schema<ServiceRequest>({
-  requestId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-  serviceId: {
-    type: Schema.Types.ObjectId,
-    ref: "Service",
-    required: true,
+const serviceRequestSchema = new Schema<ServiceRequest>(
+  {
+    requestId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    serviceId: {
+      type: Schema.Types.ObjectId,
+      ref: "Service",
+      required: true,
+    },
+    requestedDate: { type: Date, default: Date.now() },
+    status: {
+      type: String,
+      enum: ["pending", "completed"],
+      default: "pending",
+    },
   },
-  requestedDate: { type: Date, default: Date.now() },
-  status: { type: String, enum: ["pending", "completed"], default: "pending" },
-  
-}, { timestamps: true });
+  { timestamps: true }
+);
 
 const ServiceModel = mongoose.model<Service>("Service", serviceSchema);
 const ServiceRequestModel = mongoose.model<ServiceRequest>(
@@ -64,7 +70,6 @@ export class MongoServiceRepository implements ServiceRepository {
     return updatedService;
   }
   async grantservice(id: string, update: string): Promise<Service> {
-    console.log("update", update);
     const updatedService = await ServiceModel.findByIdAndUpdate(
       id,
       { status: update },
@@ -80,7 +85,6 @@ export class MongoServiceRepository implements ServiceRepository {
     id: string,
     mark: string
   ): Promise<ServiceRequest> {
-    console.log("id sr", id);
     const updatedService = await ServiceRequestModel.findByIdAndUpdate(
       id,
       { status: "completed" },
@@ -94,7 +98,6 @@ export class MongoServiceRepository implements ServiceRepository {
   async requestLocalService(
     serviceRequest: ServiceRequest
   ): Promise<ServiceRequest> {
-    console.log("in mongo service request========>", serviceRequest);
     const newServiceRequest = new ServiceRequestModel(serviceRequest);
     return await newServiceRequest.save();
   }
@@ -106,11 +109,12 @@ export class MongoServiceRepository implements ServiceRepository {
   }
 
   async getAllServices(type: string): Promise<Service[]> {
-    return ServiceModel.find({ type: type }).sort({createdAt:-1}).exec();
+    return ServiceModel.find({ type: type }).sort({ createdAt: -1 }).exec();
   }
   async getAllServicesOfUser(userId: string): Promise<Service[]> {
-    console.log('user id+++++++++',userId)
-    return ServiceModel.find({ provider: userId ,status:'granted'}).sort({createdAt:-1}).exec();
+    return ServiceModel.find({ provider: userId, status: "granted" })
+      .sort({ createdAt: -1 })
+      .exec();
   }
   async getAllRequestedServices(status: string): Promise<ServiceRequest[]> {
     const requests = await ServiceRequestModel.find({ status })
@@ -125,10 +129,10 @@ export class MongoServiceRepository implements ServiceRepository {
           select: "apartmentNumber buildingSection",
         },
       })
-      .sort({createdAt:-1})
+      .sort({ createdAt: -1 })
       .exec();
     const rawRequests = await ServiceRequestModel.find({ status }).lean();
-    console.log("mongo result of service request", rawRequests);
+
     return requests;
   }
 
@@ -137,12 +141,10 @@ export class MongoServiceRepository implements ServiceRepository {
   }
 
   async getServicesByType(type: "local" | "residential"): Promise<Service[]> {
-    console.log(type, "type");
     return ServiceModel.find({ type }).exec();
   }
 
   async getServicesByStatus(status: string, type: string): Promise<Service[]> {
-    console.log("status ", status, "type ", type);
     return ServiceModel.find({ status, type })
       .populate({
         path: "provider",
@@ -151,7 +153,7 @@ export class MongoServiceRepository implements ServiceRepository {
           select: "apartmentNumber buildingSection",
         },
       })
-      .sort({updatedAt:-1})
+      .sort({ updatedAt: -1 })
       .exec();
   }
   async findRecent(count: number): Promise<Service[]> {
@@ -210,7 +212,7 @@ export class MongoServiceRepository implements ServiceRepository {
 
       let message;
       if (chat) {
-        message=  await ChatService.addMessage(chat._id, {
+        message = await ChatService.addMessage(chat._id, {
           senderId: requestby,
           content: shareMessage,
           status: "sent",

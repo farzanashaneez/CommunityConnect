@@ -7,14 +7,11 @@ import { Box, Typography } from '@mui/material';
 export default function PostList({isUser=false,userid=''}) {
   const [posts, setPosts] = useState<PostProps['post'][]>([]);
   const { updateMediaPosts,postUpdated } = useCommunityContext();
-  //const userState = useAppSelector((state) => state.user);
-   // const id = userState.currentUser.user.id;
-
+ 
   useEffect(() => {
     const loadPosts = async () => {
       try {
         const fetchedPosts = await fetchAllPosts();
-        console.log("posts",fetchedPosts)
         setPosts(fetchedPosts);
         updateMediaPosts(fetchedPosts)
       } catch (error) {

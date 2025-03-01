@@ -10,8 +10,7 @@ export function CommentInput({ postId }: CommentInputProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Here you would typically send the comment to your backend
-    console.log(`Submitting comment for post ${postId}:`, comment)
+    // Here you would typically send the comment to your backend postId
     setComment('')
   }
 
@@ -19,6 +18,7 @@ export function CommentInput({ postId }: CommentInputProps) {
     <form onSubmit={handleSubmit} className="flex items-center">
       <input
         type="text"
+        key={postId}
         value={comment}
         onChange={(e) => setComment(e.target.value)}
         placeholder="Write a comment..."

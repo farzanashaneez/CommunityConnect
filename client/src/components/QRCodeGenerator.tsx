@@ -22,13 +22,11 @@ const QRCodeGenerator:React.FC = () => {
     fetchUserDataAndGenerateQR();
   }, []);
 useEffect(()=>{
-console.log('qrdata',qrData)
 },[qrData])
   const fetchUserDataAndGenerateQR = async () => {
     try {
       const resp=await getQRData(id);
       if(resp){
-        console.log("response ",resp)
         setQRData(`${import.meta.env.VITE_FRONTEND_URL}/security/verifyQRCode/${resp.token}`);
         // setExpiryTime(resp.expiry)
       }

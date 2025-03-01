@@ -99,11 +99,8 @@ const AdminEvents: React.FC = () => {
   const handleCropComplete = useCallback(
     (croppedBlob: Blob) => {
       const croppedImageURL = URL.createObjectURL(croppedBlob);
-      console.log("cropped blob", croppedBlob);
       setCroppedImage(croppedImageURL);
       setIsCropping(false);
-
-      // formik.setFieldValue('image', file);
     },
     [formik]
   );

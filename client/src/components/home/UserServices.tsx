@@ -15,7 +15,6 @@ const UserServices: React.FC<{userId:any}> = ({ userId}) => {
     const fetchServices = async () => {
       try {
         const response = await getAllServicesOfUser(userId);
-        console.log("response from user Service",response)
         setServiceList(response);
       } catch (error) {
         console.error("Error fetching services:", error);

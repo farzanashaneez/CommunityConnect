@@ -19,12 +19,10 @@ router.post('/create-checkout-session', (req, res,next)=>{
   try {
    
     // 2. Create temporary booking
-    console.log("stripe booking and slot",bookingData,slotData)
     const booking = await BookingService.createBooking({...bookingData,status:'pending'}, slotData);
     if(!booking || !booking._id){
       throw new Error('booking not available')
     }
-    console.log("booked item",booking)
     // 3. Calculate amount in cents
     const amount = Math.round(slotData.slotPrice * 100);
 
@@ -98,7 +96,6 @@ router.post('/create-checkout-session', (req, res,next)=>{
 
 // Webhook handler for successful payments
 router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
-  console.log("web hook called")
 
   const sig = req.headers['stripe-signature'];
   let event;

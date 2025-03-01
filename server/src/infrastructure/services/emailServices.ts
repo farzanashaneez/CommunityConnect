@@ -44,5 +44,4 @@ export const sendOTPToEmail=async(email: string, otp:string): Promise<void> =>{
       html: htmlContent
   });
 
-  console.log("OTP sent: %s", info.messageId);
 }

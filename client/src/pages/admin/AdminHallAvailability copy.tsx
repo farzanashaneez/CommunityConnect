@@ -185,7 +185,6 @@ const AdminHallAvailabilityPage: React.FC = () => {
           onSelectEvent={handleSelectEvent}
           popup={false}
           onShowMore={(events, date) => {
-            console.log("show more clicked",events,date)
             setMoreEventsDialog({
               open: true,
               events: events as Slot[],

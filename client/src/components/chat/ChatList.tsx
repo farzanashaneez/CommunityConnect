@@ -34,31 +34,14 @@ const ChatList: React.FC<ChatListProps> = ({ chats, selectedChat, onSelectChat, 
   const userState = useAppSelector((state) => state.user);
   const id = userState.currentUser.user.id;
   useEffect(() => {
-    console.log('chatlist',chats)
     socket.on("onlineStatusUpdate", (onlineStatus) => {
       setOnlineUsers(onlineStatus);
-      console.log("Online users ", onlineStatus);
     });
 
     return () => {
       socket.off("onlineStatusUpdate");
     };
   }, [chats,onlineUsers]);
-
-//   const isUserOnline = (selectedChat: any) => {
-// console.log(selectedChat,",,,,,,,",onlineUsers)
-//     let flag=false;
-//     if(selectedChat?.participants[0]?._id !== id){
-//     flag= onlineUsers.includes(selectedChat?.participants[0]?._id)
-//     }
-//     else if(selectedChat?.participants[1]?._id !== id){
-//       flag= onlineUsers.includes(selectedChat?.participants[1]?._id)
-
-//     }
-//     return flag
-    
-//   }
-  
 
   return (
     <List sx={{ 

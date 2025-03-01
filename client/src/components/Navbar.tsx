@@ -153,7 +153,6 @@ const NavBar: React.FC = () => {
   };
 
   const handleMarkAsSeen = async (notificationId: string) => {
-    console.log("seen button clicked")
     setNotifCount(null)
     try {
       await markAsSeen(notificationId, {

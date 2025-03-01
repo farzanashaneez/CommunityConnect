@@ -43,7 +43,6 @@ const BookingHistory: React.FC = () => {
     const fetchBookings = async () => {
       try {
         const response = await getAllBookingOfUser(id);
-        console.log('response',response)
 
         setBookings(response);
         setLoading(false);
@@ -103,7 +102,6 @@ const BookingListItem: React.FC<{ booking: Booking }> = ({ booking }) => {
         default: return 'default';
       }
     };
-  console.log('list called')
 
     return (
       <Card 

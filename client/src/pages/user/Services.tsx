@@ -78,7 +78,6 @@ const Services: React.FC = () => {
       }
       formData.append("type",'residential')
       formData.append("provider",userState.currentUser.user.id)
-console.log('currentuser',userState.currentUser.user.id)
       try {
         await createService(formData);
         showSnackbar("Service created successfully", "success");
@@ -111,11 +110,9 @@ console.log('currentuser',userState.currentUser.user.id)
 
 
       const croppedImageURL = URL.createObjectURL(croppedBlob);
-      console.log("cropped blob", croppedBlob);
       setCroppedImage(croppedImageURL);
       setIsCropping(false);
 
-      // formik.setFieldValue('image', file);
     },
     [formik]
   );

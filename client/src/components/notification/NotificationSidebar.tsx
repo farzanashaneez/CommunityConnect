@@ -31,7 +31,6 @@ const NotificationSidebar: React.FC<NavSidebarProps> = ({
 
   useEffect(() => {
     socket.on("notificationUpdate", (newNotification) => {
-      console.log("New notification received:", newNotification);
     });
 
     return () => {
@@ -44,7 +43,6 @@ const NotificationSidebar: React.FC<NavSidebarProps> = ({
   }, [notifications]);
 
   const handleMarkAsSeen = async (notificationId: string) => {
-    console.log("seen button clicked")
     try {
       await markAsSeen(notificationId, {
         seenBy: userState.currentUser.user.id

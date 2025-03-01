@@ -7,14 +7,12 @@ const router = express.Router();
 router.post('/', (req: Request, res: Response, next: NextFunction) => {
   const handleRefreshToken = async () => {
     const { refreshToken } = req.body;
-    console.log("========????????", refreshToken);
 
     if (!refreshToken) {
       return res.status(401).json({ message: 'Refresh token is required' });
     }
     try {
       const decoded: any = jwt.verify(refreshToken, process.env.REFRESH_SECRET || 'refreshsecret');
-      console.log('decoded*****************', decoded);
       const user: any = await UserService.getUser(decoded.id);
 
       const newAccessToken = jwt.sign(

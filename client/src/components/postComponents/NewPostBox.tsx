@@ -28,7 +28,6 @@ export default function NewPostBox() {
             values.images.forEach((image) => {
               formData.append('images', image);
             });
-            console.log('form data',formData,values.images)
           
             await createPost(formData);
             addedPost(true);

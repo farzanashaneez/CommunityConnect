@@ -9,7 +9,6 @@ const rootElement = document.getElementById('root');
 if (!rootElement) {
   alert('Root element not found!');
 }
-console.log('=====')
 if (rootElement) {
   createRoot(rootElement).render(
     <Provider store={store}>

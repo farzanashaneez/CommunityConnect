@@ -11,7 +11,6 @@ export class ChatController {
   async createChat(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const {type}=req.params;
-      console.log("creating new chat",type)
 
       const data= req.body;
       const newChat = await this.chatUseCase.createChat(data,type);
@@ -59,18 +58,7 @@ export class ChatController {
 
      
     updateMessageStatusSocket(chatId,messageIds)
-    console.log('backend called',chatId,messageIds,newmessage,status) 
-    // try {
-    //   const io = getIO();
-    //   io.emit('statusUpdatedFromFrontent', {
-    //     chatid: chatId,
-    //     unreadMessageIds: messageIds,
-    //     from: false,
-    //   });
-    // } catch (error) {
-    //   console.error('Error emitting event:', error);
-    // }
-
+   
       res.json(newmessage);
     } catch (error: any) {
       res.status(400).json({ message: 'Error adding message', error: error?.message });

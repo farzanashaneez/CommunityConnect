@@ -9,7 +9,6 @@ const Login: React.FC = () => {
     e.preventDefault();
     try {
       const response = await login(email, password);
-      console.log(response);
       // Handle successful login (e.g., store token, redirect)
     } catch (error) {
       console.error('Login failed:', error);

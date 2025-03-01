@@ -46,7 +46,6 @@ const userstate=useAppSelector(s=>s.user)
     // Listen for notification updates
     socket.on('notificationUpdate', (newNotification) => {
       setNotifications((prevNotifications) => [newNotification.message,...prevNotifications, ]);
-      console.log('New notification received:', newNotification);
     });
 
     // Cleanup on unmount
@@ -58,11 +57,9 @@ useEffect(()=>{
   const fetchnotification=async()=>{
     try{
       const notification=await getAllNotification(userstate.currentUser.user.id)
-      console.log('notification data',notification)
       setNotifications(notification);
     }
     catch(err){
-console.log('error in notfctn',err)
     }
    
   }

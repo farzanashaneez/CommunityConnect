@@ -30,7 +30,6 @@ const AnnouncementList: React.FC<AnnouncementListProps> = ({isAdmin=false}) => {
 
     fetchAnnouncements();
     socket.on("reload", (data) => {
-      console.log("reload event recieved")
       setUpdatelist((p) => p + 1);
 
       if (data === "announcement") {

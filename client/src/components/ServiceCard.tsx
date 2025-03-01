@@ -72,7 +72,6 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
   const navigate=useNavigate();
   const { requestServiceAlert } = useCommunityContext();
   const handleOpenDialog = (id: string, data: object) => {
-    console.log("open section ", data, userState);
     setConfirmId(id);
     setConfirmData(data);
     setOpen(true);
@@ -127,11 +126,9 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
 try{
   const message=`I would like to know more about the service- ${serviceData.name} you provided `
 const chatdata=await contactServiceProvider(serviceData,provider,requestby,message)
-console.log('chat data',chatdata)
 navigate(`/chatroom/${chatdata._id}`)
 }
 catch(err){
-console.log('cannot contact',err)
 }
   }
   return (

@@ -41,16 +41,13 @@ const LocalServicesTab = () => {
 
   useEffect(()=>{
       socket.on("reload", (data) => {
-          console.log("reload event recieved")
           setUpdatelist((p) => p + 1);
-    
           if (data === "servicerequest") {
             setUpdatelist((p) => p + 1);
           }
         });
         return (()=>{
           socket.off("reload");
-    
         })
       },[])
 
@@ -62,7 +59,6 @@ const LocalServicesTab = () => {
       try {
         const response = await getAllRequestedServices("pending");
         setServiceRequstArray(response);
-        console.log("response", response, serviceRequstArray);
       } catch (err) {
         console.error("Error fetching services:", err);
       }
@@ -71,7 +67,6 @@ const LocalServicesTab = () => {
       try {
         const response = await getAllRequestedServices("completed");
         setServiceRequstCompletedArray(response);
-        console.log("response", response, serviceRequstArray);
       } catch (err) {
         console.error("Error fetching services:", err);
       }

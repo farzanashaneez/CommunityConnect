@@ -30,7 +30,6 @@ const EventList: React.FC<EventListProps> = ({
 
     fetchEvents();
     socket.on("reload", (data) => {
-      console.log("reload event recieved")
       setUpdatelist((p) => p + 1);
 
       if (data === "event") {

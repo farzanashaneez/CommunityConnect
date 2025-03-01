@@ -9,7 +9,6 @@ const conncetDb = async()=>{
        
     }catch(error:any){
        
-          console.log(error.message)
           setTimeout(conncetDb,5000)
     }
 }

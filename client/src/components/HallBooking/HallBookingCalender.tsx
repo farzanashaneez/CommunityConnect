@@ -27,7 +27,6 @@ const HallBookingCalendar:React.FC = () => {
     
 const numberOfDays = 30; 
 const slots=await getAllavailableSlot(numberOfDays,'123')
-console.log("slots",slots)
       setEvents(slots);
     };
     fetchAvailableSlots();
@@ -35,7 +34,6 @@ console.log("slots",slots)
 
   
   const handleSelectSlot = (slotInfo: SlotInfo) => {
-    console.log("Slot Info:", slotInfo);
 
     const selectedDate = new Date(slotInfo.start);
     setSelectedDate(selectedDate);
@@ -47,7 +45,6 @@ console.log("slots",slots)
   };
 
   const handleBookSlot = (slot: Slot) => {
-    console.log(`Booked ${slot.slotType} slot on ${moment(slot.start).format('MMMM Do YYYY')}`);
     // Update events to remove booked slot
     setEvents(events.filter(event => event.id !== slot.id));
     setSelectedDate(null);
@@ -57,7 +54,6 @@ console.log("slots",slots)
 
   const handleSlotDetails = (slot: Slot) => {
     setSlotDetails(slot);
-    console.log("Slot Details:", slot);
     // You can display more information about the selected slot here
     // For example:
     alert(`Slot Type: ${slot.slotType}\nTime Range: ${moment(slot.start).format('hh:mm A')} - ${moment(slot.end).format('hh:mm A')}`);
@@ -90,7 +86,6 @@ console.log("slots",slots)
     return { style };
   };
   const handleSelectEvent = (event: Slot) => {
-    console.log("Event clicked:", event);
     setSelectedDate(event.start);
     setAvailableSlots([event]);
     setSlotDetails(event);

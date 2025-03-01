@@ -19,7 +19,6 @@ const UserVerificationPage: React.FC = () => {
       try {
         
         const response = await verifyQRcode(id as string);
-console.log(response.userId.userId)
         setUser(response.userId.userId);
       } catch (err) {
         setError("Verification Failed: User not found");

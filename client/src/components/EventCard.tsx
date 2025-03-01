@@ -75,15 +75,12 @@ const EventCard: React.FC<EventCardProps> = ({ event, isAdmin = false }) => {
   };
 
   const handleEditSubmit = async (values: Event) => {
-    console.log("edit update");
     try {
-      console.log("values", values);
       const updatedEvent = await updateEventApi(values._id, values);
       updateService(updatedEvent, "event");
       showSnackbar("Event updated successfully", "success");
       setEditDialogOpen(false);
     } catch (error) {
-      console.error("Error updating event:", error);
       showSnackbar("Failed to update event.", "error");
     }
   };

@@ -104,7 +104,6 @@ const HallBookingPage: React.FC = () => {
       const fetchAvailableSlots = async () => {
         const numberOfDays = 30;
         const slots = await getAllavailableSlot(numberOfDays, selectedHall._id);
-        console.log(slots)
         setEvents(slots);
       };
       const fetchuser = async () => {
@@ -146,11 +145,6 @@ const HallBookingPage: React.FC = () => {
   };
 
   const handleBookSlot = async () => {
-    console.log("Booking submitted:", {
-      ...bookingForm,
-      hall: selectedHall,
-      slot: selectedSlot,
-    });
     const bookindData = {
       userId: id,
       totalPrice: selectedSlot?.slotPrice,
@@ -163,10 +157,7 @@ const HallBookingPage: React.FC = () => {
         ...selectedSlot,
         status: "booked",
       });
-      //  const resp = await bookAHall(bookindData, selectedSlot);
-      // console.log("response booking",resp)
     } catch (err) {
-      console.log("bookin error");
       setIsBooking(false);
     }
 
@@ -232,58 +223,6 @@ const HallBookingPage: React.FC = () => {
     return { style };
   };
 
-  // const DayCellWrapper: React.FC<CustomDayCellWrapperProps> = React.memo(
-  //   ({ children, value }) => {
-  //     const eventsForDay = events.filter((event) =>
-  //       moment(new Date(event.start))
-  //         .startOf("day")
-  //         .isSame(moment(value).startOf("day"))
-  //     );
-
-  //     const handleShowMore = (e: React.MouseEvent<HTMLDivElement>) => {
-  //       e.preventDefault();
-  //       e.stopPropagation();
-  //       console.log("Events for day:", eventsForDay); // Debug log
-  //       if (eventsForDay.length > 0) {
-  //         setMoreEventsDialog({
-  //           open: true,
-  //           events: eventsForDay,
-  //           date: value,
-  //         });
-  //       }
-  //     };
-
-  //     return (
-  //       <div className="rbc-day-bg" style={{ position: "relative" }}>
-  //         {children}
-  //         {eventsForDay.length > 2 && (
-  //           <div
-  //             role="button"
-  //             onClick={handleShowMore}
-  //             style={{
-  //               cursor: "pointer",
-  //               fontSize: "0.8em",
-  //               padding: "2px 4px",
-  //               color: "#666",
-  //               textAlign: "center",
-  //               backgroundColor: "#f5f5f5",
-  //               margin: "2px",
-  //               borderRadius: "4px",
-  //               position: "absolute",
-  //               bottom: 0,
-  //               left: 0,
-  //               right: 0,
-  //               zIndex: 1,
-  //             }}
-  //           >
-  //             +{eventsForDay.length - 2} more
-  //           </div>
-  //         )}
-  //       </div>
-  //     );
-  //   }
-  // );
-
   // Modified MoreEventsDialog component
   const MoreEventsDialog = React.memo(() => (
     <Dialog
@@ -341,13 +280,6 @@ const HallBookingPage: React.FC = () => {
       </DialogActions>
     </Dialog>
   ));
-
-  // Modified EventComponent
-  // const EventComponent = React.memo(({ event }: { event: Slot }) => (
-  //   <div style={{ padding: '2px 4px' }}>
-  //     <div style={{ fontWeight: 'bold' }}>{event.title}</div>
-  //   </div>
-  // ));
 
   return (
     <Box sx={{ p: 3 }}>
@@ -445,7 +377,6 @@ const HallBookingPage: React.FC = () => {
                 Full Day Price: ${selectedHall.price.fullDay}
               </Typography>
 
-        
               <Box sx={{ mt: 3, height: 500 }}>
                 <Calendar
                   localizer={localizer}
@@ -458,14 +389,14 @@ const HallBookingPage: React.FC = () => {
                   selectable
                   components={{
                     event: EventComponent,
-                  //  dateCellWrapper: DayCellWrapper as any, // Type assertion needed due to react-big-calendar types
+                    //  dateCellWrapper: DayCellWrapper as any, // Type assertion needed due to react-big-calendar types
                   }}
                   popup={false}
                   views={["month"]}
                   defaultView="month"
                   tooltipAccessor={null}
                   messages={{
-                    showMore: (total) => ` +${total}`
+                    showMore: (total) => ` +${total}`,
                   }}
                   onShowMore={(events, date) => {
                     setMoreEventsDialog({
@@ -473,9 +404,7 @@ const HallBookingPage: React.FC = () => {
                       events: events as Slot[],
                       date: date,
                     });
-                    
                   }}
-                  
                 />
                 <MoreEventsDialog />
               </Box>
@@ -564,8 +493,6 @@ const HallBookingPage: React.FC = () => {
 
 export default HallBookingPage;
 
-
-
 // Modified EventComponent with better visibility
 const EventComponent = React.memo(({ event }: { event: Slot }) => {
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 768);
@@ -574,20 +501,20 @@ const EventComponent = React.memo(({ event }: { event: Slot }) => {
     const handleResize = () => {
       setIsSmallScreen(window.innerWidth < 768);
     };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const getAbbreviatedTitle = (slotType: string) => {
     switch (slotType) {
-      case 'HD-morning':
-        return 'M';
-      case 'HD-evening':
-        return 'E';
-      case 'Fullday':
-        return 'FD';
+      case "HD-morning":
+        return "M";
+      case "HD-evening":
+        return "E";
+      case "Fullday":
+        return "FD";
       default:
-        return '';
+        return "";
     }
   };
 
@@ -607,4 +534,3 @@ const EventComponent = React.memo(({ event }: { event: Slot }) => {
     </div>
   );
 });
-

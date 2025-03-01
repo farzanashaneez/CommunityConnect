@@ -63,7 +63,7 @@ export class MongoPostRepository implements PostRepository {
         transform: (doc) => {
           if (doc) {
             return {
-              _id:doc._id,
+              _id: doc._id,
               fullName: `${doc.firstName} ${doc.lastName}`,
               email: doc.email,
               imageUrl: doc.imageUrl,
@@ -74,7 +74,6 @@ export class MongoPostRepository implements PostRepository {
       })
       .sort({ createdAt: -1 });
 
-    console.log("============", posts);
     return posts;
   }
 
@@ -86,8 +85,6 @@ export class MongoPostRepository implements PostRepository {
   }
 
   async addLike(id: string, user: string): Promise<Post> {
-    console.log("user======>", user);
-
     const post = await PostModel.findById(id);
     if (!post) throw new Error("Post not found");
 
@@ -173,12 +170,13 @@ export class MongoPostRepository implements PostRepository {
           );
         }
 
-      if(chat){  await ChatServices.addMessage(chat._id, {
-          senderId: sharedby,
-          content: shareMessage,
-          status: "sent",
-        });
-      }
+        if (chat) {
+          await ChatServices.addMessage(chat._id, {
+            senderId: sharedby,
+            content: shareMessage,
+            status: "sent",
+          });
+        }
 
         // socketService.emitToUser(recipientId, 'newMessage', { chatId: chat._id, message: shareMessage });
       }

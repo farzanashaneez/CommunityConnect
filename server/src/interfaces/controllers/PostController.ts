@@ -10,12 +10,10 @@ export class PostController {
   async createPost(req: CustomRequestWithImageArray, res: Response,next: NextFunction) {
     try {
       const formData = req.body;
-      console.log("in post controller",formData)
 
       if (req.imageUrls && req.imageUrls.length > 0) {
         formData.images = req.imageUrls;
       }
-      console.log("in post controller",formData)
 
       const post = await this.postUseCase.createPost(formData);
       res.status(201).json(post);

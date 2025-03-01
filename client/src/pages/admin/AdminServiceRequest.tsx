@@ -33,7 +33,6 @@ const AdminServiceRequest: React.FC = () => {
       </Typography>
       <Divider />
       <Tabs value={tabValue} onChange={handleTabChange} sx={{ mb: 2 }}>
-      
         <Tab label="Residential Service Request" />
       </Tabs>
       <Divider sx={{ my: 1 }} />
@@ -41,8 +40,6 @@ const AdminServiceRequest: React.FC = () => {
     </Box>
   );
 };
-
-
 
 const ResidentialServicesTab = () => {
   const [serviceArray, setServiceArray] = useState<Service[]>([]);
@@ -83,10 +80,8 @@ const ResidentialServicesTab = () => {
       try {
         if (actionType === "accept") {
           await grantServiceApi(selectedServiceId);
-          console.log(`Service ${selectedServiceId} accepted`);
         } else {
           await rejectServiceApi(selectedServiceId);
-          console.log(`Service ${selectedServiceId} rejected`);
         }
         setServiceArray(
           serviceArray.filter((service) => service._id !== selectedServiceId)

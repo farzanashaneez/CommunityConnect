@@ -18,7 +18,6 @@ export class ApartmentController {
 
   async getApartments(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-console.log("get apartments0000000///////")
       const apartments = await this.apartmentUseCases.getAllApartments();
       res.json(apartments);
     } catch (error) {

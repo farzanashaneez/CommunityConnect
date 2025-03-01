@@ -34,7 +34,6 @@ export class MongoChatRepository implements ChatRepository {
     },
     type: string
   ): Promise<Chat | null> {
-    console.log("data#####=============", data);
     let newChat;
     const { participants, createdBy } = data;
     if (type === "group") {
@@ -100,7 +99,6 @@ export class MongoChatRepository implements ChatRepository {
       .exec();
   }
   async addMessage(chatId: string, message: Partial<Message>): Promise<Message> {
-    console.log("chat message ------------------", message);
     const newMessage = new MessageModel(message);
     const savedMessage = await newMessage.save();
 

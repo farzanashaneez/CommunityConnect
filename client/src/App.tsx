@@ -31,8 +31,7 @@ const App: React.FC = () => {
   const registerServiceWorker = async () => {
     if ('serviceWorker' in navigator) {
       try {
-        const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' });
-        console.log('Service Worker registered successfully:', registration);
+      await navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' });
       } catch (error) {
         console.error('Service Worker registration failed:', error);
       }
@@ -62,38 +61,15 @@ const App: React.FC = () => {
         setShowNotificationPrompt(false);
         setupFCM();
       } else {
-        console.log("Notification permission denied");
       }
     } catch (error) {
-      console.error("An error occurred while requesting permission:", error);
     }
   } else {
     console.warn("Notifications are not supported on this device/browser.");
   }
 };
 
-  // const setupFCM = async () => {
-  //   const currentPath = window.location.pathname;
-  //   const isRestrictedRoute = currentPath.startsWith('/admin') || 
-  //                           (currentPath.startsWith('/security') && !userState.currentUser);
-
-  //   if (!isRestrictedRoute) {
-  //     try {
-  //       // Initialize messaging first
-  //       await initializeMessaging();
-        
-  //       // Get the FCM token using the new function
-  //       const token = await getMessagingToken(VAPID_KEY);
-        
-  //       if (token) {
-  //         console.log('FCM Token:', token);
-  //         await sendTokenToServer(token);
-  //       }
-  //     } catch (error) {
-  //       console.error('An error occurred while setting up FCM:', error);
-  //     }
-  //   }
-  // };
+ 
   const setupFCM = async () => {
     if (typeof window !== "undefined" && "Notification" in window) {
       const currentPath = window.location.pathname;
@@ -105,7 +81,6 @@ const App: React.FC = () => {
           await initializeMessaging();
           const token = await getMessagingToken(VAPID_KEY);
           if (token) {
-            console.log("FCM Token:", token);
             await sendTokenToServer(token);
           }
         } catch (error) {
@@ -119,7 +94,6 @@ const App: React.FC = () => {
   
 
   const sendTokenToServer = async (token: string) => {
-    console.log('Sending token to server:', token);
     const platform = (navigator as any)?.userAgentData?.platform || navigator?.platform || 'unknown';
     
     try {
@@ -145,7 +119,6 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const unsubscribe = subscribeToMessages((payload) => {
-      console.log('Message received:', payload);
       if (Notification?.permission === 'granted' && 'serviceWorker' in navigator) {
         navigator.serviceWorker.ready.then(registration => {
           registration.showNotification(payload.notification?.title || 'New Message', {

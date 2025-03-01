@@ -24,7 +24,6 @@ const hallSchema = new Schema<Hall>({
   
   export class MongoHallRepository implements HallRepository {
     async create(hall: Partial<Hall>): Promise<Hall> {
-      console.log("hall details ==>",hall)
       const newHall = new HallModel(hall);
       return newHall.save();
     }

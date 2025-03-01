@@ -13,25 +13,20 @@ const ServiceList: React.FC<ServiceListProps> = ({ type, searchTerm = '', status
 
  useEffect(()=>{
   if (completed) {
-    console.log("community triggere.....")
     setCompleted(false); 
   }
     const fetchServices = async () => {
       try {
         const response = await getAllServices(type);
-        console.log("searchTerm",searchTerm,type,response)
         setServiceList(response);
       } catch (error) {
-        console.error("Error fetching services:", error);
       }
     };
     const fetchResidenceServices = async (status:string) => {
       try {
         const response = await getFilteredServices(status,type);
-        console.log("searchTerm",searchTerm,type,response)
         setServiceList(response);
       } catch (error) {
-        console.error("Error fetching services:", error);
       }
     };
 

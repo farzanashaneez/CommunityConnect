@@ -92,10 +92,7 @@ export function Post({ post, onPostUpdate }: PostProps) {
 
   const handleLike = async () => {
     try {
-      console.log(
-        "userState?.currentUser?.user?._id",
-        userState?.currentUser?.user?.id
-      );
+    
       const updatedPost = await likePost(
         post._id,
         userState?.currentUser?.user?.id
@@ -103,9 +100,7 @@ export function Post({ post, onPostUpdate }: PostProps) {
       
       
       onPostUpdate?.(updatedPost);
-      console.log("like button awaiting", updatedPost);
     } catch (error) {
-      console.error("Error liking post:", error);
     }
   };
 
@@ -119,7 +114,6 @@ export function Post({ post, onPostUpdate }: PostProps) {
       });
       onPostUpdate?.(updatedPost);
       setCommentText("");
-      console.log("comment section awaiting");
     } catch (error) {
       console.error("Error adding comment:", error);
     }

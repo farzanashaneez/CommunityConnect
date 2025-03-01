@@ -12,15 +12,8 @@ firebase.initializeApp({
 });
 
 const messaging = firebase.messaging();
-// self.addEventListener('install', (event) => {
-//   event.waitUntil(self.skipWaiting());
-// });
 
-// self.addEventListener('activate', (event) => {
-//   event.waitUntil(self.clients.claim());
-// });
 messaging.onBackgroundMessage((payload) => {
-  console.log('Received background message ', payload);
   // Customize notification here
   const notificationTitle = payload.notification.title;
   const notificationOptions = {
@@ -30,6 +23,5 @@ messaging.onBackgroundMessage((payload) => {
     tag: 'new-message',
     // renotify: true
   };
-  console.log('Received background message after ', payload);
   self.registration.showNotification(notificationTitle, notificationOptions);
 });

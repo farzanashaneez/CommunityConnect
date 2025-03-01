@@ -61,7 +61,6 @@ export class BookingUseCase {
       endDate.setDate(endDate.getDate() + forDays);
     
       const halldata=await this.hallRepository.findById(hallId)
-      // console.log("halldata   ",halldata)
 
       const allSlots = this.generateAllSlots(startDate, forDays, hallId,halldata?.availableSlots,halldata?.price);
       const bookedSlots = await this.bookingRepository.getAllSlots(hallId);
@@ -127,24 +126,6 @@ export class BookingUseCase {
       };
     }
     
-    // private filterAvailableSlots(allSlots: Slot[], bookedSlots: Slot[],availableslot:any): Slot[] {
-    //   const bookedSlotMap = new Map(bookedSlots.map(slot => [this.getSlotKey(slot), slot]));
-    // console.log('booked slot map',bookedSlotMap,bookedSlots)
-    //   return allSlots.filter(slot => {
-    //     const bookedSlot = bookedSlotMap.get(this.getSlotKey(slot));
-    //     if (!bookedSlot) return true;
-    
-    //     if (slot.slotType === 'Fullday') {
-    //       return false; // Remove full-day slot if there's any booking
-    //     }
-    
-    //     if (bookedSlot.slotType === 'Fullday') {
-    //       return false; // Remove half-day slot if there's a full-day booking
-    //     }
-    
-    //     return slot.slotType !== bookedSlot.slotType; // Keep the slot if it's not the same type as the booked slot
-    //   });
-    // }
     
     private filterAvailableSlots(allSlots: Slot[], bookedSlots: Slot[]): Slot[] {
       const bookedSlotMap = new Map(bookedSlots.map(slot => [this.getSlotKey(slot), slot]));

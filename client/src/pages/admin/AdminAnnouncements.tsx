@@ -43,21 +43,17 @@ const AdminAnnouncements: React.FC = () => {
     validationSchema: Yup.object({
       title: Yup.string().required("Title is required"),
       description: Yup.string().required("Description is required"),
-      // date: Yup.string().required("Date is required"),
       imageUrl: Yup.string().required("Image is required"),
       announcementtype: Yup.string().required("Announcement type is required"),
     }),
     onSubmit: async (values, { resetForm }) => {
-      console.log('ano00uncement ')
 
-      try {console.log('ano00uncement ')
+      try {
 
         // Prepare form data for API submission
         const formData = new FormData();
         formData.append("title", values.title);
         formData.append("description", values.description);
-        //  formData.append("date", values.date);
-        //  formData.append("date",Date.now().toLocaleString());
         formData.append("announcementtype", values.announcementtype); // Include the new field
 
         if (values.imageUrl) {

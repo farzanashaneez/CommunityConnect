@@ -52,11 +52,10 @@ const LocalServicesTab = () => {
   const { completed, setCompleted } = useCommunityContext();
   const [isAddDialogOpen, setAddDialogOpen] = useState(false);
 
-const adminState=useAppSelector((state)=>state.admin)
+  const adminState = useAppSelector((state) => state.admin);
   const [updateTrigger, setUpdateTrigger] = useState(0);
   useEffect(() => {
     if (completed) {
-      console.log("community triggere.....");
       setCompleted(false);
     }
   }, [completed, setCompleted]);
@@ -87,8 +86,7 @@ const adminState=useAppSelector((state)=>state.admin)
         const fileName = `cropped-image-${Date.now()}.jpeg`; // Define a unique filename
         const file = new File([values.image], fileName, { type: "image/jpeg" }); // Convert Blob to File
         formData.append("image", file);
-        formData.append("provider",adminState.currentAdmin.user.id)
-
+        formData.append("provider", adminState.currentAdmin.user.id);
       }
       try {
         await createService(formData);
@@ -121,16 +119,11 @@ const adminState=useAppSelector((state)=>state.admin)
 
   const handleCropComplete = useCallback(
     (croppedBlob: Blob) => {
-      //   const fileName = `cropped-image-${Date.now()}.jpeg`;
-      // const croppedFile = new File([croppedBlob], fileName, { type: "image/jpeg" });
-      // formik.setFieldValue("image", croppedFile);
-
+      
       const croppedImageURL = URL.createObjectURL(croppedBlob);
-      console.log("cropped blob", croppedBlob);
       setCroppedImage(croppedImageURL);
       setIsCropping(false);
 
-      // formik.setFieldValue('image', file);
     },
     [formik]
   );
@@ -147,20 +140,24 @@ const adminState=useAppSelector((state)=>state.admin)
         gap: { xs: "0", md: "16px" },
       }}
     >
-    
       <Box sx={{ flex: 1 }}>
-    <Box sx={{display:'flex', flexDirection:'row' ,justifyContent:'space-between'}}>
-    <Typography variant="h6">Available Services</Typography>
-        <Button 
-  variant="text" 
-  color="primary" 
-  onClick={() => setAddDialogOpen(true)} 
-  sx={{ mb: 2,fontSize:'18px',mr:2 }}
->
-  + New Service
-</Button>
-    </Box>
-       
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
+          <Typography variant="h6">Available Services</Typography>
+          <Button
+            variant="text"
+            color="primary"
+            onClick={() => setAddDialogOpen(true)}
+            sx={{ mb: 2, fontSize: "18px", mr: 2 }}
+          >
+            + New Service
+          </Button>
+        </Box>
 
         <Box
           sx={{
@@ -182,101 +179,103 @@ const adminState=useAppSelector((state)=>state.admin)
         </Box>
       </Box>
       <Dialog open={isAddDialogOpen} onClose={() => setAddDialogOpen(false)}>
-  <DialogTitle>Add New Service</DialogTitle>
-  <DialogContent>
-    <form onSubmit={formik.handleSubmit}>
-          <Box sx={{ padding: 4, textAlign: "center" }}>
-            {!isCropping ? (
-              <>
-                {!croppedImage && (
-                  <Typography variant="h5" sx={{ marginBottom: 2 }}>
-                    Upload and Crop an Image
-                  </Typography>
-                )}
-                {croppedImage && (
-                  <Box sx={{ marginTop: 0 }}>
-                    <Typography variant="h6" sx={{ marginBottom: 2 }}>
-                      Cropped Image Preview:
+        <DialogTitle>Add New Service</DialogTitle>
+        <DialogContent>
+          <form onSubmit={formik.handleSubmit}>
+            <Box sx={{ padding: 4, textAlign: "center" }}>
+              {!isCropping ? (
+                <>
+                  {!croppedImage && (
+                    <Typography variant="h5" sx={{ marginBottom: 2 }}>
+                      Upload and Crop an Image
                     </Typography>
-                    <img
-                      src={croppedImage}
-                      alt="Cropped"
-                      style={{
-                        maxWidth: "30%",
-                        display: "block",
-                        margin: "0 auto",
-                        border: "1px solid #ccc",
-                        borderRadius: "8px",
-                      }}
-                    />
-                  </Box>
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="mt-2"
+                  )}
+                  {croppedImage && (
+                    <Box sx={{ marginTop: 0 }}>
+                      <Typography variant="h6" sx={{ marginBottom: 2 }}>
+                        Cropped Image Preview:
+                      </Typography>
+                      <img
+                        src={croppedImage}
+                        alt="Cropped"
+                        style={{
+                          maxWidth: "30%",
+                          display: "block",
+                          margin: "0 auto",
+                          border: "1px solid #ccc",
+                          borderRadius: "8px",
+                        }}
+                      />
+                    </Box>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="mt-2"
+                  />
+                  {formik.touched.image && formik.errors.image && (
+                    <Typography color="error">
+                      {formik.errors.image as string}
+                    </Typography>
+                  )}
+                </>
+              ) : (
+                <ImageCropper
+                  imageSrc={imageSrc!}
+                  onCropComplete={handleCropComplete}
+                  onCancel={handleCancel}
                 />
-                {formik.touched.image && formik.errors.image && (
-                  <Typography color="error">
-                    {formik.errors.image as string}
-                  </Typography>
-                )}
-              </>
-            ) : (
-              <ImageCropper
-                imageSrc={imageSrc!}
-                onCropComplete={handleCropComplete}
-                onCancel={handleCancel}
-              />
-            )}
-          </Box>
-          <TextField
-            fullWidth
-            label="Service Name"
-            variant="outlined"
-            sx={{ mb: 2 }}
-            {...formik.getFieldProps("serviceName")}
-            error={
-              formik.touched.serviceName && Boolean(formik.errors.serviceName)
-            }
-            helperText={formik.touched.serviceName && formik.errors.serviceName}
-          />
-          <TextField
-            fullWidth
-            label="Description"
-            variant="outlined"
-            multiline
-            rows={3}
-            sx={{ mb: 2 }}
-            {...formik.getFieldProps("description")}
-            error={
-              formik.touched.description && Boolean(formik.errors.description)
-            }
-            helperText={formik.touched.description && formik.errors.description}
-          />
-          <TextField
-            fullWidth
-            label="Price"
-            variant="outlined"
-            type="number"
-            sx={{ mb: 2 }}
-            {...formik.getFieldProps("price")}
-            error={formik.touched.price && Boolean(formik.errors.price)}
-            helperText={formik.touched.price && formik.errors.price}
-          />
-          <Button onClick={() => setAddDialogOpen(false)}>Cancel</Button>
-    <Button type="submit" variant="contained" color="primary">
-      Add Service
-    </Button>
-          {/* <Button variant="contained" color="primary" type="submit">
+              )}
+            </Box>
+            <TextField
+              fullWidth
+              label="Service Name"
+              variant="outlined"
+              sx={{ mb: 2 }}
+              {...formik.getFieldProps("serviceName")}
+              error={
+                formik.touched.serviceName && Boolean(formik.errors.serviceName)
+              }
+              helperText={
+                formik.touched.serviceName && formik.errors.serviceName
+              }
+            />
+            <TextField
+              fullWidth
+              label="Description"
+              variant="outlined"
+              multiline
+              rows={3}
+              sx={{ mb: 2 }}
+              {...formik.getFieldProps("description")}
+              error={
+                formik.touched.description && Boolean(formik.errors.description)
+              }
+              helperText={
+                formik.touched.description && formik.errors.description
+              }
+            />
+            <TextField
+              fullWidth
+              label="Price"
+              variant="outlined"
+              type="number"
+              sx={{ mb: 2 }}
+              {...formik.getFieldProps("price")}
+              error={formik.touched.price && Boolean(formik.errors.price)}
+              helperText={formik.touched.price && formik.errors.price}
+            />
+            <Button onClick={() => setAddDialogOpen(false)}>Cancel</Button>
+            <Button type="submit" variant="contained" color="primary">
+              Add Service
+            </Button>
+            {/* <Button variant="contained" color="primary" type="submit">
             Add Service
           </Button> */}
-        
-        </form>
-  </DialogContent>
-
-</Dialog>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       <CustomSnackbar
         open={snackbar.open}
@@ -294,11 +293,10 @@ const ResidentialServicesTab = () => {
       sx={{
         display: "flex",
         // flexDirection: { xs: "column", md: "row" },
-         flexDirection:"column",
+        flexDirection: "column",
         gap: { xs: "0", md: "16px" },
       }}
     >
-      
       <Box sx={{ flex: 1 }}>
         <Typography variant="h6" sx={{ mb: 2, fontWeight: "600" }}>
           Accepted Services
@@ -318,7 +316,7 @@ const ResidentialServicesTab = () => {
           <ServiceList
             type="residential"
             searchTerm="residential"
-            status='granted'
+            status="granted"
             update={1}
             isAdmin={true}
           />
@@ -343,7 +341,7 @@ const ResidentialServicesTab = () => {
           <ServiceList
             type="residential"
             searchTerm="residential"
-            status='pending'
+            status="pending"
             update={1}
             isAdmin={true}
           />
@@ -368,13 +366,12 @@ const ResidentialServicesTab = () => {
           <ServiceList
             type="residential"
             searchTerm="residential"
-            status='rejected'
+            status="rejected"
             update={1}
             isAdmin={true}
           />
         </Box>
       </Box>
-
     </Box>
   );
 };

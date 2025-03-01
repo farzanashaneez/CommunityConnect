@@ -14,10 +14,8 @@ export const initializeSocket = (server: any) => {
     path: "/socket.io",
   });
 
-  console.log("Socket.IO initialized");
 
   io.on("connection", (socket) => {
-    console.log(`User connected: ${socket.id}`);
 
     // Register event handlers
     registerChatHandlers(io, socket);
@@ -25,7 +23,6 @@ export const initializeSocket = (server: any) => {
     registerUserHandlers(io, socket);
 
     socket.on("disconnect", () => {
-      console.log(`User disconnected: ${socket.id}`);
     });
   });
 };

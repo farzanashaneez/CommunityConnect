@@ -10,7 +10,6 @@ export class QRCodeController {
   async generateQRCode(req: Request, res: Response): Promise<void> {
     try {
       const { userId,token,expiry } = req.body;
-      console.log(req.body)
       const data = await this.qrCodeUseCase.GenerateQRCodeUseCase(userId,token,expiry);
       res.json({ data });
     } catch (error) {
@@ -21,7 +20,6 @@ export class QRCodeController {
     try {
       const { id } = req.params;
       const token = await this.qrCodeUseCase.getToken(id);
-      console.log('0000000000000000000000000000000000000000000',token)
 
       res.status(201).json(token);
     } catch (error) {

@@ -9,16 +9,7 @@ export class BookingController {
   async createBooking(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const {bookingData,slotData} = req.body;
-      console.log('nooking and slot data ========>>>',bookingData,slotData)
       const newBooking = await this.bookingUseCase.createBooking(bookingData,slotData);
-
-      // Promise.resolve().then(async () => {
-      //   const notificationMessage = `New booking created for hall: ${newBooking.hallId}`;
-      //   await notificationServices.createNotification(notificationMessage, [newBooking.userId], true);
-      //   const io = getIO();
-      //   io.emit("notificationUpdate", notificationMessage);
-      // });
-
       res.status(201).json(newBooking);
     } catch (error: any) {
       res.status(400).json({ message: 'Error creating booking', error: error?.message });
@@ -81,9 +72,7 @@ export class BookingController {
   async getAvailableSlots(req: Request, res: Response, next: NextFunction): Promise<void>{
     try{
       const {fordays,hallid}=req.params;
-      console.log("booking",fordays,hallid)
       const slots=await this.bookingUseCase.getAvailableSlots(parseInt(fordays),hallid)
-      console.log("==>booking",slots)
       res.json(slots)
     }
     catch(err:any){
@@ -94,9 +83,7 @@ res.status(400).json({message:'Error getting available slots',error:err.message}
   async getAllSlotsOfHall(req: Request, res: Response, next: NextFunction): Promise<void>{
     try{
       const {fordays,hallid}=req.params;
-      console.log("booking",fordays,hallid)
       const slots=await this.bookingUseCase.getAllSlotsOfHall(parseInt(fordays),hallid)
-      console.log("==>booking",slots)
       res.json(slots)
     }
     catch(err:any){

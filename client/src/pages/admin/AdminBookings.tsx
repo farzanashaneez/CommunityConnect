@@ -72,7 +72,6 @@ const AdminBookings: React.FC = () => {
       try {
         // Replace with your actual API call
         const response = await getAllBookings()
-        console.log(response)
         setBookings(response);
       } catch (error) {
         console.error('Failed to fetch bookings', error);

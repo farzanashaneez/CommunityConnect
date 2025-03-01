@@ -9,7 +9,6 @@ export class HallController {
     try {
       const hallData = req.body;
       const images=req.imageUrls;
-console.log("images from cloudinary",images)
 const halldatanew={...hallData,images:images};
       const newHall = await this.hallUseCase.createHall(halldatanew);
       res.status(201).json(newHall);
