@@ -47,7 +47,7 @@ export function Post({ post, onPostUpdate }: PostProps) {
   const userState = useAppSelector((state) => state.user);
   const [open, setOpen] = useState(false);
   const [confirmId, setConfirmId] = useState<string | null>(null);
-  const { deletePostAlert } = useCommunityContext();
+  const { deletePostAlert,setPostUpdated } = useCommunityContext();
   const [commentText, setCommentText] = useState("");
 
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
@@ -82,6 +82,8 @@ export function Post({ post, onPostUpdate }: PostProps) {
     try {
       if (confirmId) {
         await deletePost(confirmId);
+        setPostUpdated(true)
+
       }
       handleCloseDialog();
       deletePostAlert(true);
