@@ -11,37 +11,6 @@ interface CreateCheckoutRequest extends Request {
     slotData: Slot
   }
 }
-// router.post('/create-checkout-session', async (req, res) => {
-
-//   const {bookingData,slotData}=req.body;
- 
-//   try {
-//     const result=await BookingService.createBooking(bookingData,slotData);
-//     console.log('product',result)
-
-//     const session = await stripe.checkout.sessions.create({
-//       payment_method_types: ['card'],
-//       line_items: [
-//         {
-//           price_data: {
-//             currency: 'usd',
-//             product_data: {
-//               name: 'Your Product',
-//             },
-//             unit_amount: 2000,
-//           },
-//           quantity: 1,
-//         },
-//       ],
-//       mode: 'payment',
-//       success_url: 'http://localhost:5173/success',
-//       cancel_url: 'http://localhost:5173/cancel',
-//     });
-//     res.json({ id: session.id });
-//   } catch (error:any) {
-//     res.status(500).json({ error: error.message });
-//   }
-// });
 
 router.post('/create-checkout-session', (req, res,next)=>{ 
   (async (req:CreateCheckoutRequest, res:Response,) => {

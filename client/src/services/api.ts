@@ -115,6 +115,17 @@ export const updatePassword = async (id:string,password:string) => {
   const response = await api.post(`${API_URL}/users/updatepassword/${id}`,{password:pass,d:'123'});
   return response.data;
 };
+
+export const verifyOtp=async(userId:string,otp:string)=>{
+  const response = await axios.post(`${API_URL}/users/${userId}/verify-otp`, { otp });
+    return response.data;
+}
+export const requestOtp=async(userId:string)=>{
+  console.log(userId," is requested")
+  const response = await axios.get(`${API_URL}/users/${userId}/otp`);
+  return response.data;
+}
+
 export const addProfileImage = async (id:string, data:object) => {
   console.log("data====",data,id)
   const response = await api.post(`${API_URL}/users/addprofileImage/${id}`, data

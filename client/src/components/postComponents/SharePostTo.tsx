@@ -39,9 +39,9 @@ const SharePostTo: React.FC<SharePostToProps> = ({ postid, open, onClose }) => {
   const fetchUsers = async () => {
     try {
       const response = await fetchAllUsers();
-      setUsers(response);
+
+      setUsers(response.filter((user:any)=>user._id!==userState?.currentUser.user.id));
     } catch (error) {
-      console.error("Error fetching users:", error);
     }
   };
 
@@ -60,14 +60,7 @@ const SharePostTo: React.FC<SharePostToProps> = ({ postid, open, onClose }) => {
       if (!userId) throw new Error("user Id missing");
        await sharePost(postid, userId, selectedUsers);
 
-      // // Emit socket event
-      // socket.emit("sendMessage", {
-      //   chatId: chatId,
-      //   senderId: 'YOUR_USER_ID', // Replace with actual user ID
-      //   content: message,
-      // });
     } catch (error) {
-      console.error("Error sending message:", error);
     }
 
     onClose();
@@ -95,7 +88,7 @@ const SharePostTo: React.FC<SharePostToProps> = ({ postid, open, onClose }) => {
               <ListItemAvatar>
                 <Avatar src={user.imageUrl} alt={user.firstName} />
               </ListItemAvatar>
-              <ListItemText primary={user.firstName} />
+              <ListItemText primary={user.firstName} secondary={`${user.apartmentId.buildingSection} ${user.apartmentId.apartmentNumber}`} />
               <Checkbox
                 edge="end"
                 checked={selectedUsers.includes(user._id)}

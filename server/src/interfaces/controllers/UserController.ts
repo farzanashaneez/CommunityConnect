@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { sendWelcomeEmail } from "../../infrastructure/services/emailServices";
+import { sendOTPToEmail, sendWelcomeEmail } from "../../infrastructure/services/emailServices";
 import { UserUseCases } from "../../application/usecases/userUseCases";
-import { error } from "console";
 import { CustomRequest } from "../../infrastructure/middlewares/uploadImageToCloudinary";
 import ApartmentService from "../../application/services/ApartmentService";
 
@@ -310,4 +309,107 @@ catch(err){
 next(err)
 }
   }
+
+ 
+async sendOtp(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    console.log('----------------------->')
+
+    const userId = req.params.userId;
+    
+    // Find the user
+    const user = await this.userUseCases.getUserById(userId);
+    if (!user) {
+      const error = new Error("User not found");
+      (error as any).statusCode = 404;
+      throw error;
+    }
+    
+    // Generate a 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // Set expiry time (e.g., 10 minutes from now)
+    const expiryTime = new Date();
+    expiryTime.setMinutes(expiryTime.getMinutes() + 10);
+    console.log('----------------------->')
+    // Store OTP in the database
+    await this.userUseCases.storeOtp(userId, otp, expiryTime);
+    
+    // Send OTP to user's email
+    await sendOTPToEmail(user.email, otp);
+    
+    res.status(200).json({ 
+      message: "OTP sent successfully",
+      userId: userId
+    });
+  } catch (error) {
+    console.log("Send OTP error:", error);
+    next(error);
+  }
+}
+
+async verifyOtp(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const userId = req.params.userId;
+    const { otp } = req.body;
+    
+    if (!otp) {
+      const error = new Error("OTP is required");
+      (error as any).statusCode = 400;
+      throw error;
+    }
+    
+    // Find the user
+    const user = await this.userUseCases.getUserById(userId);
+    if (!user) {
+      const error = new Error("User not found");
+      (error as any).statusCode = 404;
+      throw error;
+    }
+    
+    // Get stored OTP details
+    const otpDetails = await this.userUseCases.getOtpDetails(userId);
+    
+    if (!otpDetails) {
+      const error = new Error("OTP not found or expired. Please request a new OTP");
+      (error as any).statusCode = 400;
+      throw error;
+    }
+    
+    // Check if OTP is expired
+    const currentTime = new Date();
+    if (currentTime > otpDetails.expiryTime) {
+      const error = new Error("OTP has expired. Please request a new OTP");
+      (error as any).statusCode = 400;
+      throw error;
+    }
+    
+    // Verify OTP
+    if (otpDetails.otp !== otp) {
+      const error = new Error("Invalid OTP");
+      (error as any).statusCode = 400;
+      throw error;
+    }
+    
+    // Mark OTP as verified
+    await this.userUseCases.markOtpAsVerified(userId);
+    
+    res.status(200).json({ 
+      message: "OTP verified successfully",
+      userId: userId,
+      verified: true
+    });
+  } catch (error) {
+    console.log("Verify OTP error:", error);
+    next(error);
+  }
+}
 }

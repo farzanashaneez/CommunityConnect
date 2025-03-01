@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
+
+import React, { useEffect, useState } from 'react';
 import { 
   TextField, 
   Button, 
@@ -9,11 +10,10 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Alert,
-  Box
+  Alert
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
-import { login, verifyEmail, updatePassword, verifyOtp, requestOtp } from '../../services/api';
+import { login, verifyEmail, updatePassword } from '../../services/api';
 import CustomModal from '../../components/CustomModal';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
@@ -26,15 +26,11 @@ const UserLogin: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
   const [emailVerified, setEmailVerified] = useState(false);
-  const [otpVerified, setOtpVerified] = useState(false);
   const [verifiedId, setVerifiedId] = useState('');
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
-  const [disableResendOtp, setDisableResendOtp] = useState(false);
-  const [counter, setCounter] = useState(60); // Start with 60 seconds
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
+  
   const userState = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
   const location = useLocation();
@@ -46,43 +42,6 @@ const UserLogin: React.FC = () => {
       navigate('/home');
     }
   }, [location, userState.currentUser, navigate]);
-
-  // Timer for OTP resend button
-  useEffect(() => {
-    // Clear any existing interval
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-
-    // Only start the timer if the resend button is disabled
-    if (disableResendOtp) {
-      setCounter(60); // Reset to 60 seconds when disabled
-      
-      intervalRef.current = setInterval(() => {
-        setCounter((prevCounter) => {
-          // When counter reaches 0, enable the resend button
-          if (prevCounter <= 1) {
-            setDisableResendOtp(false);
-            if (intervalRef.current) {
-              clearInterval(intervalRef.current);
-              intervalRef.current = null;
-            }
-            return 0;
-          }
-          return prevCounter - 1;
-        });
-      }, 1000);
-    }
-
-    // Cleanup function
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    };
-  }, [disableResendOtp]);
 
   const loginValidationSchema = Yup.object({
     email: Yup.string()
@@ -96,12 +55,6 @@ const UserLogin: React.FC = () => {
     email: Yup.string()
       .email('Invalid email address')
       .required('Email is required'),
-  });
-
-  const otpValidationSchema = Yup.object({
-    otp: Yup.string()
-      .required('OTP is required')
-      .matches(/^\d{6}$/, 'OTP must be 6 digits'),
   });
 
   const newPasswordValidationSchema = Yup.object({
@@ -146,37 +99,12 @@ const UserLogin: React.FC = () => {
         if (response) {
           setVerifiedId(response._id);
           setEmailVerified(true);
-          // Request OTP after email is verified
-          await requestOtp(response._id);
-          setDisableResendOtp(true); // Disable resend button after initial OTP request
-          setSnackbarMessage('Email verified. OTP sent to your email');
+          setSnackbarMessage('Email verified successfully');
           setSnackbarSeverity('success');
           setOpenSnackbar(true);
         }
       } catch (error) {
         setSnackbarMessage('Email verification failed');
-        setSnackbarSeverity('error');
-        setOpenSnackbar(true);
-      }
-    },
-  });
-
-  const otpFormik = useFormik({
-    initialValues: {
-      otp: '',
-    },
-    validationSchema: otpValidationSchema,
-    onSubmit: async (values) => {
-      try {
-        const response = await verifyOtp(verifiedId, values.otp);
-        if (response) {
-          setOtpVerified(true);
-          setSnackbarMessage('OTP verified successfully');
-          setSnackbarSeverity('success');
-          setOpenSnackbar(true);
-        }
-      } catch (error) {
-        setSnackbarMessage('OTP verification failed');
         setSnackbarSeverity('error');
         setOpenSnackbar(true);
       }
@@ -191,13 +119,13 @@ const UserLogin: React.FC = () => {
     validationSchema: newPasswordValidationSchema,
     onSubmit: async (values) => {
       try {
-        await updatePassword(verifiedId, values.password);
+        console.log('values',values.password)
+        await updatePassword(verifiedId,values.password);
         setSnackbarMessage('Password reset successful');
         setSnackbarSeverity('success');
         setOpenSnackbar(true);
         setForgotPasswordOpen(false);
         setEmailVerified(false);
-        setOtpVerified(false);
       } catch (error) {
         setSnackbarMessage('Password reset failed');
         setSnackbarSeverity('error');
@@ -206,25 +134,6 @@ const UserLogin: React.FC = () => {
     },
   });
 
-  const handleResendOtp = async () => {
-    // Only proceed if button is enabled
-    if (!disableResendOtp) {
-      setDisableResendOtp(true);
-      
-      try {
-        await requestOtp(verifiedId);
-        setSnackbarMessage('OTP resent successfully');
-        setSnackbarSeverity('success');
-        setOpenSnackbar(true);
-      } catch (error) {
-        setSnackbarMessage('Failed to resend OTP');
-        setSnackbarSeverity('error');
-        setOpenSnackbar(true);
-        // Even if there's an error, keep the button disabled for the cooldown period
-      }
-    }
-  };
-
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
@@ -232,138 +141,8 @@ const UserLogin: React.FC = () => {
   const handleCloseForgotPassword = () => {
     setForgotPasswordOpen(false);
     setEmailVerified(false);
-    setOtpVerified(false);
-    setDisableResendOtp(false);
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
     forgotPasswordFormik.resetForm();
-    otpFormik.resetForm();
     resetPasswordFormik.resetForm();
-  };
-
-  // Format the counter as mm:ss
-  const formatTime = (seconds: number) => {
-    return `${Math.floor(seconds / 60)}:${(seconds % 60).toString().padStart(2, '0')}`;
-  };
-
-  // Determine which form to show in the dialog
-  const renderPasswordResetForm = () => {
-    if (!emailVerified) {
-      return (
-        <form onSubmit={forgotPasswordFormik.handleSubmit} noValidate>
-          <TextField
-            variant="outlined"
-            margin="normal"
-            fullWidth
-            id="reset-email"
-            name="email"
-            label="Email Address"
-            value={forgotPasswordFormik.values.email}
-            onChange={forgotPasswordFormik.handleChange}
-            onBlur={forgotPasswordFormik.handleBlur}
-            error={forgotPasswordFormik.touched.email && Boolean(forgotPasswordFormik.errors.email)}
-            helperText={forgotPasswordFormik.touched.email && forgotPasswordFormik.errors.email}
-          />
-        </form>
-      );
-    } else if (!otpVerified) {
-      // Step 2: OTP verification form
-      return (
-        <form onSubmit={otpFormik.handleSubmit} noValidate>
-          <TextField
-            variant="outlined"
-            margin="normal"
-            fullWidth
-            id="otp"
-            name="otp"
-            label="Enter 6-digit OTP"
-            value={otpFormik.values.otp}
-            onChange={otpFormik.handleChange}
-            onBlur={otpFormik.handleBlur}
-            error={otpFormik.touched.otp && Boolean(otpFormik.errors.otp)}
-            helperText={otpFormik.touched.otp && otpFormik.errors.otp}
-          />
-          <Box sx={{ mt: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            {disableResendOtp && (
-              <Box sx={{ fontSize: '0.8rem', color: 'text.secondary' }}>
-                Resend in: {formatTime(counter)}
-              </Box>
-            )}
-            <Button 
-              variant="text" 
-              size="small" 
-              onClick={handleResendOtp}
-              disabled={disableResendOtp}
-              sx={{ 
-                color: '#1976d2',
-                fontSize: '0.8rem',
-                ml: 'auto' // Push to the right
-              }}
-            >
-              Resend OTP
-            </Button>
-          </Box>
-        </form>
-      );
-    } else {
-      return (
-        <form onSubmit={resetPasswordFormik.handleSubmit} noValidate>
-          <TextField
-            variant="outlined"
-            margin="normal"
-            fullWidth
-            id="new-password"
-            name="password"
-            label="New Password"
-            type="password"
-            value={resetPasswordFormik.values.password}
-            onChange={resetPasswordFormik.handleChange}
-            onBlur={resetPasswordFormik.handleBlur}
-            error={resetPasswordFormik.touched.password && Boolean(resetPasswordFormik.errors.password)}
-            helperText={resetPasswordFormik.touched.password && resetPasswordFormik.errors.password}
-          />
-          <TextField
-            variant="outlined"
-            margin="normal"
-            fullWidth
-            id="confirm-password"
-            name="confirmPassword"
-            label="Confirm Password"
-            type="password"
-            value={resetPasswordFormik.values.confirmPassword}
-            onChange={resetPasswordFormik.handleChange}
-            onBlur={resetPasswordFormik.handleBlur}
-            error={resetPasswordFormik.touched.confirmPassword && Boolean(resetPasswordFormik.errors.confirmPassword)}
-            helperText={resetPasswordFormik.touched.confirmPassword && resetPasswordFormik.errors.confirmPassword}
-          />
-        </form>
-      );
-    }
-  };
-
-  // Determine the title and button text for the dialog based on the current step
-  const getDialogTitle = () => {
-    if (!emailVerified) return 'Forgot Password';
-    if (!otpVerified) return 'Verify OTP';
-    return 'Reset Password';
-  };
-
-  const getActionButtonText = () => {
-    if (!emailVerified) return 'Verify Email';
-    if (!otpVerified) return 'Verify OTP';
-    return 'Reset Password';
-  };
-
-  const handleDialogAction = () => {
-    if (!emailVerified) {
-      forgotPasswordFormik.handleSubmit();
-    } else if (!otpVerified) {
-      otpFormik.handleSubmit();
-    } else {
-      resetPasswordFormik.handleSubmit();
-    }
   };
 
   return (
@@ -475,7 +254,7 @@ const UserLogin: React.FC = () => {
         </form>
       </Paper>
 
-      {/* Forgot Password Dialog with multiple steps */}
+      {/* Forgot Password Dialog */}
       <Dialog 
         open={forgotPasswordOpen} 
         onClose={handleCloseForgotPassword}
@@ -489,20 +268,71 @@ const UserLogin: React.FC = () => {
         }}
       >
         <DialogTitle>
-          {getDialogTitle()}
+          {emailVerified ? 'Reset Password' : 'Forgot Password'}
         </DialogTitle>
         <DialogContent>
-          {renderPasswordResetForm()}
+          {!emailVerified ? (
+            <form onSubmit={forgotPasswordFormik.handleSubmit} noValidate>
+              <TextField
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                id="reset-email"
+                name="email"
+                label="Email Address"
+                value={forgotPasswordFormik.values.email}
+                onChange={forgotPasswordFormik.handleChange}
+                onBlur={forgotPasswordFormik.handleBlur}
+                error={forgotPasswordFormik.touched.email && Boolean(forgotPasswordFormik.errors.email)}
+                helperText={forgotPasswordFormik.touched.email && forgotPasswordFormik.errors.email}
+              />
+            </form>
+          ) : (
+            <form onSubmit={resetPasswordFormik.handleSubmit} noValidate>
+              <TextField
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                id="new-password"
+                name="password"
+                label="New Password"
+                type="password"
+                value={resetPasswordFormik.values.password}
+                onChange={resetPasswordFormik.handleChange}
+                onBlur={resetPasswordFormik.handleBlur}
+                error={resetPasswordFormik.touched.password && Boolean(resetPasswordFormik.errors.password)}
+                helperText={resetPasswordFormik.touched.password && resetPasswordFormik.errors.password}
+              />
+              <TextField
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                id="confirm-password"
+                name="confirmPassword"
+                label="Confirm Password"
+                type="password"
+                value={resetPasswordFormik.values.confirmPassword}
+                onChange={resetPasswordFormik.handleChange}
+                onBlur={resetPasswordFormik.handleBlur}
+                error={resetPasswordFormik.touched.confirmPassword && Boolean(resetPasswordFormik.errors.confirmPassword)}
+                helperText={resetPasswordFormik.touched.confirmPassword && resetPasswordFormik.errors.confirmPassword}
+              />
+            </form>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseForgotPassword}>
             Cancel
           </Button>
           <Button 
-            onClick={handleDialogAction}
+            onClick={() => 
+              emailVerified 
+                ? resetPasswordFormik.handleSubmit() 
+                : forgotPasswordFormik.handleSubmit()
+            }
             variant="contained"
           >
-            {getActionButtonText()}
+            {emailVerified ? 'Reset Password' : 'Verify Email'}
           </Button>
         </DialogActions>
       </Dialog>

@@ -1,6 +1,10 @@
 // backend/application/interfaces/UserRepository.ts
 import { User } from "../../domain/entities/User";
-
+export interface OtpDetails {
+    otp: string;
+    expiryTime: Date;
+    verified: boolean;
+  }
 export interface UserRepository {
     create(user: User): Promise<User>;
     deleteUser(id: string): Promise<void>;
@@ -14,6 +18,7 @@ export interface UserRepository {
     getAllFCMTokens():Promise<string[]>;
     updateName(userId: string, fullName: { firstname: string; lastname: string; }): Promise<User | null>; 
     updateImage(userId: string, imageUrl: string): Promise<User | null>; 
-
-
+    storeOtp(userId: string, otp: string, expiryTime: Date): Promise<void>;
+    getOtpDetails(userId: string): Promise<OtpDetails | null>;
+    markOtpAsVerified(userId: string): Promise<void>;
 }

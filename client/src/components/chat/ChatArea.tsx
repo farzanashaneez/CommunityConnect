@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
-// import parse from "html-react-parser";
+ import parse from "html-react-parser";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 
 import {
@@ -466,7 +466,11 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                   })()}
                 </Typography>
               )}
-              <Typography variant="body1">{message?.content}</Typography>
+<Typography variant="body1">
+  {message.content.includes('<') && message.content.includes('>') 
+    ? parse(message.content) 
+    : message.content}
+</Typography>
               {/* Message Time */}
               <Typography
                 variant="caption"

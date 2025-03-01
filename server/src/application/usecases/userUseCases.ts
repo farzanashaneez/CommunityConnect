@@ -1,7 +1,7 @@
 // backend/application/useCases/userUseCases.ts
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { UserRepository } from "../interfaces/UserRepository";
+import { OtpDetails, UserRepository } from "../interfaces/UserRepository";
 import { User } from "../../domain/entities/User";
 
 export class UserUseCases {
@@ -152,4 +152,15 @@ export class UserUseCases {
   async deleteUser(id: string): Promise<void> {
     return this.userRepository.deleteUser(id);
   }
+
+  async storeOtp(userId: string, otp: string, expiryTime: Date): Promise<void> {
+    return this.userRepository.storeOtp(userId, otp, expiryTime);
+  }
+  async getOtpDetails(userId: string): Promise<OtpDetails | null> {
+    return this.userRepository.getOtpDetails(userId);
+  }
+  async markOtpAsVerified(userId: string): Promise<void> {
+    return this.userRepository.markOtpAsVerified(userId);
+  }
+
 }

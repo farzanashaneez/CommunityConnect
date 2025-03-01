@@ -1,6 +1,6 @@
 import mongoose, { Model, Schema } from "mongoose";
 import { User } from "../../domain/entities/User";
-import { UserRepository } from "../../application/interfaces/UserRepository";
+import { OtpDetails, UserRepository } from "../../application/interfaces/UserRepository";
 import ApartmentService from "../../application/services/ApartmentService";
 
 const userSchema = new Schema<User>({
@@ -33,7 +33,13 @@ const userSchema = new Schema<User>({
       deviceInfo: { type: String },
       lastUsed: { type: Date, default: Date.now }
     }
-  ]
+  ],
+  otp: {
+    code: { type: String },
+    expiryTime: { type: Date },
+    verified: { type: Boolean, default: false },
+    createdAt: { type: Date }
+  }
 });
 
 const UserModel = mongoose.model<User>("User", userSchema);
@@ -219,5 +225,39 @@ return users.map(user=>user.token);
       .limit(count)
       .exec();
   }
+
+  async storeOtp(userId: string, otp: string, expiryTime: Date): Promise<void> {
+    // MongoDB example:
+    await UserModel.findByIdAndUpdate(userId, {
+      otp: {
+        code: otp,
+        expiryTime: expiryTime,
+        verified: false
+      }
+    });
+  }
+
+  async getOtpDetails(userId: string): Promise<OtpDetails | null> {
+    // MongoDB example:
+    const user = await UserModel.findById(userId);
+    if (!user || !user.otp) {
+      return null;
+    }
+    
+    return {
+      otp: user.otp.code,
+      expiryTime: user.otp.expiryTime,
+      verified: user.otp.verified
+    };
+  }
+
+  async markOtpAsVerified(userId: string): Promise<void> {
+    // MongoDB example:
+    await UserModel.findByIdAndUpdate(userId, {
+      'otp.verified': true
+    });
+  }
+
+
   
 }

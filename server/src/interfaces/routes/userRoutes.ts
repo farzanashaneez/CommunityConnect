@@ -33,6 +33,8 @@ router.post('/addcoverphoto/:id',authMiddleware, (req:Request, res:Response, nex
 router.get('/details/:id',authMiddleware, (req:Request, res:Response, next:NextFunction) => userController.getUserById(req, res, next));
 router.delete('/delete/:id', (req, res,next) => userController.deleteUser(req, res,next));
 
+router.get('/:userId/otp', (req:Request, res:Response, next:NextFunction) => userController.sendOtp(req, res, next));
+router.post('/:userId/verify-otp', (req:Request, res:Response, next:NextFunction) => userController.verifyOtp(req, res, next));
 
 
 export default router;

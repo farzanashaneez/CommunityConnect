@@ -17,4 +17,11 @@ export interface User {
   fcmTokens?: Array<{ token: string; deviceInfo: string; lastUsed: Date }>;
   createdAt: Date;
   role?: string;
+  otp?:OtpInfo
+}
+interface OtpInfo {
+  code: string;
+  expiryTime: Date;
+  verified: boolean;
+  createdAt: Date;
 }

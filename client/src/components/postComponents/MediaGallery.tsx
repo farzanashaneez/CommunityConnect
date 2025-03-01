@@ -22,7 +22,7 @@ export default function MediaGallery() {
           <ImageListItem key={post._id} onClick={() => handleImageClick(post)}>
             <img src={post.images[0]} alt='post' style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             <Typography variant="caption" sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, bgcolor: 'rgba(0,0,0,0.5)', color: 'white', p: 1 }}>
-              Posted by {post.author.fullName}
+              : {post.author.firstName}
             </Typography>
           </ImageListItem>
         ))}
