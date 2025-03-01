@@ -21,8 +21,8 @@ api.interceptors.request.use(
     const currenttoken = state.user?.currentUser?.token;
     const securitytoken = state.security?.currentSecurity?.token;
 
-    let tokenUsed = null;
-    let reason = "";
+    var tokenUsed = null;
+    var reason = "";
 
     if (window.location.pathname.startsWith("/admin") && admintoken) {
       config.headers["Authorization"] = `Bearer ${admintoken}`;
