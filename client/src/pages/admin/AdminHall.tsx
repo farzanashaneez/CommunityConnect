@@ -15,7 +15,7 @@ import * as Yup from "yup";
 import CustomSnackbar from "../../components/customSnackbar";
 import { useSnackbar } from "../../hooks/useSnackbar";
 import { createHall, deleteHall, getAllHall, updateHall } from "../../services/api";
-import HallCard from "../../components/HallBooking/HallCard";
+import HallCard from "../../components/hallBooking/HallCard";
 
 export interface Hall {
   _id?: string;

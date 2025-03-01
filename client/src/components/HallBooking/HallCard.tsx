@@ -15,18 +15,6 @@ import {
 } from '@mui/material';
 import { Hall } from '../../pages/admin/AdminHall';
 
-// interface Hall {
-//   _id?: string;
-//   name: string;
-//   capacity: number;
-//   images: string[];
-//   details: string;
-//   price: {
-//     morning: number;
-//     evening: number;
-//     fullDay: number;
-//   };
-// }
 
 interface HallCardProps {
   hall: Hall;
