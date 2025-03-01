@@ -3,8 +3,10 @@ import { MongoHallRepository } from '../../infrastructure/database/MongoHallRepo
 import { HallController } from '../controllers/HallController';
 import { HallUseCase } from '../../application/usecases/HallUseCase';
 import { upload, uploadImageArrayToCloudinary } from '../../infrastructure/middlewares/uploadImageToCloudinary';
+import { authMiddleware } from '../../infrastructure/middlewares/authMiddleware';
 
 const router = express.Router();
+router.use(authMiddleware)
 
 // Initialize dependencies
 const hallRepository = new MongoHallRepository();

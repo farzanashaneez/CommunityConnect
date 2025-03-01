@@ -5,8 +5,10 @@ import { MongoPostRepository } from '../../infrastructure/database/MongoPostRepo
 import { PostUseCase } from '../../application/usecases/postUseCase';
 import { PostController } from '../controllers/PostController';
 import { CustomRequestWithImageArray,upload, uploadImageArrayToCloudinary } from '../../infrastructure/middlewares/uploadImageToCloudinary';
+import { authMiddleware } from '../../infrastructure/middlewares/authMiddleware';
 
 const router = express.Router();
+router.use(authMiddleware)
 
 // Initialize dependencies
 const postRepository = new MongoPostRepository();

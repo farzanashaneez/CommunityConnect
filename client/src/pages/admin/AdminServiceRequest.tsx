@@ -109,7 +109,7 @@ const ResidentialServicesTab = () => {
       >
         <Grid container spacing={2}>
           {serviceArray.map((service, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
+            <Grid item xs={12} sm={6} md={6} key={index}>
               <Card sx={{ display: "flex", alignItems: "center", pl: 1 }}>
                 <CardMedia
                   component="img"

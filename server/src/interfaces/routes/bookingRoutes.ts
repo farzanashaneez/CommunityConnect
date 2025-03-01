@@ -3,8 +3,11 @@ import { MongoBookingRepository } from '../../infrastructure/database/MongoBooki
 import { BookingController } from '../controllers/BookingController';
 import { BookingUseCase } from '../../application/usecases/BookingUseCase';
 import { MongoHallRepository } from '../../infrastructure/database/MongoHallRepository';
+import { authMiddleware } from '../../infrastructure/middlewares/authMiddleware';
 
 const router = express.Router();
+router.use(authMiddleware)
+
 
 // Initialize dependencies
 const bookingRepository = new MongoBookingRepository();

@@ -6,6 +6,7 @@ import { MongoApartmentRepository } from '../../infrastructure/database/MongoApa
 import { adminMiddleware, authMiddleware,CustomRequest } from '../../infrastructure/middlewares/authMiddleware';
 
 const router = express.Router();
+
 const apartmentRepository = new MongoApartmentRepository();
 const apartmentUseCases = new ApartmentUseCases(apartmentRepository);
 const apartmentController = new ApartmentController(apartmentUseCases);

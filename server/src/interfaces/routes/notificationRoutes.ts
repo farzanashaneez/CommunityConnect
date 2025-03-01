@@ -3,8 +3,10 @@ import express from 'express';
 import { MongoNotificationRepository } from '../../infrastructure/database/MongoNotificationRepository';
 import { NotificationController } from '../controllers/NotificationController';
 import { NotificationUseCase } from '../../application/usecases/NotificationUseCase';
+import { authMiddleware } from '../../infrastructure/middlewares/authMiddleware';
 
 const router = express.Router();
+router.use(authMiddleware)
 
 // Initialize dependencies
 const notificationRepository = new MongoNotificationRepository();

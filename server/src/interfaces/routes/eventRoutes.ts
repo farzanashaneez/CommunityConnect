@@ -5,8 +5,10 @@ import { MongoEventRepository } from '../../infrastructure/database/MongoEventRe
 import { EventUseCase } from '../../application/usecases/eventUseCase';
 import { EventController } from '../controllers/EventController';
 import { uploadImageToCloudinary,upload } from '../../infrastructure/middlewares/uploadImageToCloudinary';
+import { authMiddleware } from '../../infrastructure/middlewares/authMiddleware';
 
 const router = express.Router();
+router.use(authMiddleware)
 
 // Initialize dependencies
 const eventRepository = new MongoEventRepository();

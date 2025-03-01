@@ -14,6 +14,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxStoreHook";
 import { loggedin, loginfailure } from "../../redux-store/user/adminSlice";
+import { fontStyle } from "html2canvas/dist/types/css/property-descriptors/font-style";
 
 const AdminLogin: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
@@ -78,7 +79,7 @@ const AdminLogin: React.FC = () => {
       maxWidth={false}
       sx={{
         //   backgroundColor: 'blue',
-        backgroundImage: "url('/src/assets/admin_background.avif')",
+        backgroundImage: "url('/src/assets/adminLoginBG.webp')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         margin: 0,
@@ -91,6 +92,11 @@ const AdminLogin: React.FC = () => {
       }}
     >
       <Paper elevation={3} style={{ padding: "20px" }}>
+      <Typography variant="h4" align="center"  style={{ fontFamily: "'Lobster', cursive", fontWeight: "bold" }}
+
+>
+          COMMUNITY CONNECT
+        </Typography>
         <Typography variant="h5" align="center">
           Admin Login
         </Typography>

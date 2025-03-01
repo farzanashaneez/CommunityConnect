@@ -4,8 +4,10 @@ import express from 'express';
 import { MongoChatRepository } from '../../infrastructure/database/MongoChatRepository';
 import { ChatUseCase } from '../../application/usecases/chatUseCase';
 import { ChatController } from '../controllers/ChatController';
+import { authMiddleware } from '../../infrastructure/middlewares/authMiddleware';
 
 const router = express.Router();
+router.use(authMiddleware)
 
 // Initialize dependencies
 const chatRepository = new MongoChatRepository();
