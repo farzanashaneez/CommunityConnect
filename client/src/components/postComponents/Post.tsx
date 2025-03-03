@@ -39,7 +39,7 @@ export interface PostProps {
     }>;
   };
   onPostUpdate?: (updatedPost: PostProps["post"]) => void;
-  onPostDelete:((id:string)=>void)
+  onPostDelete?:((id:string)=>void)
 }
 
 export function Post({ post, onPostUpdate,onPostDelete }: PostProps) {
@@ -83,7 +83,7 @@ export function Post({ post, onPostUpdate,onPostDelete }: PostProps) {
     try {
       if (confirmId) {
         await deletePost(confirmId);
-        onPostDelete(confirmId)
+        onPostDelete?.(confirmId)
 
       }
       handleCloseDialog();

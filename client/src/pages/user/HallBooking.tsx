@@ -366,15 +366,15 @@ const HallBookingPage: React.FC = () => {
               <Typography variant="body2">
                 Capacity: {selectedHall.capacity} persons
               </Typography>
-              <Typography variant="body2">
+             {selectedHall.price.morning!==0 && <Typography variant="body2">
                 Morning Price: ${selectedHall.price.morning}
-              </Typography>
-              <Typography variant="body2">
+              </Typography>} 
+              {selectedHall.price.evening!==0 && <Typography variant="body2">
                 Evening Price: ${selectedHall.price.evening}
-              </Typography>
-              <Typography variant="body2">
+              </Typography>}
+             {selectedHall.price.fullDay!==0 && <Typography variant="body2">
                 Full Day Price: ${selectedHall.price.fullDay}
-              </Typography>
+              </Typography>} 
 
               <Box sx={{ mt: 3, height: 500 }}>
                 <Calendar
@@ -431,12 +431,9 @@ const HallBookingPage: React.FC = () => {
               </Typography>
               <Typography variant="body2">
                 Price:{" "}
-                {selectedSlot.slotType === "HD-morning" &&
-                  selectedHall?.price["morning"]}
-                {selectedSlot.slotType === "HD-evening" &&
-                  selectedHall?.price["evening"]}
-                {selectedSlot.slotType === "Fullday" &&
-                  selectedHall?.price["fullDay"]}
+                {selectedSlot.slotType === "HD-morning" && selectedHall?.price["morning"]}
+                {selectedSlot.slotType === "HD-evening" && selectedHall?.price["evening"]}
+                {selectedSlot.slotType === "Fullday" && selectedHall?.price["fullDay"]}
               </Typography>
             </Box>
           )}
