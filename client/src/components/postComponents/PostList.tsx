@@ -37,11 +37,15 @@ export default function PostList({isUser=false,userid=''}) {
     );
     updateMediaPosts(posts);
   };
+  const handledelete=(id:string)=>{
+setPosts(posts => posts.filter(post => post._id !== id));
+
+  }
   return (
     <div className="space-y-4 max-h-0.5 px-1 ">
       {posts.length > 0 ? (
       posts.map((post) => (
-        <Post key={post._id} post={post} onPostUpdate={handlePostUpdate} />
+        <Post key={post._id} post={post} onPostUpdate={handlePostUpdate} onPostDelete={handledelete} />
       ))
     ) : (
       <Box 

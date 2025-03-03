@@ -39,15 +39,16 @@ export interface PostProps {
     }>;
   };
   onPostUpdate?: (updatedPost: PostProps["post"]) => void;
+  onPostDelete:((id:string)=>void)
 }
 
-export function Post({ post, onPostUpdate }: PostProps) {
+export function Post({ post, onPostUpdate,onPostDelete }: PostProps) {
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [initialImageIndex, setInitialImageIndex] = useState(0);
   const userState = useAppSelector((state) => state.user);
   const [open, setOpen] = useState(false);
   const [confirmId, setConfirmId] = useState<string | null>(null);
-  const { deletePostAlert,setPostUpdated } = useCommunityContext();
+  const { deletePostAlert } = useCommunityContext();
   const [commentText, setCommentText] = useState("");
 
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
@@ -82,7 +83,7 @@ export function Post({ post, onPostUpdate }: PostProps) {
     try {
       if (confirmId) {
         await deletePost(confirmId);
-        setPostUpdated(true)
+        onPostDelete(confirmId)
 
       }
       handleCloseDialog();
