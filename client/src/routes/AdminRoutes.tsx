@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { Box, Drawer, IconButton, useMediaQuery, useTheme } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import Sidebar from '../components/Sidebar';
@@ -84,6 +84,7 @@ const AdminRoutes: React.FC = () => {
       >
         <Routes>
           <Route path='/dashboard' element={<Dashboard />} />
+          <Route path='/' element={<Navigate to={'/admin/dashboard'} />} />
           <Route path='/users' element={<AdminUser />} />
           <Route path='/services' element={<AdminServices />} />
           <Route path='/events' element={<AdminEvents />} />

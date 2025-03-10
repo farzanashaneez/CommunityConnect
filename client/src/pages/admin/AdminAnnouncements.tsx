@@ -20,6 +20,7 @@ import { useSnackbar } from "../../hooks/useSnackbar";
 import { useCommunityContext } from "../../context/communityContext";
 import CustomSnackbar from "../../components/customSnackbar";
 import AnnouncementList from "../../components/AnnouncementList"; // Updated component
+import { Announcement } from "../../components/communityInterfaces";
 
 const AdminAnnouncements: React.FC = () => {
   // State management
@@ -27,6 +28,7 @@ const AdminAnnouncements: React.FC = () => {
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
   const [isCropping, setIsCropping] = useState(false);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [newAnnouncement,setNewAnnouncement]=useState<Announcement|null>(null)
 
   const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
   const { addCompleted } = useCommunityContext();
@@ -64,7 +66,8 @@ const AdminAnnouncements: React.FC = () => {
           formData.append("imageUrl", file);
         }
         // API call
-        await createAnnouncementApi(formData);
+        const response=await createAnnouncementApi(formData);
+        setNewAnnouncement(response)
         addCompleted("announcement");
         showSnackbar("Announcement added successfully", "success");
         setAddDialogOpen(false);
@@ -134,7 +137,7 @@ const AdminAnnouncements: React.FC = () => {
             borderRadius: "4px",
           }}
         >
-          <AnnouncementList isAdmin />
+          <AnnouncementList isAdmin newAnnouncement={newAnnouncement}/>
         </Box>
       </Box>
 

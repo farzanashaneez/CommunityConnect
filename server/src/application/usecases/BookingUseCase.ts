@@ -55,7 +55,7 @@ export class BookingUseCase {
   }
     async getAllSlotsOfHall(forDays: number, hallId: string): Promise<Slot[]> {
       const startDate = new Date();
-      startDate.setDate(startDate.getDate() + 1); // Set start date to 2 days from now
+      startDate.setDate(startDate.getDate() + 2); // Set start date to 2 days from now
       
       const endDate = new Date(startDate);
       endDate.setDate(endDate.getDate() + forDays);
@@ -70,6 +70,7 @@ export class BookingUseCase {
 
     async getAvailableSlots(forDays: number, hallId: string): Promise<Slot[]> {
       const startDate = new Date();
+      const bookeddate=new Date();
       startDate.setDate(startDate.getDate() + 1); // Set start date to 2 days from now
       
       const endDate = new Date(startDate);
@@ -79,8 +80,7 @@ export class BookingUseCase {
       const halldata=await this.hallRepository.findById(hallId)
 
       const allSlots = this.generateAllSlots(startDate, forDays, hallId,halldata?.availableSlots,halldata?.price);
-      const bookedSlots = await this.bookingRepository.getAvailableSlots(startDate, endDate,hallId);
-
+      const bookedSlots = await this.bookingRepository.getAvailableSlots(bookeddate, endDate,hallId);
       return this.filterAvailableSlots(allSlots, bookedSlots);
     }
     

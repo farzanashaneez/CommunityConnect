@@ -7,7 +7,7 @@ import { useCommunityContext } from "../context/communityContext";
 import { socket } from "../services/socketConnection";
 
 
-const AnnouncementList: React.FC<AnnouncementListProps> = ({isAdmin=false}) => {
+const AnnouncementList: React.FC<AnnouncementListProps> = ({isAdmin=false,newAnnouncement}) => {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
   const { completed, setCompleted } = useCommunityContext();
@@ -42,6 +42,11 @@ const AnnouncementList: React.FC<AnnouncementListProps> = ({isAdmin=false}) => {
     })
   }, [completed,updatelist]);
 
+  useEffect(() => {
+    if (newAnnouncement) {
+      setAnnouncements((prev) => [newAnnouncement,...prev]); 
+    }
+  }, [newAnnouncement]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -51,7 +56,7 @@ const AnnouncementList: React.FC<AnnouncementListProps> = ({isAdmin=false}) => {
     <Grid container spacing={2}>
       {announcements.map((announcement) => (
         <Grid key={announcement._id} container spacing={{ xs: 2, md: 3 }} columns={{ xs: 6, sm: 4, md: 2 }}>
-          <AnnouncementCard announcement={announcement} isAdmin={isAdmin} />
+          <AnnouncementCard announcement={announcement} isAdmin={isAdmin} setAnnouncements={setAnnouncements}/>
         </Grid>
       ))}
     </Grid>

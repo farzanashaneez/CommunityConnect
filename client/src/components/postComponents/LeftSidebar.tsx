@@ -6,8 +6,8 @@ export default function LeftSidebar() {
   return (
     <div className="space-y-8">
       <NewPostBox />
-      <UpcomingEvents />
       <MediaGallery/>
+      <UpcomingEvents />
     </div>
   )
 }

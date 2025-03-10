@@ -13,19 +13,23 @@ export interface Service {
     status?:string;
     update?:number;
     isAdmin:boolean;
+    newService?:Service | null;
+
   }
   
   export interface Event {
     _id: string;
     name: string;
     description: string;
-    price: number;
+    date: string;
     imageUrl: string;
+    status: string;
+    location: { lat: number; lng: number };
   }
   
  export  interface EventListProps {
-  
     isAdmin:boolean;
+    newEvent?:Event | null;
   }
 
   export interface Announcement {
@@ -41,4 +45,5 @@ export interface Service {
   
  export  interface AnnouncementListProps {
     isAdmin:boolean;
+    newAnnouncement:Announcement|null;
   }

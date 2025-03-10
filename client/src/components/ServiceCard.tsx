@@ -46,6 +46,7 @@ interface ServiceCardProps {
   service: Service;
   type?: "local" | "residential";
   isAdmin: boolean;
+  setServiceList?:React.Dispatch<React.SetStateAction<Service[]>>;
   isprofile?:boolean
 }
 
@@ -53,10 +54,10 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
   service,
   type,
   isAdmin = false,
+  setServiceList,
   isprofile =false
 }) => {
   const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
-  const { deleteService, updateService } = useCommunityContext();
 
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setDetailsDialogOpen] = useState(false);
@@ -68,6 +69,9 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
 
   const userState = useAppSelector((state) => state.user);
   const id = userState?.currentUser?.user?.id;
+
+  const [confirmAction,setConfirmAction]=useState(false);
+  const [selectedId,setselectedId]=useState<string>('');
 
   const navigate=useNavigate();
   const { requestServiceAlert } = useCommunityContext();
@@ -95,11 +99,13 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async () => {
     try {
-      await deleteServiceApi(id);
+      await deleteServiceApi(selectedId);
       showSnackbar("Service deleted successfully", "success");
-      deleteService(id);
+      setServiceList?.((s) => s.filter((service) => service._id !== selectedId));
+      setConfirmAction(false)
+      // deleteService(id);
     } catch (error) {
       console.error("Error deleting service:", error);
       showSnackbar("Failed to delete service.", "error");
@@ -109,8 +115,12 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
   const handleEditSubmit = async (values: Service) => {
     try {
       const updatedService = await updateServiceApi(values._id, values);
-      updateService(updatedService); // Update context with new data
-      showSnackbar("Service updated successfully", "success");
+      setServiceList?.(prevList => 
+        prevList.map(service => 
+          service._id === updatedService._id ? updatedService : service
+        )
+      );   
+         showSnackbar("Service updated successfully", "success");
       setEditDialogOpen(false);
     } catch (error) {
       console.error("Error updating service:", error);
@@ -175,8 +185,8 @@ catch(err){
               color="error"
               onClick={(e) => {
                 e.stopPropagation(); // Prevent triggering card click
-                handleDelete(service._id);
-              }}
+                setselectedId(service._id);
+                setConfirmAction(true)              }}
             >
               <DeleteIcon fontSize="small" />
             </IconButton>
@@ -243,7 +253,7 @@ catch(err){
           ) : (
            <></>
           )}
-       {!isprofile && service.provider._id!==id &&
+       {!isprofile && service?.provider?._id!==id &&
        <>
         <Divider sx={{my:'5px'}}></Divider>
         {type === "residential" && (
@@ -266,14 +276,14 @@ catch(err){
               left: 10,
             }}>
               <Avatar
-                src={service.provider.imageUrl}
-                alt={service.provider.firstName}
+                src={service?.provider?.imageUrl}
+                alt={service?.provider?.firstName}
                 sx={{ width: 24, height: 24, marginRight: 1 }}
               >
                 {service?.provider?.firstName?.charAt(0)}
               </Avatar>
               
-              <ProfileLink  id={service.provider._id}> <Typography variant="body2">{service.provider.firstName}</Typography> </ProfileLink>
+              <ProfileLink  id={service?.provider?._id}> <Typography variant="body2">{service?.provider?.firstName}</Typography> </ProfileLink>
 
            { !isAdmin &&  <Button
            
@@ -281,7 +291,7 @@ catch(err){
             e.preventDefault(); // Prevent default behavior
             e.stopPropagation();
 
-            handleContactProvider(service,service.provider._id,id); // Call the function to open details
+            handleContactProvider(service,service?.provider?._id,id); // Call the function to open details
           }}
          >
            contact
@@ -302,7 +312,13 @@ catch(err){
           onClose={hideSnackbar}
         />
       </Card>
-
+      <ConfirmationDialog
+        open={confirmAction}
+        onClose={() => setConfirmAction(false)}
+        onConfirm={handleDelete}
+        title="Confirm Delete"
+        message="Do you want to continue?"
+      />
       {/* Details Dialog */}
       <Dialog open={isDetailsDialogOpen} onClose={handleDetailsClose}>
         <DialogTitle

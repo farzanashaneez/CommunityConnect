@@ -20,6 +20,7 @@ import { useSnackbar } from "../../hooks/useSnackbar";
 import CustomSnackbar from "../../components/customSnackbar";
 import { useCommunityContext } from "../../context/communityContext";
 import { useAppSelector } from "../../hooks/reduxStoreHook";
+import { Service } from "../../components/communityInterfaces";
 
 const AdminServices: React.FC = () => {
   const [tabValue, setTabValue] = useState(0);
@@ -54,11 +55,15 @@ const LocalServicesTab = () => {
 
   const adminState = useAppSelector((state) => state.admin);
   const [updateTrigger, setUpdateTrigger] = useState(0);
+
+const [newService,setNewService]=useState<Service|null>(null)
   useEffect(() => {
     if (completed) {
       setCompleted(false);
     }
   }, [completed, setCompleted]);
+
+ 
 
   const formik = useFormik({
     initialValues: {
@@ -89,12 +94,13 @@ const LocalServicesTab = () => {
         formData.append("provider", adminState.currentAdmin.user.id);
       }
       try {
-        await createService(formData);
+        const response=await createService(formData);
         showSnackbar("Service created successfully", "success");
         resetForm();
         setCroppedImage(null);
         setUpdateTrigger((prev) => prev + 1);
-        setCompleted(true);
+        // setCompleted(true);
+       setNewService(response)
         setAddDialogOpen(false);
       } catch (error) {
         showSnackbar("Error creating service", "error");
@@ -175,6 +181,7 @@ const LocalServicesTab = () => {
             searchTerm="local"
             update={updateTrigger}
             isAdmin={true}
+            newService={newService}
           />
         </Box>
       </Box>

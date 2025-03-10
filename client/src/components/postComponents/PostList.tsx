@@ -35,7 +35,7 @@ export default function PostList({isUser=false,userid=''}) {
         post._id === updatedPost._id ? updatedPost : post
       )
     );
-    updateMediaPosts(posts);
+    // updateMediaPosts(posts);
   };
   const handledelete=(id:string)=>{
 setPosts(posts => posts.filter(post => post._id !== id));

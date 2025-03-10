@@ -4,7 +4,9 @@ import {
   Button,
   Container,
   Dialog,
+  DialogActions,
   DialogContent,
+  DialogContentText,
   DialogTitle,
   Grid,
   IconButton,
@@ -17,6 +19,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TablePagination,
   Tabs,
   Typography
 } from '@mui/material';
@@ -55,6 +58,16 @@ const AdminDashboard:React.FC = () => {
   const [openUserDialog, setOpenUserDialog] = useState(false);
   const [openSecurityDialog, setOpenSecurityDialog] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '' });
+  
+  // New state for delete confirmation
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<{id: string, isUser: boolean, name: string} | null>(null);
+
+  // Pagination state
+  const [userPage, setUserPage] = useState(0);
+  const [userRowsPerPage, setUserRowsPerPage] = useState(5);
+  const [securityPage, setSecurityPage] = useState(0);
+  const [securityRowsPerPage, setSecurityRowsPerPage] = useState(5);
 
   useEffect(() => {
     fetchInitialData();
@@ -62,7 +75,7 @@ const AdminDashboard:React.FC = () => {
 
   const fetchInitialData = async () => {
     try {
-      const [usersResponse, apartmentsResponse,secuurityResponse] = await Promise.all([
+      const [usersResponse, apartmentsResponse, secuurityResponse] = await Promise.all([
         fetchAllUsers(),
         fetchAllApartments(),
         fetchAllSecurities()
@@ -86,9 +99,9 @@ const AdminDashboard:React.FC = () => {
   const handleAddUser = async (values:any, { resetForm }:any) => {
     try {
       const generatedPassword = Math.random().toString(36).slice(-8);
-      await register({ ...values, password: generatedPassword });
+      const response=await register({ ...values, password: generatedPassword });
       showSnackbar('User added successfully');
-      fetchInitialData();
+      setUsers(s=>[response.user,...s])
       resetForm();
       setOpenUserDialog(false);
     } catch (error) {
@@ -96,23 +109,47 @@ const AdminDashboard:React.FC = () => {
     }
   };
 
-  const handleRemoveUser = async (userId:string) => {
+  // New function to open delete confirmation
+  const openDeleteConfirmation = (userId: string, isUser: boolean, name: string) => {
+    setUserToDelete({ id: userId, isUser, name });
+    setDeleteConfirmOpen(true);
+  };
+
+  // Modified to handle the actual deletion after confirmation
+  const handleRemoveUser = async () => {
+    if (!userToDelete) return;
+    
     try {
-      await deleteUser(userId);
+      await deleteUser(userToDelete.id);
       showSnackbar('User removed successfully');
-      fetchInitialData();
+      
+      if (userToDelete.isUser) {
+        setUsers(s => s.filter(user => user._id !== userToDelete.id));
+      } else {
+        setSecurity(s => s.filter(user => user._id !== userToDelete.id));
+      }
+      
+      // Close the confirmation dialog
+      setDeleteConfirmOpen(false);
+      setUserToDelete(null);
     } catch (error) {
       showSnackbar('Error removing user');
+      setDeleteConfirmOpen(false);
     }
+  };
+  
+  // Function to cancel deletion
+  const handleCancelDelete = () => {
+    setDeleteConfirmOpen(false);
+    setUserToDelete(null);
   };
 
   const handleAddSecurity = async (values:any, { resetForm }:any) => {
     try {
       const generatedPassword = Math.random().toString(36).slice(-8);
-      await registerSecurity({ ...values, password: generatedPassword});
-
-        showSnackbar('Security staff added successfully');
-        fetchInitialData();
+      const response = await registerSecurity({ ...values, password: generatedPassword});
+      showSnackbar('Security staff added successfully');
+      setSecurity(s=>[response.user,...s])
       resetForm();
       setOpenSecurityDialog(false);
     } catch (error) {
@@ -122,9 +159,42 @@ const AdminDashboard:React.FC = () => {
         errorMessage += ` ${(error as any).response?.data.message}`;
       }
       showSnackbar(errorMessage);
-
     }
   };
+
+  // Handle page change for users
+  const handleUserPageChange = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+    setUserPage(newPage);
+  };
+
+  // Handle rows per page change for users
+  const handleUserRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setUserRowsPerPage(parseInt(event.target.value, 10));
+    setUserPage(0);
+  };
+
+  // Handle page change for security
+  const handleSecurityPageChange = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+    setSecurityPage(newPage);
+  };
+
+  // Handle rows per page change for security
+  const handleSecurityRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSecurityRowsPerPage(parseInt(event.target.value, 10));
+    setSecurityPage(0);
+  };
+
+  // Get paginated users
+  const paginatedUsers = users.slice(
+    userPage * userRowsPerPage,
+    userPage * userRowsPerPage + userRowsPerPage
+  );
+
+  // Get paginated security
+  const paginatedSecurity = security.slice(
+    securityPage * securityRowsPerPage,
+    securityPage * securityRowsPerPage + securityRowsPerPage
+  );
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
@@ -159,7 +229,7 @@ const AdminDashboard:React.FC = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {users.map((user) => (
+                    {paginatedUsers.map((user) => (
                       <TableRow key={user._id}>
                         <TableCell>{user.firstName}</TableCell>
                         <TableCell>{user.email}</TableCell>
@@ -172,7 +242,7 @@ const AdminDashboard:React.FC = () => {
                         <TableCell align="center">
                           <IconButton
                             color="error"
-                            onClick={() => handleRemoveUser(user._id)}
+                            onClick={() => openDeleteConfirmation(user._id, true, user.firstName || user.email)}
                           >
                             <DeleteIcon />
                           </IconButton>
@@ -182,6 +252,15 @@ const AdminDashboard:React.FC = () => {
                   </TableBody>
                 </Table>
               </TableContainer>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={users.length}
+                rowsPerPage={userRowsPerPage}
+                page={userPage}
+                onPageChange={handleUserPageChange}
+                onRowsPerPageChange={handleUserRowsPerPageChange}
+              />
             </>
           ) : (
             <>
@@ -206,13 +285,16 @@ const AdminDashboard:React.FC = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {security.map((staff) => (
+                    {paginatedSecurity.map((staff) => (
                       <TableRow key={staff._id}>
                         <TableCell>{staff.firstName}</TableCell>
                         <TableCell>{staff.email}</TableCell>
                         <TableCell>{staff.mobileNumber}</TableCell>
                         <TableCell align="center">
-                          <IconButton color="error"   onClick={() => handleRemoveUser(staff._id)}>
+                          <IconButton 
+                            color="error" 
+                            onClick={() => openDeleteConfirmation(staff._id, false, staff.firstName || staff.email)}
+                          >
                             <DeleteIcon />
                           </IconButton>
                         </TableCell>
@@ -221,6 +303,15 @@ const AdminDashboard:React.FC = () => {
                   </TableBody>
                 </Table>
               </TableContainer>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={security.length}
+                rowsPerPage={securityRowsPerPage}
+                page={securityPage}
+                onPageChange={handleSecurityPageChange}
+                onRowsPerPageChange={handleSecurityRowsPerPageChange}
+              />
             </>
           )}
         </Box>
@@ -321,9 +412,6 @@ const AdminDashboard:React.FC = () => {
               <Form>
                 <Grid container spacing={2} sx={{ mt: 1 }}>
                   <Grid item xs={12}>
-                   
-                  </Grid>
-                  <Grid item xs={12}>
                     <TextField
                       fullWidth
                       name="email"
@@ -347,7 +435,6 @@ const AdminDashboard:React.FC = () => {
                       helperText={touched.mobileNumber && errors.mobileNumber}
                     />
                   </Grid>
-                 
                   <Grid item xs={12}>
                     <Button type="submit" variant="contained" fullWidth>
                       Add Security Staff
@@ -358,6 +445,31 @@ const AdminDashboard:React.FC = () => {
             )}
           </Formik>
         </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteConfirmOpen}
+        onClose={handleCancelDelete}
+        aria-labelledby="delete-confirm-title"
+        aria-describedby="delete-confirm-description"
+      >
+        <DialogTitle id="delete-confirm-title">
+          {"Confirm Deletion"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="delete-confirm-description">
+            Are you sure you want to delete user: {userToDelete?.name}?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleRemoveUser} color="error" variant="contained" autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
       </Dialog>
 
       <Snackbar

@@ -35,11 +35,13 @@ interface Announcement {
 interface AnnouncementCardProps {
   announcement: Announcement;
   isAdmin: boolean;
+  setAnnouncements: React.Dispatch<React.SetStateAction<Announcement[]>>;
 }
 
 const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
   announcement,
   isAdmin = false,
+  setAnnouncements
 }) => {
   const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
   const { deleteService, updateService } = useCommunityContext();
@@ -51,9 +53,9 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
 
 
   const handleDelete = async () => {
-    console.log(selectedId)
     try {
       await deleteAnnouncementApi(selectedId);
+      setAnnouncements((prev) => prev.filter((announcement) => announcement._id !== selectedId));
       showSnackbar("Announcement deleted successfully", "success");
       deleteService(selectedId, "announcement");
     } catch (error) {
@@ -67,6 +69,11 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
       const updatedAnnouncement = await updateAnnouncementApi(
         values._id,
         values
+      );
+      setAnnouncements((prev) =>
+        prev.map((announcement) =>
+          announcement._id === updatedAnnouncement._id ? updatedAnnouncement : announcement
+        )
       );
       updateService(updatedAnnouncement, "announcement");
       showSnackbar("Announcement updated successfully", "success");

@@ -131,7 +131,7 @@ export class MongoServiceRepository implements ServiceRepository {
       })
       .sort({ createdAt: -1 })
       .exec();
-    const rawRequests = await ServiceRequestModel.find({ status }).lean();
+    // const rawRequests = await ServiceRequestModel.find({ status }).lean();
 
     return requests;
   }
@@ -145,16 +145,19 @@ export class MongoServiceRepository implements ServiceRepository {
   }
 
   async getServicesByStatus(status: string, type: string): Promise<Service[]> {
-    return ServiceModel.find({ status, type })
+    return ServiceModel.find({ status, type})
       .populate({
         path: "provider",
+        match: {},
         populate: {
           path: "apartmentId",
           select: "apartmentNumber buildingSection",
         },
       })
       .sort({ updatedAt: -1 })
-      .exec();
+      .exec()
+      .then((services) => services.filter((service) => service.provider)); 
+
   }
   async findRecent(count: number): Promise<Service[]> {
     return ServiceModel.find().sort({ createdAt: -1 }).limit(count).exec();
@@ -218,7 +221,6 @@ export class MongoServiceRepository implements ServiceRepository {
           status: "sent",
         });
 
-        // socketService.emitToUser(recipientId, 'newMessage', { chatId: chat._id, message: shareMessage });
       }
 
       return chat;

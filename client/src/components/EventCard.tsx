@@ -18,24 +18,15 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { deleteEventApi, updateEventApi } from "../services/api";
 import { useSnackbar } from "../hooks/useSnackbar";
 import CustomSnackbar from "./customSnackbar";
-import { useCommunityContext } from "../context/communityContext";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import MapComponent from "./map/GoogleMap";
-
-interface Event {
-  _id: string;
-  name: string;
-  description: string;
-  date: string;
-  imageUrl: string;
-  status: string;
-  location: { lat: number; lng: number };
-}
+import { Event } from "./communityInterfaces";
 
 interface EventCardProps {
   event: Event;
   isAdmin: boolean;
+  setEventList: React.Dispatch<React.SetStateAction<Event[]>>;
 }
 export const getEventStatus = (eventDate: string) => {
   const now = new Date();
@@ -50,9 +41,12 @@ export const getEventStatus = (eventDate: string) => {
   }
 };
 
-const EventCard: React.FC<EventCardProps> = ({ event, isAdmin = false }) => {
+const EventCard: React.FC<EventCardProps> = ({
+  event,
+  isAdmin = false,
+  setEventList,
+}) => {
   const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
-  const { deleteService, updateService } = useCommunityContext();
 
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setDetailsDialogOpen] = useState(false);
@@ -67,7 +61,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, isAdmin = false }) => {
     try {
       await deleteEventApi(id);
       showSnackbar("Event deleted successfully", "success");
-      deleteService(id, "event");
+      setEventList((prev) => prev.filter((event) => event._id !== id));
     } catch (error) {
       console.error("Error deleting event:", error);
       showSnackbar("Failed to delete event.", "error");
@@ -77,7 +71,11 @@ const EventCard: React.FC<EventCardProps> = ({ event, isAdmin = false }) => {
   const handleEditSubmit = async (values: Event) => {
     try {
       const updatedEvent = await updateEventApi(values._id, values);
-      updateService(updatedEvent, "event");
+      setEventList((prev) =>
+        prev.map((event) =>
+          event._id === updatedEvent._id ? updatedEvent : event
+        )
+      );
       showSnackbar("Event updated successfully", "success");
       setEditDialogOpen(false);
     } catch (error) {
@@ -156,7 +154,14 @@ const EventCard: React.FC<EventCardProps> = ({ event, isAdmin = false }) => {
         )}
 
         <CardContent
-          sx={{ width: "100%", textAlign: "center", height: "auto",display:'flex',flexDirection:'column',alignItems:'center' }}
+          sx={{
+            width: "100%",
+            textAlign: "center",
+            height: "auto",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
         >
           <Typography variant="h6" sx={{ fontWeight: "bold", mb: 0 }}>
             {event.name}
@@ -172,7 +177,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, isAdmin = false }) => {
               display: "-webkit-box",
               WebkitLineClamp: 3,
               WebkitBoxOrient: "vertical",
-              textAlign:'center'
+              textAlign: "center",
             }}
           >
             {event.description}
@@ -202,8 +207,6 @@ const EventCard: React.FC<EventCardProps> = ({ event, isAdmin = false }) => {
 
       {/* Details Dialog */}
       <Dialog open={isDetailsDialogOpen} onClose={handleDetailsClose}>
-        
-      
         <DialogTitle
           sx={{ fontWeight: "700", fontSize: "25px", margin: "auto" }}
         >
@@ -228,7 +231,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, isAdmin = false }) => {
           <Typography variant="body1" gutterBottom>
             {event.description}
           </Typography>
-          <Typography variant="body2" sx={{my:2}}>
+          <Typography variant="body2" sx={{ my: 2 }}>
             Date:{" "}
             {new Date(event.date).toLocaleString("en-US", {
               year: "numeric",
@@ -239,15 +242,12 @@ const EventCard: React.FC<EventCardProps> = ({ event, isAdmin = false }) => {
             })}
           </Typography>
           {/* <Typography variant="body2">Location: {selectedPlaceName}</Typography> Show selected place */}
-        <MapComponent 
-          center={{ lat: event.location.lat, lng: event.location.lng }} 
-          markers={[{ lat: event.location.lat, lng: event.location.lng }]} 
-          onPlaceSelected={handlePlaceSelected} // Pass the handler to MapComponent
-        />
-        <Typography variant="body1" >
-            {selectedPlaceName}
-          </Typography>
-
+          <MapComponent
+            center={{ lat: event.location.lat, lng: event.location.lng }}
+            markers={[{ lat: event.location.lat, lng: event.location.lng }]}
+            onPlaceSelected={handlePlaceSelected} // Pass the handler to MapComponent
+          />
+          <Typography variant="body1">{selectedPlaceName}</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDetailsClose} color="primary">

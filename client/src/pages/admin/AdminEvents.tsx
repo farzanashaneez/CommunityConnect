@@ -14,9 +14,9 @@ import * as Yup from "yup";
 import ImageCropper from "../../components/ImageCropper"; // Ensure you have this component
 import { createEventApi } from "../../services/api";
 import { useSnackbar } from "../../hooks/useSnackbar";
-import { useCommunityContext } from "../../context/communityContext";
 import CustomSnackbar from "../../components/customSnackbar";
 import MapComponent from "../../components/map/GoogleMap";
+import { Event } from "../../components/communityInterfaces";
 
 const AdminEvents: React.FC = () => {
   const [isAddDialogOpen, setAddDialogOpen] = useState(false);
@@ -24,12 +24,12 @@ const AdminEvents: React.FC = () => {
   const [isCropping, setIsCropping] = useState(false);
   const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
   const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [event, setEvent] = useState<Event | null>(null);
   const [eventLocation, setEventLocation] = useState<{
     lat: number;
     lng: number;
   } | null>(null);
 
-  const { addCompleted } = useCommunityContext();
 
   const formik = useFormik({
     initialValues: {
@@ -68,13 +68,10 @@ const AdminEvents: React.FC = () => {
       }
 
       try {
-        await createEventApi(formData);
-
-        addCompleted("event");
+        const response = await createEventApi(formData);
+        setEvent(response);
         setCroppedImage(null);
         setAddDialogOpen(false);
-        //showSnackbar("Event added successfully", "success");
-
         resetForm();
       } catch (error) {
         showSnackbar("Error creating event", "error");
@@ -138,7 +135,7 @@ const AdminEvents: React.FC = () => {
             borderRadius: "4px",
           }}
         >
-          <EventList isAdmin={true} />
+          <EventList isAdmin={true} newEvent={event} />
         </Box>
       </Box>
       <CustomSnackbar
@@ -195,10 +192,10 @@ const AdminEvents: React.FC = () => {
             }}
           />
           {formik.touched.location && formik.errors.location && (
-  <Typography color="error">
-    {String(formik.errors.location)}
-  </Typography>
-)}
+            <Typography color="error">
+              {String(formik.errors.location)}
+            </Typography>
+          )}
 
           <Box sx={{ padding: 4, textAlign: "center" }}>
             {!isCropping ? (

@@ -1,6 +1,9 @@
 import mongoose, { Model, Schema } from "mongoose";
 import { User } from "../../domain/entities/User";
-import { OtpDetails, UserRepository } from "../../application/interfaces/UserRepository";
+import {
+  OtpDetails,
+  UserRepository,
+} from "../../application/interfaces/UserRepository";
 import ApartmentService from "../../application/services/ApartmentService";
 
 const userSchema = new Schema<User>({
@@ -31,15 +34,15 @@ const userSchema = new Schema<User>({
     {
       token: { type: String, required: true },
       deviceInfo: { type: String },
-      lastUsed: { type: Date, default: Date.now }
-    }
+      lastUsed: { type: Date, default: Date.now },
+    },
   ],
   otp: {
     code: { type: String },
     expiryTime: { type: Date },
     verified: { type: Boolean, default: false },
-    createdAt: { type: Date }
-  }
+    createdAt: { type: Date },
+  },
 });
 
 const UserModel = mongoose.model<User>("User", userSchema);
@@ -48,32 +51,28 @@ export class MongoUserRepository implements UserRepository {
   private apartmentService = new ApartmentService();
 
   async create(user: User): Promise<User> {
-    // const newUser = new UserModel(user);
-    
-    // return newUser.save();
     const session = await mongoose.startSession();
     session.startTransaction();
-
     try {
-      // Step 1: Create the user
       const newUser = new UserModel(user);
       const savedUser = await newUser.save({ session });
 
-      // Step 2: Mark the apartment as filled
       if (user.apartmentId) {
-        await this.apartmentService.markFilled(user.apartmentId.toString(), true);
+        await this.apartmentService.markFilled(
+          user.apartmentId.toString(),
+          true
+        );
       }
 
       await session.commitTransaction();
       session.endSession();
 
-      return savedUser;
+      return savedUser.populate("apartmentId");
     } catch (error) {
       await session.abortTransaction();
       session.endSession();
       throw error;
     }
-  
   }
 
   async findByEmail(email: string): Promise<User | null> {
@@ -81,10 +80,10 @@ export class MongoUserRepository implements UserRepository {
   }
 
   async findAll(): Promise<User[]> {
-    return UserModel.find({isSecurity:false}).populate("apartmentId").exec(); // Populate to get apartment details if needed
+    return UserModel.find({ isSecurity: false }).populate("apartmentId").sort({createdAt:-1}).exec(); // Populate to get apartment details if needed
   }
   async findAllSecurities(): Promise<User[]> {
-    return UserModel.find({isSecurity:true}).populate("apartmentId").exec(); // Populate to get apartment details if needed
+    return UserModel.find({ isSecurity: true }).populate("apartmentId").sort({createdAt:-1}).exec(); // Populate to get apartment details if needed
   }
   async findById(userId: string): Promise<User | null> {
     const objectId = new mongoose.Types.ObjectId(userId);
@@ -116,38 +115,35 @@ export class MongoUserRepository implements UserRepository {
   ): Promise<User | null> {
     const objectId = new mongoose.Types.ObjectId(userId);
 
- 
-  await UserModel.updateOne(
-    { _id: objectId },
-    { $pull: { fcmTokens: { token: fcmTokens.token } } }
-  );
+    await UserModel.updateOne(
+      { _id: objectId },
+      { $pull: { fcmTokens: { token: fcmTokens.token } } }
+    );
 
-  
-  return UserModel.findByIdAndUpdate(
-    objectId,
-    { $push: { fcmTokens } },
-    { new: true }
-  ).exec();
+    return UserModel.findByIdAndUpdate(
+      objectId,
+      { $push: { fcmTokens } },
+      { new: true }
+    ).exec();
   }
-  async getAllFCMTokens():Promise<string[]>{
+  async getAllFCMTokens(): Promise<string[]> {
     const users = await UserModel.aggregate([
       { $match: { isSecurity: false } },
-      { $unwind: '$fcmTokens' },
-      { $project: { _id: 0, token: '$fcmTokens.token' } }
+      { $unwind: "$fcmTokens" },
+      { $project: { _id: 0, token: "$fcmTokens.token" } },
     ]);
 
-return users.map(user=>user.token);
+    return users.map((user) => user.token);
   }
 
-  async getAllFCMTokensOfSecurities():Promise<string[]>{
-
+  async getAllFCMTokensOfSecurities(): Promise<string[]> {
     const users = await UserModel.aggregate([
       { $match: { isSecurity: true } },
-      { $unwind: '$fcmTokens' },
-      { $project: { _id: 0, token: '$fcmTokens.token' } }
+      { $unwind: "$fcmTokens" },
+      { $project: { _id: 0, token: "$fcmTokens.token" } },
     ]);
 
-return users.map(user=>user.token);
+    return users.map((user) => user.token);
   }
 
   async updateName(
@@ -155,69 +151,71 @@ return users.map(user=>user.token);
     fullName: { firstname: string; lastname: string }
   ): Promise<User | null> {
     const objectId = new mongoose.Types.ObjectId(userId);
-  
+
     return UserModel.findByIdAndUpdate(
       objectId,
       { $set: { firstName: fullName.firstname, lastName: fullName.lastname } },
       { new: true } // Return the updated document
     ).exec();
   }
-  
-  async updateImage(
-    userId: string,
-    imageUrl: string
-  ): Promise<User | null> {
+
+  async updateImage(userId: string, imageUrl: string): Promise<User | null> {
     const objectId = new mongoose.Types.ObjectId(userId);
-  
+
     return UserModel.findByIdAndUpdate(
       objectId,
       { $set: { imageUrl: imageUrl } },
       { new: true } // Return the updated document
     ).exec();
   }
-  
+
   async deleteUser(id: string): Promise<void> {
     const session = await mongoose.startSession();
     session.startTransaction();
-  
+
     try {
       // Step 1: Find and delete the user
-      const user = await UserModel.findByIdAndDelete(id).session(session).exec();
+      const user = await UserModel.findByIdAndDelete(id)
+        .session(session)
+        .exec();
       if (!user) {
-        throw new Error('User not found');
+        throw new Error("User not found");
       }
-  
+
       // Step 2: Update the apartment's isFilled status to false if the user has an apartment
       if (user.apartmentId) {
-        await this.apartmentService.markFilled(user.apartmentId.toString(),false);
+        await this.apartmentService.markFilled(
+          user.apartmentId.toString(),
+          false
+        );
       }
-  
+
       await session.commitTransaction();
       session.endSession();
     } catch (error) {
       // Rollback the transaction in case of error
       await session.abortTransaction();
       throw error;
-    } 
+    }
   }
-  
-  async getUserCount():Promise<number>{
+
+  async getUserCount(): Promise<number> {
     const [totalUsers, aggregateResult] = await Promise.all([
       UserModel.countDocuments().exec(),
       UserModel.aggregate([
         { $unwind: "$members" },
-        { $group: { _id: null, totalMembers: { $sum: 1 } } }
-      ]).exec()
+        { $group: { _id: null, totalMembers: { $sum: 1 } } },
+      ]).exec(),
     ]);
-  
+
     const totalMembers = aggregateResult[0]?.totalMembers || 0;
-  
-    return  totalUsers+totalMembers   }
+
+    return totalUsers + totalMembers;
+  }
 
   async findRecent(count: number): Promise<User[]> {
-
-    return UserModel.find({isSecurity:false})
-    .populate("apartmentId")
+    return UserModel.find({ isSecurity: false })
+      .populate("apartmentId")
       .sort({ createdAt: -1 })
       .limit(count)
       .exec();
@@ -229,8 +227,8 @@ return users.map(user=>user.token);
       otp: {
         code: otp,
         expiryTime: expiryTime,
-        verified: false
-      }
+        verified: false,
+      },
     });
   }
 
@@ -240,21 +238,18 @@ return users.map(user=>user.token);
     if (!user || !user.otp) {
       return null;
     }
-    
+
     return {
       otp: user.otp.code,
       expiryTime: user.otp.expiryTime,
-      verified: user.otp.verified
+      verified: user.otp.verified,
     };
   }
 
   async markOtpAsVerified(userId: string): Promise<void> {
     // MongoDB example:
     await UserModel.findByIdAndUpdate(userId, {
-      'otp.verified': true
+      "otp.verified": true,
     });
   }
-
-
-  
 }
