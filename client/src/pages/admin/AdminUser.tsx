@@ -163,7 +163,7 @@ const AdminDashboard:React.FC = () => {
   };
 
   // Handle page change for users
-  const handleUserPageChange = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+  const handleUserPageChange = (_:any, newPage: number) => {
     setUserPage(newPage);
   };
 
@@ -174,7 +174,7 @@ const AdminDashboard:React.FC = () => {
   };
 
   // Handle page change for security
-  const handleSecurityPageChange = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+  const handleSecurityPageChange = (_: any, newPage: number) => {
     setSecurityPage(newPage);
   };
 

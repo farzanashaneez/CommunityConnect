@@ -45,5 +45,5 @@ export interface Service {
   
  export  interface AnnouncementListProps {
     isAdmin:boolean;
-    newAnnouncement:Announcement|null;
+    newAnnouncement?:Announcement|null;
   }

@@ -39,7 +39,7 @@ const ServiceList: React.FC<ServiceListProps> = ({ type, searchTerm = '', status
     if (newService) {
       setServiceList(prevList => [newService, ...prevList]);
     }
-  }, [newService]);
+  }, [newService,update]);
 
   return (
     <Grid container spacing={2} sx={{justifyContent:'center'}}>
