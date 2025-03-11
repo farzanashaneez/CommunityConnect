@@ -1,7 +1,7 @@
 export interface Announcement {
-    _id: string; // Unique identifier
-    title: string; // Title of the announcement
-    description: string; // Details of the announcement
+    _id: string; 
+    title: string; 
+    description: string; 
     announcementtype: 'general' | 'urgent'; 
     date:Date;
     imageUrl:string;

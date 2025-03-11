@@ -18,6 +18,7 @@ export interface CustomRequest extends Request {
 
 export const authMiddleware = (req: CustomRequest, res: Response, next: NextFunction):void => {
   const token = req.header('Authorization')?.replace('Bearer ', '');
+  console.log(token)
   if (!token) {
     res.status(401).json({ message: 'No token provided' });
     return; 
@@ -44,6 +45,6 @@ export const adminMiddleware = (req: CustomRequest, res: Response, next: NextFun
     if (req.user && req.user?.isSeccurity) {
       next();
     } else {
-      res.status(403).json({ message: 'Access denied. Admin rights required.' });
+      res.status(403).json({ message: 'Access denied. security rights required.' });
     }
   };

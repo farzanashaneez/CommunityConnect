@@ -178,7 +178,6 @@ const [newService,setNewService]=useState<Service|null>(null)
         >
           <ServiceList
             type="local"
-            searchTerm="local"
             update={updateTrigger}
             isAdmin={true}
             newService={newService}
@@ -277,9 +276,7 @@ const [newService,setNewService]=useState<Service|null>(null)
             <Button type="submit" variant="contained" color="primary">
               Add Service
             </Button>
-            {/* <Button variant="contained" color="primary" type="submit">
-            Add Service
-          </Button> */}
+          
           </form>
         </DialogContent>
       </Dialog>
@@ -322,33 +319,7 @@ const ResidentialServicesTab = () => {
         >
           <ServiceList
             type="residential"
-            searchTerm="residential"
             status="granted"
-            update={1}
-            isAdmin={true}
-          />
-        </Box>
-      </Box>
-      <Box sx={{ flex: 1 }}>
-        <Typography variant="h6" sx={{ mb: 2, fontWeight: "600" }}>
-          Pending Services
-        </Typography>
-        <Box
-          sx={{
-            flex: 1,
-            height: "100vh",
-            overflowY: "auto",
-            padding: "10px",
-            backgroundColor: "#ffffff",
-            mb: 5,
-            boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.3)",
-            borderRadius: "4px",
-          }}
-        >
-          <ServiceList
-            type="residential"
-            searchTerm="residential"
-            status="pending"
             update={1}
             isAdmin={true}
           />
@@ -372,7 +343,6 @@ const ResidentialServicesTab = () => {
         >
           <ServiceList
             type="residential"
-            searchTerm="residential"
             status="rejected"
             update={1}
             isAdmin={true}

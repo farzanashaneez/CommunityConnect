@@ -1,7 +1,5 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState } from "react";
 import {
-  IconButton,
-  InputBase,
   Box,
   Typography,
   Button,
@@ -9,39 +7,26 @@ import {
   Dialog,
   DialogTitle,
   TextField,
-} from '@mui/material';
-import { alpha, styled } from '@mui/material/styles';
-import SearchIcon from '@mui/icons-material/Search';
-import {  useFormik } from 'formik';
-import * as Yup from 'yup';
-import ServiceList from '../../components/ServiceList';
-import ImageCropper from '../../components/ImageCropper'; // Assuming ImageCropper is a separate component
-import { createService } from '../../services/api';
-import { useSnackbar } from '../../hooks/useSnackbar';
-import CustomSnackbar from '../../components/customSnackbar';
-import { useAppSelector } from '../../hooks/reduxStoreHook';
-
-const StyledIconButton = styled(IconButton)(({ theme }) => ({
-  color: theme.palette.text.primary,
-  padding: '8px',
-  '&:hover': {
-    backgroundColor: alpha(theme.palette.primary.main, 0.1),
-  },
-}));
+  InputAdornment,
+} from "@mui/material";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import ServiceList from "../../components/ServiceList";
+import ImageCropper from "../../components/ImageCropper"; // Assuming ImageCropper is a separate component
+import { createService } from "../../services/api";
+import { useSnackbar } from "../../hooks/useSnackbar";
+import CustomSnackbar from "../../components/customSnackbar";
+import { useAppSelector } from "../../hooks/reduxStoreHook";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import AddIcon from "@mui/icons-material/Add";
 
 const Services: React.FC = () => {
- 
   const [isAddDialogOpen, setAddDialogOpen] = useState(false);
-
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
   const [isCropping, setIsCropping] = useState(false);
   const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
-
-  const userState=useAppSelector((state)=>state.user)
-
-
- 
+  const userState = useAppSelector((state) => state.user);
 
   const formik = useFormik({
     initialValues: {
@@ -60,7 +45,7 @@ const Services: React.FC = () => {
         .required("Price is required"),
       image: Yup.mixed().required("Image is required"),
     }),
-    onSubmit: async (values,{resetForm}) => {
+    onSubmit: async (values, { resetForm }) => {
       const formData = new FormData();
       formData.append("serviceName", values.serviceName);
       formData.append("description", values.description);
@@ -70,8 +55,8 @@ const Services: React.FC = () => {
         const file = new File([values.image], fileName, { type: "image/jpeg" }); // Convert Blob to File
         formData.append("image", file);
       }
-      formData.append("type",'residential')
-      formData.append("provider",userState.currentUser.user.id)
+      formData.append("type", "residential");
+      formData.append("provider", userState.currentUser.user.id);
       try {
         await createService(formData);
         showSnackbar("Service created successfully", "success");
@@ -101,12 +86,9 @@ const Services: React.FC = () => {
 
   const handleCropComplete = useCallback(
     (croppedBlob: Blob) => {
-
-
       const croppedImageURL = URL.createObjectURL(croppedBlob);
       setCroppedImage(croppedImageURL);
       setIsCropping(false);
-
     },
     [formik]
   );
@@ -117,64 +99,140 @@ const Services: React.FC = () => {
 
   return (
     <Box sx={{ padding: 4 }}>
-      <Typography variant="h4" sx={{ textAlign: 'center', mb: 2 }}>
+      <Typography variant="h4" sx={{ textAlign: "center", mb: 2 }}>
         SERVICES
       </Typography>
-
+      <Button
+        sx={{
+          textTransform: "none",
+          padding: 0,
+          color: "primary.main",
+          background: "none",
+          boxShadow: "none",
+        }}
+        onClick={() => setAddDialogOpen(true)}
+      >
+        Add Service
+      </Button>
       <Divider sx={{ mb: 3 }} />
 
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h5" sx={{ mb: 2 ,fontWeight:'700'}}>
+        <Typography variant="h5" sx={{ mb: 2, fontWeight: "700" }}>
           Local Services
         </Typography>
-        <ServiceList type="local"  isAdmin={false} />
+        <ServiceList type="local" isAdmin={false} />
       </Box>
       <Divider sx={{ my: 3 }} />
       <Box>
-        <Typography variant="h5" sx={{ mb: 2,fontWeight:'700' }}>
+        <Typography variant="h5" sx={{ mb: 2, fontWeight: "700" }}>
           Residential Services
         </Typography>
-        <ServiceList type="residential"  isAdmin={false} />
+        <ServiceList type="residential" isAdmin={false} />
       </Box>
 
       {/* Add Service Dialog */}
-      <Dialog open={isAddDialogOpen} onClose={() => setAddDialogOpen(false)}>
-        <DialogTitle>Add New Service</DialogTitle>
+      <Dialog
+        open={isAddDialogOpen}
+        onClose={() => setAddDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle
+          sx={{
+            borderBottom: "1px solid #e0e0e0",
+            py: 2,
+            backgroundColor: "primary.light",
+            color: "white",
+            fontWeight: 500,
+          }}
+        >
+          Add New Service
+        </DialogTitle>
+
         <form onSubmit={formik.handleSubmit}>
-          <Box sx={{ padding: 4, textAlign: "center" }}>
+          <Box sx={{ padding: 3 }}>
             {!isCropping ? (
               <>
-                {!croppedImage && (
-                  <Typography variant="h5" sx={{ marginBottom: 2 }}>
-                    Upload and Crop an Image
-                  </Typography>
-                )}
-                {croppedImage && (
-                  <Box sx={{ marginTop: 0 }}>
-                    <Typography variant="h6" sx={{ marginBottom: 2 }}>
-                      Cropped Image Preview:
+                {!croppedImage ? (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      p: 2,
+                      mb: 2,
+                      border: "1px dashed #ccc",
+                      borderRadius: 2,
+                      backgroundColor: "#f9f9f9",
+                    }}
+                  >
+                    <Typography
+                      variant="h6"
+                      sx={{ mb: 1, color: "text.secondary" }}
+                    >
+                      Upload and Crop an Image
                     </Typography>
-                    <img
-                      src={croppedImage}
-                      alt="Cropped"
-                      style={{
-                        maxWidth: "30%",
-                        display: "block",
-                        margin: "0 auto",
-                        border: "1px solid #ccc",
-                        borderRadius: "8px",
+                    <Button
+                      variant="contained"
+                      component="label"
+                      startIcon={<CloudUploadIcon />}
+                      sx={{ mt: 1 }}
+                    >
+                      Select Image
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        hidden
+                      />
+                    </Button>
+                  </Box>
+                ) : (
+                  <Box
+                    sx={{
+                      mb: 3,
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography
+                      variant="subtitle1"
+                      sx={{ mb: 1, fontWeight: 500 }}
+                    >
+                      Image Preview
+                    </Typography>
+                    <Box
+                      sx={{
+                        position: "relative",
+                        width: "100%",
+                        display: "flex",
+                        justifyContent: "center",
                       }}
-                    />
+                    >
+                      <img
+                        src={croppedImage}
+                        alt="Cropped"
+                        style={{
+                          width: "auto",
+                          height: "120px",
+                          display: "block",
+                          border: "1px solid #e0e0e0",
+                          borderRadius: "8px",
+                          boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                        }}
+                      />
+                    </Box>
                   </Box>
                 )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="mt-2"
-                />
+
                 {formik.touched.image && formik.errors.image && (
-                  <Typography color="error">
+                  <Typography
+                    color="error"
+                    variant="caption"
+                    display="block"
+                    sx={{ mb: 1, textAlign: "center" }}
+                  >
                     {formik.errors.image as string}
                   </Typography>
                 )}
@@ -186,44 +244,77 @@ const Services: React.FC = () => {
                 onCancel={handleCancel}
               />
             )}
+
+            <TextField
+              fullWidth
+              label="Service Name"
+              variant="outlined"
+              sx={{ mb: 2 }}
+              {...formik.getFieldProps("serviceName")}
+              error={
+                formik.touched.serviceName && Boolean(formik.errors.serviceName)
+              }
+              helperText={
+                formik.touched.serviceName && formik.errors.serviceName
+              }
+            />
+
+            <TextField
+              fullWidth
+              label="Description"
+              variant="outlined"
+              multiline
+              rows={3}
+              sx={{ mb: 2 }}
+              {...formik.getFieldProps("description")}
+              error={
+                formik.touched.description && Boolean(formik.errors.description)
+              }
+              helperText={
+                formik.touched.description && formik.errors.description
+              }
+            />
+
+            <TextField
+              fullWidth
+              label="Price"
+              variant="outlined"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">$</InputAdornment>
+                ),
+              }}
+              type="number"
+              sx={{ mb: 3 }}
+              {...formik.getFieldProps("price")}
+              error={formik.touched.price && Boolean(formik.errors.price)}
+              helperText={formik.touched.price && formik.errors.price}
+            />
+
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: 2,
+                mt: 2,
+              }}
+            >
+              <Button
+                variant="outlined"
+                onClick={() => setAddDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                startIcon={<AddIcon />}
+              >
+                Add Service
+              </Button>
+            </Box>
           </Box>
-          <TextField
-            fullWidth
-            label="Service Name"
-            variant="outlined"
-            sx={{ mb: 2 }}
-            {...formik.getFieldProps("serviceName")}
-            error={
-              formik.touched.serviceName && Boolean(formik.errors.serviceName)
-            }
-            helperText={formik.touched.serviceName && formik.errors.serviceName}
-          />
-          <TextField
-            fullWidth
-            label="Description"
-            variant="outlined"
-            multiline
-            rows={3}
-            sx={{ mb: 2 }}
-            {...formik.getFieldProps("description")}
-            error={
-              formik.touched.description && Boolean(formik.errors.description)
-            }
-            helperText={formik.touched.description && formik.errors.description}
-          />
-          <TextField
-            fullWidth
-            label="Price"
-            variant="outlined"
-            type="number"
-            sx={{ mb: 2 }}
-            {...formik.getFieldProps("price")}
-            error={formik.touched.price && Boolean(formik.errors.price)}
-            helperText={formik.touched.price && formik.errors.price}
-          />
-          <Button variant="contained" color="primary" type="submit">
-            Add Service
-          </Button>
         </form>
       </Dialog>
       <CustomSnackbar

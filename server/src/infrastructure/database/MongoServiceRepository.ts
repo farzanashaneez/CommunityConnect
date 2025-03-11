@@ -117,22 +117,30 @@ export class MongoServiceRepository implements ServiceRepository {
       .exec();
   }
   async getAllRequestedServices(status: string): Promise<ServiceRequest[]> {
-    const requests = await ServiceRequestModel.find({ status })
-      .populate({
-        path: "serviceId",
-        select: "imageUrl name",
-      })
-      .populate({
-        path: "requestId",
-        populate: {
-          path: "apartmentId",
-          select: "apartmentNumber buildingSection",
-        },
-      })
-      .sort({ createdAt: -1 })
-      .exec();
-
-    return requests;
+    const requests = await ServiceRequestModel.find({
+      status,
+      serviceId: { $ne: null },
+      requestId: { $ne: null }
+    })
+    .populate({
+      path: "serviceId",
+      select: "imageUrl name",
+    })
+    .populate({
+      path: "requestId",
+      populate: {
+        path: "apartmentId",
+        select: "apartmentNumber buildingSection",
+      },
+    })
+    .sort({ createdAt: -1 })
+    .exec();
+    
+    const filteredRequests = requests.filter(req =>
+      req.serviceId != null && req.requestId != null
+    );
+    
+    return filteredRequests;
   }
 
   async getServicesByCategory(category: string): Promise<Service[]> {
@@ -162,23 +170,30 @@ export class MongoServiceRepository implements ServiceRepository {
     return ServiceModel.find().sort({ createdAt: -1 }).limit(count).exec();
   }
   async findRecentRequestedServices(count: number): Promise<ServiceRequest[]> {
-    const requests = await ServiceRequestModel.find({ status: "pending" })
-      .populate({
-        path: "serviceId",
-        select: "imageUrl name",
-      })
-      .populate({
-        path: "requestId",
-        populate: {
-          path: "apartmentId",
-          select: "apartmentNumber buildingSection",
-        },
-      })
-      .sort({ requestedDate: -1 })
-      .limit(10)
-      .exec();
-
-    return requests;
+    const requests = await ServiceRequestModel.find({ 
+      status: "pending",
+      serviceId: { $ne: null },
+      requestId: { $ne: null }
+    })
+    .populate({
+      path: "serviceId",
+      select: "imageUrl name",
+    })
+    .populate({
+      path: "requestId",
+      populate: {
+        path: "apartmentId",
+        select: "apartmentNumber buildingSection",
+      },
+    })
+    .sort({ requestedDate: -1 })
+    .exec();
+    
+    const filteredRequests = requests.filter(req => 
+      req.serviceId != null && req.requestId != null
+    );
+    
+    return filteredRequests.slice(0, 10);
   }
 
   async contactServiceProvider(

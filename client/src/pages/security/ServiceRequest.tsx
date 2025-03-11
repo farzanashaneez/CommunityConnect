@@ -118,7 +118,7 @@ const LocalServicesTab = () => {
                       borderRadius: "5%",
                       objectFit: "cover",
                     }}
-                    image={item.serviceId.imageUrl}
+                    image={item?.serviceId?.imageUrl}
                     alt="Service"
                   />
                   <CardContent
@@ -138,7 +138,7 @@ const LocalServicesTab = () => {
                       }}
                     >
                       <Typography variant="body2" noWrap>
-                        {item.serviceId.name}
+                        {item.serviceId?.name}
                       </Typography>
                       <Typography variant="caption" sx={{ fontWeight: "400" }}>
                         Requested by
@@ -215,7 +215,7 @@ const LocalServicesTab = () => {
                       borderRadius: "5%",
                       objectFit: "cover",
                     }}
-                    image={item.serviceId.imageUrl}
+                    image={item?.serviceId?.imageUrl}
                     alt="Service"
                   />
                   <CardContent
@@ -235,7 +235,7 @@ const LocalServicesTab = () => {
                     }}
                     >
                       <Typography variant="body2" noWrap>
-                        {item.serviceId.name}
+                        {item.serviceId?.name}
                       </Typography>
                       <Typography variant="caption" sx={{ fontWeight: "400" }}>
                         Requested by

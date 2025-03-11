@@ -126,7 +126,6 @@ router.post(
             paid: session.amount_total ? session.amount_total / 100 : 0,
           });
 
-        // You could also send confirmation email here
       } catch (error) {
         console.error("Error updating booking:", error);
       }

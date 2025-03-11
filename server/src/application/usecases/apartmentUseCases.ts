@@ -1,5 +1,5 @@
 
-import { Apartment } from '../../domain/entities/Apartment';
+import { Apartment } from '../../domain/entities/apartments/Apartment';
 import { ApartmentRepository } from '../interfaces/ApartmentRepository';
 
 export class ApartmentUseCases {

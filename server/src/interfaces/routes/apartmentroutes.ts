@@ -1,4 +1,3 @@
-// src/interfaces/routes/apartmentRoutes.ts
 import express,{Response,Request,NextFunction} from 'express';
 import { ApartmentController } from '../controllers/ApartmentController';
 import { ApartmentUseCases } from '../../application/usecases/apartmentUseCases';
