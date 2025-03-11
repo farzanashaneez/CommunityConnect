@@ -1,18 +1,9 @@
-import { IconButton, InputBase, Box, Typography, Divider } from "@mui/material";
-import React, { useState } from "react";
-import SearchIcon from "@mui/icons-material/Search";
-import { alpha, styled } from "@mui/material/styles";
+import {  Box, Typography, Divider } from "@mui/material";
+import React from "react";
 import CustomSnackbar from "../../components/customSnackbar";
 import { useSnackbar } from "../../hooks/useSnackbar";
 import EventList from "../../components/EventList";
 
-const StyledIconButton = styled(IconButton)(({ theme }) => ({
-  color: theme.palette.text.primary,
-  padding: "8px",
-  "&:hover": {
-    backgroundColor: alpha(theme.palette.primary.main, 0.1),
-  },
-}));
 const Events: React.FC = () => {
   const { snackbar, hideSnackbar } = useSnackbar();
   return (
