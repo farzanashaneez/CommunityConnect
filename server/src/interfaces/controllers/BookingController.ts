@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import { getIO } from '../../infrastructure/services/socket';
-import notificationServices from '../../application/services/notificationServices';
+// import { getIO } from '../../infrastructure/services/socket';
+// import notificationServices from '../../application/services/notificationServices';
 import { BookingUseCase } from '../../application/usecases/BookingUseCase';
 
 export class BookingController {
@@ -82,6 +82,7 @@ res.status(400).json({message:'Error getting available slots',error:err.message}
 
   async getAllSlotsOfHall(req: Request, res: Response, next: NextFunction): Promise<void>{
     try{
+      
       const {fordays,hallid}=req.params;
       const slots=await this.bookingUseCase.getAllSlotsOfHall(parseInt(fordays),hallid)
       res.json(slots)

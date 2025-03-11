@@ -130,6 +130,29 @@ router.post(
         console.error("Error updating booking:", error);
       }
     }
+    else if (event.type === "checkout.session.expired") {
+      const session = event.data.object as Stripe.Checkout.Session;
+  const bookingId = session.metadata?.bookingId;
+
+  try {
+    if (bookingId) {
+      const booking = await BookingService.getBookingById(bookingId);
+      
+      if (booking) {
+        await BookingService.updateBooking(bookingId, {
+          status: "cancelled",
+        });
+
+        // Release the slot
+        if (typeof booking.selectedSlot === "string") {
+          await BookingService.deleteExpiredSlot(booking.selectedSlot);
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Error handling expired session:", error);
+  }
+    }
 
     res.json({ received: true });
   }

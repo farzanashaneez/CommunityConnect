@@ -2,19 +2,22 @@ import { Booking, Slot } from "../../domain/entities/hallbooking/HallBooking";
 import { MongoBookingRepository } from "../../infrastructure/database/MongoBookingRepository";
 
 class BookingService {
-  private bookingREpo = new MongoBookingRepository();
+  private bookingRepo = new MongoBookingRepository();
 
   async createBooking(bookindData: Booking, slotData: Slot) {
-    return this.bookingREpo.createBooking(bookindData, slotData);
+    return this.bookingRepo.createBooking(bookindData, slotData);
   }
   async updateBooking(id: string, bookingdata: Partial<Booking>) {
-    return this.bookingREpo.update(id, bookingdata);
+    return this.bookingRepo.update(id, bookingdata);
+  }
+  async getBookingById(id:string){
+    return this.bookingRepo.findById(id)
   }
   async findExpiredPendingBookings() {
-    return this.bookingREpo.findByExpired();
+    return this.bookingRepo.findByExpired();
   }
   async deleteExpiredSlot(id: string) {
-    return this.bookingREpo.deleteSlot(id);
+    return this.bookingRepo.deleteSlot(id);
   }
 }
 

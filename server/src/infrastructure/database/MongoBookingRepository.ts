@@ -145,7 +145,7 @@ export class MongoBookingRepository implements BookingRepository {
         { new: true, session }
       ).exec();
 
-      const updatedBooking = await BookingModel.findOneAndUpdate(
+      await BookingModel.findOneAndUpdate(
         { selectedSlot: slotId },
         { status: "cancelled" },
         { new: true, session }
