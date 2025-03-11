@@ -1,6 +1,6 @@
 // src/application/usecases/chatUseCase.ts
 
-import { Chat, Message } from "../../domain/entities/Chat";
+import { Chat, Message } from "../../domain/entities/chats/Chat";
 import { ChatRepository } from "../interfaces/ChatRepository";
 
 export class ChatUseCase {

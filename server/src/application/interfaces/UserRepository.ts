@@ -1,5 +1,4 @@
-// backend/application/interfaces/UserRepository.ts
-import { User } from "../../domain/entities/User";
+import { User } from "../../domain/entities/users/User";
 export interface OtpDetails {
     otp: string;
     expiryTime: Date;

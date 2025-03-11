@@ -1,6 +1,6 @@
 // src/application/interfaces/ChatRepository.ts
 
-import { Chat, Message } from "../../domain/entities/Chat";
+import { Chat, Message } from "../../domain/entities/chats/Chat";
 
 export interface ChatRepository {
   createChat(data:object,type:string): Promise<Chat | null>;

@@ -1,5 +1,5 @@
 // src/application/interfaces/NotificationRepository.ts
-import { Notification } from "../../domain/entities/Notification";
+import { Notification } from "../../domain/entities/notifications/Notification";
 
 export interface NotificationRepository {
   createNotification(notification: Partial<Notification>): Promise<Notification>;

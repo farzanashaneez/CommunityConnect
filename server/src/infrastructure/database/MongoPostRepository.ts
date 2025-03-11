@@ -1,8 +1,8 @@
 import mongoose, { Model, Schema } from "mongoose";
-import { Post } from "../../domain/entities/Post";
 import { PostRepository } from "../../application/interfaces/PostRepository";
 import ChatServices from "../../application/services/ChatService";
 import UserService from "../../application/services/UserService";
+import { Post } from "../../domain/entities/posts/Post";
 
 const CommentSchema: Schema = new Schema({
   content: { type: String, required: true },

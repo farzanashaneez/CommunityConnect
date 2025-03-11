@@ -1,7 +1,7 @@
 import mongoose, { Model, Schema } from "mongoose";
-import { Service, ServiceRequest } from "../../domain/entities/Service";
+import { Service, ServiceRequest } from "../../domain/entities/services/Service";
 import { ServiceRepository } from "../../application/interfaces/ServiceRepository";
-import { Chat, Message } from "../../domain/entities/Chat";
+import { Chat, Message } from "../../domain/entities/chats/Chat";
 import UserService from "../../application/services/UserService";
 import ChatService from "../../application/services/ChatService";
 
@@ -131,13 +131,12 @@ export class MongoServiceRepository implements ServiceRepository {
       })
       .sort({ createdAt: -1 })
       .exec();
-    // const rawRequests = await ServiceRequestModel.find({ status }).lean();
 
     return requests;
   }
 
   async getServicesByCategory(category: string): Promise<Service[]> {
-    return ServiceModel.find({ category }).exec();
+    return ServiceModel.find({ category }).sort({ createdAt: -1 }).exec();
   }
 
   async getServicesByType(type: "local" | "residential"): Promise<Service[]> {
@@ -199,7 +198,6 @@ export class MongoServiceRepository implements ServiceRepository {
         throw new Error("provider not found");
       }
 
-      // const shareMessage = `${sender.firstName} shared a post with you: ${process.env.FRONTEND_URL}/post/${postId}`;
 
       let chat = await ChatService.getChatbyparticipants(provider, requestby);
       if (!chat) {

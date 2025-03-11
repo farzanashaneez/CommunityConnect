@@ -1,5 +1,5 @@
 import mongoose, { Model, Schema } from "mongoose";
-import { Announcement } from "../../domain/entities/Announcement";
+import { Announcement } from "../../domain/entities/announcement/Announcement";
 import { AnnouncementRepository } from "../../application/interfaces/AnnouncementRepository";
 
 const announcementSchema = new Schema<Announcement>({

@@ -1,4 +1,4 @@
-import { Event } from "../../domain/entities/Event";
+import { Event } from "../../domain/entities/events/Event";
 
 export interface EventRepository {
   createEvent(event: Partial<Event>): Promise<Event>;

@@ -1,8 +1,7 @@
-// backend/application/useCases/userUseCases.ts
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { OtpDetails, UserRepository } from "../interfaces/UserRepository";
-import { User } from "../../domain/entities/User";
+import { User } from "../../domain/entities/users/User";
 
 export class UserUseCases {
   constructor(private userRepository: UserRepository) {}

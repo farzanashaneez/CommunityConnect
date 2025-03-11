@@ -7,7 +7,7 @@ import { Service, ServiceListProps } from './communityInterfaces';
 
 
 
-const ServiceList: React.FC<ServiceListProps> = ({ type, searchTerm = '', status='granted',update ,isAdmin=false,newService}) => {
+const ServiceList: React.FC<ServiceListProps> = ({ type, status='granted',update ,isAdmin=false,newService}) => {
   const [serviceList, setServiceList] = useState<Service[]>([]);
  const {completed,setCompleted}=useCommunityContext();
 
@@ -33,7 +33,7 @@ const ServiceList: React.FC<ServiceListProps> = ({ type, searchTerm = '', status
 
     type==='local'?fetchServices():fetchResidenceServices(status)
 
-  }, [searchTerm]);
+  }, []);
   
   useEffect(() => {
     if (newService) {

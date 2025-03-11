@@ -1,4 +1,4 @@
-import { Apartment } from '../../domain/entities/Apartment';
+import { Apartment } from '../../domain/entities/apartments/Apartment';
 
 export interface ApartmentRepository {
   create(apartment: Apartment): Promise<Apartment>;

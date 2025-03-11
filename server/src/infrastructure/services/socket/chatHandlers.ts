@@ -1,6 +1,6 @@
 import { Server, Socket } from "socket.io";
 import { getIO } from ".";
-import { Message } from "../../../domain/entities/Chat";
+import { Message } from "../../../domain/entities/chats/Chat";
 
 const chatSocketMap = new Map<string, Set<string>>();
 

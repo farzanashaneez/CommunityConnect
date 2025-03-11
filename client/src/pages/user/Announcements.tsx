@@ -1,77 +1,23 @@
-import {
-  IconButton,
-  InputBase,
-  Box,
-  Typography,
-  Divider,
-  
-} from '@mui/material';import React, { useState } from 'react'
-import SearchIcon from '@mui/icons-material/Search';
-import { alpha, styled } from '@mui/material/styles';
-import CustomSnackbar from '../../components/customSnackbar';
-import { useSnackbar } from '../../hooks/useSnackbar';
-import AnnouncementList from '../../components/AnnouncementList';
+import {  Box, Typography, Divider } from "@mui/material";
 
-const StyledIconButton = styled(IconButton)(({ theme }) => ({
-  color: theme.palette.text.primary,
-  padding: '8px',
-  '&:hover': {
-    backgroundColor: alpha(theme.palette.primary.main, 0.1),
-  },
-}));
-const Announcements:React.FC = () => {
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+import CustomSnackbar from "../../components/customSnackbar";
+import { useSnackbar } from "../../hooks/useSnackbar";
+import AnnouncementList from "../../components/AnnouncementList";
+
+
+const Announcements: React.FC = () => {
   const { snackbar, hideSnackbar } = useSnackbar();
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
-  };
   return (
     <Box sx={{ padding: 4 }}>
-      <Typography variant="h4" sx={{ textAlign: 'center', mb: 0 }}>
-        Announcements      
+      <Typography variant="h4" sx={{ textAlign: "center", mb: 2 }}>
+        Announcements
       </Typography>
 
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0, mr: 4 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <StyledIconButton onClick={() => setSearchOpen(!searchOpen)}>
-            <SearchIcon sx={{ fontSize: '30px' }} />
-          </StyledIconButton>
-          {searchOpen && (
-            <InputBase
-              placeholder="Search…"
-              value={searchTerm}
-              onChange={handleSearchChange}
-              sx={{
-                color: 'text.primary',
-                '& .MuiInputBase-input': {
-                  padding: '8px 12px',
-                  transition: 'width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
-                  width: '200px',
-                  borderRadius: '20px',
-                  backgroundColor: (theme) => alpha(theme.palette.common.white, 0.2),
-                  '&::placeholder': {
-                    color: 'text.secondary',
-                    opacity: 0.7,
-                  },
-                  '&:hover': {
-                    backgroundColor: (theme) => alpha(theme.palette.common.white, 0.3),
-                  },
-                  '&:focus': {
-                    backgroundColor: (theme) => alpha(theme.palette.common.white, 0.4),
-                    width: '220px',
-                  },
-                },
-              }}
-            />
-          )}
-        </Box>
-      </Box>
       <Divider sx={{ mb: 3 }} />
-              <Box>
-                <AnnouncementList isAdmin={false}/>
-              </Box>
+      <Box>
+        <AnnouncementList isAdmin={false} />
+      </Box>
       <CustomSnackbar
         open={snackbar.open}
         message={snackbar.message}
@@ -80,6 +26,6 @@ const Announcements:React.FC = () => {
       />
     </Box>
   );
-}
+};
 
-export default Announcements
+export default Announcements;

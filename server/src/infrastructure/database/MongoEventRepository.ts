@@ -1,5 +1,5 @@
 import mongoose, { Model, Schema } from "mongoose";
-import { Event } from "../../domain/entities/Event";
+import { Event } from "../../domain/entities/events/Event";
 import { EventRepository } from "../../application/interfaces/EventRepository";
 
 const eventSchema = new Schema<Event>({
@@ -54,7 +54,7 @@ export class MongoEventRepository implements EventRepository {
   }
 
   async getAllEvents(): Promise<Event[]> {
-    return EventModel.find().exec();
+    return EventModel.find().sort({ createdAt: -1 }).exec();
   }
 
   async getEventsByStatus(status: 'scheduled' | 'completed'): Promise<Event[]> {

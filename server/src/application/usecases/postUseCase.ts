@@ -1,4 +1,4 @@
-import { Post } from "../../domain/entities/Post";
+import { Post } from "../../domain/entities/posts/Post";
 import { PostRepository } from "../interfaces/PostRepository";
 
 export class PostUseCase {

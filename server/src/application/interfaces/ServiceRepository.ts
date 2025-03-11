@@ -1,5 +1,5 @@
-import { Chat } from "../../domain/entities/Chat";
-import { Service,ServiceRequest } from "../../domain/entities/Service";
+import { Chat } from "../../domain/entities/chats/Chat";
+import { Service,ServiceRequest } from "../../domain/entities/services/Service";
 
 export interface ServiceRepository {
   createService(service: Partial<Service>): Promise<Service>;

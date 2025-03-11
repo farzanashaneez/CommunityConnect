@@ -1,6 +1,5 @@
-// src/infrastructure/database/MongoNotificationRepository.ts
 import mongoose, { Schema, Document } from "mongoose";
-import { Notification } from "../../domain/entities/Notification";
+import { Notification } from "../../domain/entities/notifications/Notification";
 import { NotificationRepository } from "../../application/interfaces/NotificationRepository";
 
 const notificationSchema = new Schema<Notification>({
@@ -52,7 +51,7 @@ export class MongoNotificationRepository implements NotificationRepository {
   }
 
   async getAllNotifications(): Promise<Notification[]> {
-    return NotificationModel.find().exec();
+    return NotificationModel.find().sort({ createdAt: -1 }).exec();
   }
 
   async getNotificationsByUserId(userId: string): Promise<Notification[]> {

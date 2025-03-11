@@ -1,4 +1,4 @@
-import { Post } from "../../domain/entities/Post";
+import { Post } from "../../domain/entities/posts/Post";
 
 export interface PostRepository {
   createPost(post: Partial<Post>): Promise<Post>;

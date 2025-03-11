@@ -1,5 +1,5 @@
 import { MongoNotificationRepository } from "../../infrastructure/database/MongoNotificationRepository";
-import { Notification } from "../../domain/entities/Notification";
+import { Notification } from "../../domain/entities/notifications/Notification";
 
 class NotificationService {
   private notificationRepository = new MongoNotificationRepository();
@@ -9,7 +9,6 @@ class NotificationService {
     return this.notificationRepository.createNotification(notificationData);
   }
 
-  // Other methods for fetching and managing notifications...
 }
 
 export default new NotificationService();

@@ -1,7 +1,7 @@
 // src/infrastructure/database/MongoChatRepository.ts
 
 import mongoose, { Model, Schema } from "mongoose";
-import { Chat, Message } from "../../domain/entities/Chat";
+import { Chat, Message } from "../../domain/entities/chats/Chat";
 import { ChatRepository } from "../../application/interfaces/ChatRepository";
 
 const messageSchema = new Schema<Message>({

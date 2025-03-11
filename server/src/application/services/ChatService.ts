@@ -1,4 +1,4 @@
-import { Message } from "../../domain/entities/Chat";
+import { Message } from "../../domain/entities/chats/Chat";
 import { MongoChatRepository } from "../../infrastructure/database/MongoChatRepository";
 
 class ChatServices{

@@ -1,4 +1,4 @@
-import { Announcement } from "../../domain/entities/Announcement";
+import { Announcement } from "../../domain/entities/announcement/Announcement";
 import { AnnouncementRepository } from "../interfaces/AnnouncementRepository";
 
 export class AnnouncementUseCase {

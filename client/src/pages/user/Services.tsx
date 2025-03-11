@@ -30,8 +30,7 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
 }));
 
 const Services: React.FC = () => {
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+ 
   const [isAddDialogOpen, setAddDialogOpen] = useState(false);
 
   const [imageSrc, setImageSrc] = useState<string | null>(null);
@@ -41,11 +40,6 @@ const Services: React.FC = () => {
 
   const userState=useAppSelector((state)=>state.user)
 
-
-
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
-  };
 
  
 
@@ -123,65 +117,24 @@ const Services: React.FC = () => {
 
   return (
     <Box sx={{ padding: 4 }}>
-      <Typography variant="h4" sx={{ textAlign: 'center', mb: 0 }}>
+      <Typography variant="h4" sx={{ textAlign: 'center', mb: 2 }}>
         SERVICES
       </Typography>
 
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0, mr: 4 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <StyledIconButton onClick={() => setSearchOpen(!searchOpen)}>
-            <SearchIcon sx={{ fontSize: '30px' }} />
-          </StyledIconButton>
-          {searchOpen && (
-            <InputBase
-              placeholder="Search…"
-              value={searchTerm}
-              onChange={handleSearchChange}
-              sx={{
-                color: 'text.primary',
-                '& .MuiInputBase-input': {
-                  padding: '8px 12px',
-                  transition: 'width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
-                  width: '200px',
-                  borderRadius: '20px',
-                  backgroundColor: (theme) => alpha(theme.palette.common.white, 0.2),
-                  '&::placeholder': {
-                    color: 'text.secondary',
-                    opacity: 0.7,
-                  },
-                  '&:hover': {
-                    backgroundColor: (theme) => alpha(theme.palette.common.white, 0.3),
-                  },
-                  '&:focus': {
-                    backgroundColor: (theme) => alpha(theme.palette.common.white, 0.4),
-                    width: '220px',
-                  },
-                },
-              }}
-            />
-          )}
-        </Box>
-        <Button
-          sx={{ textTransform: 'none', padding: 0, color: 'primary.main', background: 'none', boxShadow: 'none' }}
-          onClick={() => setAddDialogOpen(true)}
-        >
-          Add Service
-        </Button>
-      </Box>
       <Divider sx={{ mb: 3 }} />
 
       <Box sx={{ mb: 4 }}>
         <Typography variant="h5" sx={{ mb: 2 ,fontWeight:'700'}}>
           Local Services
         </Typography>
-        <ServiceList type="local" searchTerm={searchTerm} isAdmin={false} />
+        <ServiceList type="local"  isAdmin={false} />
       </Box>
       <Divider sx={{ my: 3 }} />
       <Box>
         <Typography variant="h5" sx={{ mb: 2,fontWeight:'700' }}>
           Residential Services
         </Typography>
-        <ServiceList type="residential" searchTerm={searchTerm} isAdmin={false} />
+        <ServiceList type="residential"  isAdmin={false} />
       </Box>
 
       {/* Add Service Dialog */}

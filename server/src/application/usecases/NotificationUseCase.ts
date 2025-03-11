@@ -1,6 +1,5 @@
-// src/application/usecases/notificationUseCase.ts
 import { NotificationRepository } from "../interfaces/NotificationRepository";
-import { Notification } from "../../domain/entities/Notification";
+import { Notification } from "../../domain/entities/notifications/Notification";
 
 export class NotificationUseCase {
   constructor(private notificationRepository: NotificationRepository) {}

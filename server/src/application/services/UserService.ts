@@ -1,5 +1,5 @@
 import { MongoUserRepository } from "../../infrastructure/database/MongoUserRepository";
-import { User } from "../../domain/entities/User";
+import { User } from "../../domain/entities/users/User";
 
 class UserService {
   private userRepository = new MongoUserRepository();

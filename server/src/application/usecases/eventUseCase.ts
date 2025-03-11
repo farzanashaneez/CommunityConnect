@@ -1,4 +1,4 @@
-import { Event } from "../../domain/entities/Event";
+import { Event } from "../../domain/entities/events/Event";
 import { EventRepository } from "../interfaces/EventRepository";
 
 export class EventUseCase {

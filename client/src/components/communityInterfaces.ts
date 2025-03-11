@@ -9,7 +9,6 @@ export interface Service {
   
  export  interface ServiceListProps {
     type: 'local' | 'residential';
-    searchTerm: string;
     status?:string;
     update?:number;
     isAdmin:boolean;

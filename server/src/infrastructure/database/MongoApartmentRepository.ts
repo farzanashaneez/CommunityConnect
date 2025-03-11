@@ -1,5 +1,5 @@
 import mongoose, { Schema, Model } from 'mongoose';
-import { Apartment } from '../../domain/entities/Apartment';
+import { Apartment } from '../../domain/entities/apartments/Apartment';
 import { ApartmentRepository } from '../../application/interfaces/ApartmentRepository';
 
 const apartmentSchema = new Schema<Apartment>({
